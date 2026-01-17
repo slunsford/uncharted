@@ -1,0 +1,6 @@
+# Release Cadence
+label,production,hotfix,beta
+Q1,4,2,8
+Q2,5,1,6
+Q3,3,3,10
+Q4,6,2,5

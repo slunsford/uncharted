@@ -1,0 +1,570 @@
+/* Uncharted - CSS Charts for Eleventy
+ * Default stylesheet with CSS custom properties for easy customization
+ */
+
+/* ==========================================================================
+   Color Palette
+   ========================================================================== */
+
+:root {
+  --chart-color-1: #2196f3;  /* Blue */
+  --chart-color-2: #4caf50;  /* Green */
+  --chart-color-3: #ffc107;  /* Amber */
+  --chart-color-4: #ff7043;  /* Orange */
+  --chart-color-5: #9c27b0;  /* Purple */
+  --chart-color-6: #e91e63;  /* Pink */
+  --chart-color-7: #009688;  /* Teal */
+  --chart-color-8: #78909c;  /* Gray */
+
+  /* Backgrounds - neutral with opacity for light/dark adaptability */
+  --chart-bg: rgba(128, 128, 128, 0.15);
+
+  /* Spacing and sizing */
+  --chart-gap: 0.5rem;
+  --chart-bar-height: 1.5rem;
+  --chart-column-width: 2.5rem;
+  --chart-donut-size: 12rem;
+  --chart-donut-thickness: 2.5rem;
+  --chart-dot-size: 0.75rem;
+}
+
+/* ==========================================================================
+   Color Classes
+   ========================================================================== */
+
+.chart-color-1 { --color: var(--chart-color-1); background-color: var(--chart-color-1); }
+.chart-color-2 { --color: var(--chart-color-2); background-color: var(--chart-color-2); }
+.chart-color-3 { --color: var(--chart-color-3); background-color: var(--chart-color-3); }
+.chart-color-4 { --color: var(--chart-color-4); background-color: var(--chart-color-4); }
+.chart-color-5 { --color: var(--chart-color-5); background-color: var(--chart-color-5); }
+.chart-color-6 { --color: var(--chart-color-6); background-color: var(--chart-color-6); }
+.chart-color-7 { --color: var(--chart-color-7); background-color: var(--chart-color-7); }
+.chart-color-8 { --color: var(--chart-color-8); background-color: var(--chart-color-8); }
+
+/* ==========================================================================
+   Base Chart Styles
+   ========================================================================== */
+
+.chart {
+  margin: 1.5rem 0;
+  font-family: inherit;
+}
+
+.chart-title {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.chart-subtitle {
+  display: block;
+  font-weight: normal;
+  font-size: 0.875em;
+  opacity: 0.7;
+  margin-top: 0.25rem;
+}
+
+/* ==========================================================================
+   Legend
+   ========================================================================== */
+
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem 0;
+  font-size: 0.875rem;
+}
+
+.chart-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: transparent;
+}
+
+.chart-legend-item::before {
+  content: '';
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 2px;
+  background-color: var(--color);
+  flex-shrink: 0;
+}
+
+/* Dot/scatter charts use circular legend markers */
+.chart-dot .chart-legend-item::before,
+.chart-scatter .chart-legend-item::before {
+  border-radius: 50%;
+}
+
+.chart-legend-item .legend-value {
+  opacity: 0.7;
+  margin-left: 0.25rem;
+}
+
+/* ==========================================================================
+   Axes
+   ========================================================================== */
+
+.chart-body {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.chart-y-axis {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-end;
+  min-width: 2rem;
+  box-sizing: border-box;
+  height: 12rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0;
+}
+
+.chart-y-axis .axis-label {
+  font-size: 0.7rem;
+  opacity: 0.6;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.chart-y-axis .axis-label:first-child {
+  transform: translateY(-50%);
+}
+
+.chart-y-axis .axis-label:last-child {
+  transform: translateY(50%);
+}
+
+.chart-x-axis {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.25rem 0;
+  margin-top: 0.25rem;
+  padding-right: 0.5rem;
+}
+
+.chart-x-axis .axis-label {
+  font-size: 0.7rem;
+  opacity: 0.6;
+  font-variant-numeric: tabular-nums;
+}
+
+.chart-x-axis .axis-label:first-child {
+  transform: translateX(-50%);
+}
+
+.chart-x-axis .axis-label:last-child {
+  transform: translateX(50%);
+}
+
+/* ==========================================================================
+   Stacked Bar Chart (Horizontal)
+   ========================================================================== */
+
+.chart-stacked-bar .chart-bars {
+  display: flex;
+  flex-direction: column;
+  gap: var(--chart-gap);
+}
+
+.chart-stacked-bar .bar-row {
+  display: grid;
+  grid-template-columns: minmax(6rem, auto) 1fr auto;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.chart-stacked-bar .bar-label {
+  font-size: 0.875rem;
+  text-align: right;
+}
+
+.chart-stacked-bar .bar-track {
+  height: var(--chart-bar-height);
+  border-radius: 3px;
+  overflow: hidden;
+  background: var(--chart-bg);
+}
+
+.chart-stacked-bar .bar-fills {
+  display: flex;
+  height: 100%;
+}
+
+.chart-stacked-bar .bar-fill {
+  height: 100%;
+  width: var(--value);
+  transition: width 0.3s ease;
+}
+
+.chart-stacked-bar .bar-value {
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+  min-width: 2rem;
+}
+
+/* ==========================================================================
+   Stacked Column Chart (Vertical)
+   ========================================================================== */
+
+.chart-stacked-column .chart-body {
+  align-items: stretch;
+}
+
+.chart-stacked-column .chart-columns {
+  display: flex;
+  gap: var(--chart-gap);
+  align-items: stretch;
+  height: 12rem;
+  flex: 1;
+  background: var(--chart-bg);
+  border-radius: 3px;
+  padding: 0.5rem 0.5rem 0 0.5rem;
+  box-sizing: border-box;
+}
+
+.chart-stacked-column .column-track {
+  display: flex;
+  flex-direction: column-reverse;
+  flex: 1;
+  min-width: var(--chart-column-width);
+  max-width: calc(var(--chart-column-width) * 2);
+  border-radius: 3px 3px 0 0;
+  overflow: hidden;
+}
+
+.chart-stacked-column .column-segment {
+  width: 100%;
+  height: var(--value);
+  transition: height 0.3s ease;
+}
+
+.chart-stacked-column .column-labels {
+  display: flex;
+  gap: var(--chart-gap);
+  padding: 0.25rem 0.5rem 0;
+  margin-left: 2.5rem;
+}
+
+.chart-stacked-column .column-label {
+  flex: 1;
+  min-width: var(--chart-column-width);
+  max-width: calc(var(--chart-column-width) * 2);
+  font-size: 0.75rem;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ==========================================================================
+   Donut Chart
+   ========================================================================== */
+
+.chart-donut {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.chart-donut .donut-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.chart-donut .donut-ring {
+  width: var(--chart-donut-size);
+  height: var(--chart-donut-size);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chart-donut .donut-center {
+  width: calc(var(--chart-donut-size) - var(--chart-donut-thickness) * 2);
+  height: calc(var(--chart-donut-size) - var(--chart-donut-thickness) * 2);
+  border-radius: 50%;
+  background: var(--chart-donut-center-bg, Canvas);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.chart-donut .donut-value {
+  font-size: 2rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.chart-donut .donut-label {
+  font-size: 0.75rem;
+  opacity: 0.7;
+  margin-top: 0.25rem;
+}
+
+.chart-donut .chart-legend {
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.chart-donut .chart-legend-item {
+  min-width: 10rem;
+}
+
+.chart-donut .chart-legend-item .legend-label {
+  flex: 1;
+}
+
+/* ==========================================================================
+   Dot Chart (Categorical - columns with dots at Y positions)
+   ========================================================================== */
+
+.chart-dot .chart-body {
+  align-items: stretch;
+}
+
+.chart-dot .dot-chart {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+  height: 12rem;
+  background: var(--chart-bg);
+  border-radius: 3px;
+  padding: 0.5rem 0.5rem 0 0.5rem;
+  flex: 1;
+  box-sizing: border-box;
+}
+
+.chart-dot .dot-col {
+  flex: 1;
+  position: relative;
+  min-width: 1.5rem;
+}
+
+.chart-dot .dot {
+  width: var(--chart-dot-size);
+  height: var(--chart-dot-size);
+  border-radius: 50%;
+  position: absolute;
+  left: 50%;
+  bottom: var(--value);
+  transform: translateX(-50%);
+  cursor: default;
+}
+
+.chart-dot .dot[title]:hover {
+  transform: translateX(-50%) scale(1.3);
+  z-index: 1;
+}
+
+.chart-dot .dot-labels {
+  display: flex;
+  gap: 6px;
+  padding: 0 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.chart-dot .dot-label {
+  flex: 1;
+  font-size: 0.75rem;
+  text-align: center;
+  min-width: 1.5rem;
+}
+
+/* ==========================================================================
+   Scatter Chart (Continuous X and Y axes)
+   ========================================================================== */
+
+.chart-scatter .chart-body {
+  align-items: stretch;
+}
+
+.chart-scatter .scatter-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.chart-scatter .dot-area {
+  position: relative;
+  height: 12rem;
+  background: var(--chart-bg);
+  border-radius: 3px;
+  padding: 0.5rem 0.5rem 0 0;
+  box-sizing: border-box;
+}
+
+.chart-scatter .dot {
+  position: absolute;
+  width: var(--chart-dot-size);
+  height: var(--chart-dot-size);
+  border-radius: 50%;
+  left: var(--x);
+  bottom: var(--value);
+  transform: translate(-50%, 50%);
+  cursor: default;
+}
+
+.chart-scatter .dot[title]:hover {
+  transform: translate(-50%, 50%) scale(1.3);
+  z-index: 1;
+}
+
+/* ==========================================================================
+   Animations (Optional)
+   Add 'animate: true' to chart config to enable
+   Clip-path applied to track containers for smooth whole-bar reveals
+   ========================================================================== */
+
+/* Row/column index for staggered delays */
+.bar-row:nth-child(1) { --row-index: 0; }
+.bar-row:nth-child(2) { --row-index: 1; }
+.bar-row:nth-child(3) { --row-index: 2; }
+.bar-row:nth-child(4) { --row-index: 3; }
+.bar-row:nth-child(5) { --row-index: 4; }
+.bar-row:nth-child(6) { --row-index: 5; }
+.bar-row:nth-child(7) { --row-index: 6; }
+.bar-row:nth-child(8) { --row-index: 7; }
+
+.column-track:nth-child(1) { --col-index: 0; }
+.column-track:nth-child(2) { --col-index: 1; }
+.column-track:nth-child(3) { --col-index: 2; }
+.column-track:nth-child(4) { --col-index: 3; }
+.column-track:nth-child(5) { --col-index: 4; }
+.column-track:nth-child(6) { --col-index: 5; }
+.column-track:nth-child(7) { --col-index: 6; }
+.column-track:nth-child(8) { --col-index: 7; }
+.column-track:nth-child(9) { --col-index: 8; }
+.column-track:nth-child(10) { --col-index: 9; }
+.column-track:nth-child(11) { --col-index: 10; }
+.column-track:nth-child(12) { --col-index: 11; }
+
+.dot-col:nth-child(1) { --col-index: 0; }
+.dot-col:nth-child(2) { --col-index: 1; }
+.dot-col:nth-child(3) { --col-index: 2; }
+.dot-col:nth-child(4) { --col-index: 3; }
+.dot-col:nth-child(5) { --col-index: 4; }
+.dot-col:nth-child(6) { --col-index: 5; }
+.dot-col:nth-child(7) { --col-index: 6; }
+.dot-col:nth-child(8) { --col-index: 7; }
+
+/* Bar chart: clip-path on fills wrapper, reveals left-to-right */
+.chart-animate .bar-fills {
+  animation: bar-reveal 1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  animation-delay: calc(var(--row-index, 0) * 0.08s);
+}
+
+@keyframes bar-reveal {
+  from { clip-path: inset(0 100% 0 0); }
+  to { clip-path: inset(0 0 0 0); }
+}
+
+/* Column chart: clip-path on track, reveals bottom-to-top */
+.chart-animate .column-track {
+  animation: column-reveal 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  animation-delay: calc(var(--col-index, 0) * 0.05s);
+}
+
+@keyframes column-reveal {
+  from { clip-path: inset(100% 0 0 0); }
+  to { clip-path: inset(0 0 0 0); }
+}
+
+/* Dot chart: dots rise from bottom with staggered delays */
+.chart-animate.chart-dot .dot {
+  animation: dot-rise 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  animation-delay: calc(var(--col-index, 0) * 0.08s);
+  opacity: 0;
+}
+
+@keyframes dot-rise {
+  from {
+    bottom: 0;
+    opacity: 0;
+    transform: translateX(-50%) scale(0.5);
+  }
+  to {
+    bottom: var(--value);
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+  }
+}
+
+/* Donut chart: clockwise reveal using @property animation */
+@property --donut-reveal {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.chart-animate .donut-ring {
+  position: relative;
+}
+
+.chart-animate .donut-ring::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    transparent var(--donut-reveal),
+    var(--chart-donut-center-bg, Canvas) var(--donut-reveal)
+  );
+  animation: donut-clockwise 0.8s ease-out 0.1s forwards;
+  pointer-events: none;
+}
+
+@keyframes donut-clockwise {
+  from { --donut-reveal: 0deg; }
+  to { --donut-reveal: 360deg; }
+}
+
+/* Scatter chart: dots animate from origin with stagger */
+.chart-animate.chart-scatter .dot {
+  animation: scatter-rise 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  animation-delay: calc(var(--dot-index, 0) * 0.08s);
+  opacity: 0;
+}
+
+@keyframes scatter-rise {
+  from {
+    bottom: 0;
+    opacity: 0;
+    transform: translate(-50%, 50%) scale(0.5);
+  }
+  to {
+    bottom: var(--value);
+    opacity: 1;
+    transform: translate(-50%, 50%) scale(1);
+  }
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .chart-animate .bar-fills,
+  .chart-animate .column-track,
+  .chart-animate.chart-dot .dot,
+  .chart-animate.chart-scatter .dot,
+  .chart-animate .donut-ring::before {
+    animation: none;
+  }
+
+  .chart-animate.chart-dot .dot,
+  .chart-animate.chart-scatter .dot {
+    opacity: 1;
+    transform: none;
+  }
+}

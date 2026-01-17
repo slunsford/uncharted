@@ -1,0 +1,10 @@
+# Performance Data
+label,x,y,series
+Point A,10,45,alpha
+Point B,25,78,alpha
+Point C,40,62,alpha
+Point D,55,89,alpha
+Point E,15,32,beta
+Point F,35,56,beta
+Point G,60,71,beta
+Point H,80,85,beta

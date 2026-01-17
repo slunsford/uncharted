@@ -1,0 +1,26 @@
+{
+  "releases": {
+    "type": "stacked-column",
+    "title": "Release Cadence",
+    "subtitle": "By quarter",
+    "file": "charts/releases.csv",
+    "legend": ["Production", "Hotfix", "Beta"]
+  },
+  "adoption": {
+    "type": "dot",
+    "title": "AI-Assisted Development",
+    "subtitle": "PRs and commits by month",
+    "file": "charts/adoption.csv",
+    "max": 50,
+    "legend": ["Pull Requests", "Commits"]
+  },
+  "scatter": {
+    "type": "scatter",
+    "title": "Performance Metrics",
+    "subtitle": "Alpha vs Beta",
+    "file": "charts/scatter-data.csv",
+    "maxX": 100,
+    "maxY": 100,
+    "legend": ["Alpha Group", "Beta Group"]
+  }
+}

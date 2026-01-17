@@ -1,0 +1,32 @@
+{
+  "name": "uncharted",
+  "version": "1.0.0",
+  "description": "An Eleventy plugin that renders CSS-based charts from CSV data using shortcodes",
+  "main": "eleventy.config.js",
+  "type": "module",
+  "exports": {
+    ".": "./eleventy.config.js",
+    "./css": "./css/uncharted.css"
+  },
+  "files": [
+    "eleventy.config.js",
+    "src/",
+    "css/"
+  ],
+  "keywords": [
+    "eleventy",
+    "eleventy-plugin",
+    "charts",
+    "css",
+    "csv",
+    "data-visualization"
+  ],
+  "author": "",
+  "license": "MIT",
+  "peerDependencies": {
+    "@11ty/eleventy": ">=2.0.0"
+  },
+  "devDependencies": {
+    "@11ty/eleventy": "^3.0.0"
+  }
+}
