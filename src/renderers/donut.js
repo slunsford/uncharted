@@ -71,7 +71,7 @@ export function renderDonut(config) {
 
   // Donut visual
   html += `<div class="donut-container">`;
-  html += `<div class="donut-ring" style="background: ${gradient}">`;
+  html += `<div class="donut-ring" style="background: ${gradient}"></div>`;
   html += `<div class="donut-center">`;
 
   // Center content (optional)
@@ -85,7 +85,6 @@ export function renderDonut(config) {
     }
   }
 
-  html += `</div>`;
   html += `</div>`;
   html += `</div>`;
 

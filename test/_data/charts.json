@@ -11,7 +11,7 @@
     "title": "AI-Assisted Development",
     "subtitle": "PRs and commits by month",
     "file": "charts/adoption.csv",
-    "max": 50,
+    "max": 60,
     "legend": ["Pull Requests", "Commits"]
   },
   "scatter": {

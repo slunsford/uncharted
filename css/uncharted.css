@@ -274,6 +274,7 @@
 }
 
 .chart-donut .donut-container {
+  position: relative;
   display: flex;
   justify-content: center;
   margin-bottom: 1rem;
@@ -286,20 +287,29 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  /* Radial mask punches out the center hole */
+  --_hole-size: calc((var(--chart-donut-size) - var(--chart-donut-thickness) * 2) / 2);
+  mask-image: radial-gradient(
+    circle at center,
+    transparent var(--_hole-size),
+    black var(--_hole-size)
+  );
+  -webkit-mask-image: radial-gradient(
+    circle at center,
+    transparent var(--_hole-size),
+    black var(--_hole-size)
+  );
 }
 
 .chart-donut .donut-center {
-  width: calc(var(--chart-donut-size) - var(--chart-donut-thickness) * 2);
-  height: calc(var(--chart-donut-size) - var(--chart-donut-thickness) * 2);
-  border-radius: 50%;
-  background: var(--chart-donut-center-bg, Canvas);
+  position: absolute;
+  inset: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  position: relative;
-  z-index: 1;
+  pointer-events: none;
 }
 
 .chart-donut .donut-value {
@@ -503,7 +513,7 @@
   }
 }
 
-/* Donut chart: clockwise reveal using @property animation */
+/* Donut chart: clockwise reveal using animated mask */
 @property --donut-reveal {
   syntax: '<angle>';
   initial-value: 0deg;
@@ -511,21 +521,16 @@
 }
 
 .chart-animate .donut-ring {
-  position: relative;
-}
-
-.chart-animate .donut-ring::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  background: conic-gradient(
-    from 0deg,
-    transparent var(--donut-reveal),
-    var(--chart-donut-center-bg, Canvas) var(--donut-reveal)
-  );
+  --_hole-size: calc((var(--chart-donut-size) - var(--chart-donut-thickness) * 2) / 2);
+  mask-image:
+    radial-gradient(circle at center, transparent var(--_hole-size), black var(--_hole-size)),
+    conic-gradient(from 0deg, black var(--donut-reveal), transparent var(--donut-reveal));
+  mask-composite: intersect;
+  -webkit-mask-image:
+    radial-gradient(circle at center, transparent var(--_hole-size), black var(--_hole-size)),
+    conic-gradient(from 0deg, black var(--donut-reveal), transparent var(--donut-reveal));
+  -webkit-mask-composite: source-in;
   animation: donut-clockwise 0.8s ease-out 0.1s forwards;
-  pointer-events: none;
 }
 
 @keyframes donut-clockwise {
@@ -568,3 +573,4 @@
     transform: none;
   }
 }
+
