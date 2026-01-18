@@ -9,11 +9,11 @@
 :root {
   --chart-color-1: #2196f3;  /* Blue */
   --chart-color-2: #4caf50;  /* Green */
-  --chart-color-3: #ffc107;  /* Amber */
-  --chart-color-4: #ff7043;  /* Orange */
-  --chart-color-5: #9c27b0;  /* Purple */
-  --chart-color-6: #e91e63;  /* Pink */
-  --chart-color-7: #009688;  /* Teal */
+  --chart-color-3: #ff7043;  /* Orange */
+  --chart-color-4: #ffc107;  /* Amber */
+  --chart-color-5: #009688;  /* Teal */
+  --chart-color-6: #9c27b0;  /* Purple */
+  --chart-color-7: #e91e63;  /* Pink */
   --chart-color-8: #78909c;  /* Gray */
 
   /* Backgrounds - neutral with opacity for light/dark adaptability */
