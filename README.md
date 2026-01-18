@@ -40,13 +40,13 @@ If you set `injectCss: false`, you'll need to manually include the stylesheet in
 
 ## Chart Types
 
-| Type | Description |
-|------|-------------|
-| `donut` | Pie/donut chart using conic-gradient |
-| `stacked-bar` | Horizontal bars with stacked segments |
-| `stacked-column` | Vertical columns with stacked segments |
-| `dot` | Categorical dot chart with Y-axis positioning |
-| `scatter` | XY scatter plot with continuous axes |
+| Type | Description | Negative Values |
+|------|-------------|-----------------|
+| `donut` | Pie/donut chart using conic-gradient | No |
+| `stacked-bar` | Horizontal bars with stacked segments | No |
+| `stacked-column` | Vertical columns with stacked segments | Yes |
+| `dot` | Categorical dot chart with Y-axis positioning | Yes |
+| `scatter` | XY scatter plot with continuous axes | Yes (X and Y) |
 
 ## Usage
 
@@ -127,6 +127,22 @@ Point A,10,45,alpha
 Point B,25,78,alpha
 Point C,15,32,beta
 ```
+
+## Negative Values
+
+Stacked column, dot, and scatter charts support negative values. When negative values are present, a zero axis line appears automatically and values are positioned relative to it.
+
+For stacked columns, positive values stack upward from zero and negative values stack downward:
+
+```csv
+label,Cost,Profit
+Q1,20,10
+Q2,25,-10
+Q3,15,25
+Q4,30,-10
+```
+
+The chart automatically calculates the range from the maximum positive stack to the minimum negative stack, ensuring proper scaling.
 
 ## Configuration Options
 
