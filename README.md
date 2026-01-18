@@ -5,14 +5,14 @@ A CSS-based charting plugin for Eleventy. Renders charts as pure HTML/CSS with n
 ## Installation
 
 ```bash
-npm install uncharted
+npm install eleventy-plugin-uncharted
 ```
 
 ## Setup
 
 ```javascript
 // eleventy.config.js
-import uncharted from 'uncharted';
+import uncharted from 'eleventy-plugin-uncharted';
 
 export default function(eleventyConfig) {
   eleventyConfig.addPlugin(uncharted);
