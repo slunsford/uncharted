@@ -1,6 +1,6 @@
 {
-  "name": "uncharted",
-  "version": "1.0.0",
+  "name": "eleventy-plugin-uncharted",
+  "version": "0.1.0",
   "description": "An Eleventy plugin that renders CSS-based charts from CSV data using shortcodes",
   "main": "eleventy.config.js",
   "type": "module",
@@ -21,8 +21,16 @@
     "csv",
     "data-visualization"
   ],
-  "author": "",
+  "author": "Sean Lunsford",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/slunsford/uncharted.git"
+  },
+  "homepage": "https://github.com/slunsford/uncharted#readme",
+  "bugs": {
+    "url": "https://github.com/slunsford/uncharted/issues"
+  },
   "peerDependencies": {
     "@11ty/eleventy": ">=2.0.0"
   },
