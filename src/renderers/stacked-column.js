@@ -1,4 +1,4 @@
-import { slugify, calculatePercentages, getSeriesNames, escapeHtml } from '../utils.js';
+import { slugify, getSeriesNames, escapeHtml } from '../utils.js';
 
 /**
  * Render a stacked column chart (vertical)
@@ -24,21 +24,35 @@ export function renderStackedColumn(config) {
   const legendLabels = legend ?? seriesKeys;
   const animateClass = animate ? ' chart-animate' : '';
 
-  // Calculate max for consistent scaling across all columns
-  let maxValue = max;
-  if (!maxValue) {
-    maxValue = Math.max(
-      ...data.map(row => {
-        const values = seriesKeys.map(key => {
-          const val = row[key];
-          return typeof val === 'number' ? val : parseFloat(val) || 0;
-        });
-        return values.reduce((sum, v) => sum + v, 0);
-      })
-    );
-  }
+  // Calculate stacked totals for positive and negative values separately
+  // Positives stack up from zero, negatives stack down from zero
+  let maxPositiveStack = 0;
+  let minNegativeStack = 0;
 
-  let html = `<figure class="chart chart-stacked-column${animateClass}">`;
+  data.forEach(row => {
+    let positiveSum = 0;
+    let negativeSum = 0;
+    seriesKeys.forEach(key => {
+      const val = row[key];
+      const value = typeof val === 'number' ? val : parseFloat(val) || 0;
+      if (value >= 0) {
+        positiveSum += value;
+      } else {
+        negativeSum += value;
+      }
+    });
+    maxPositiveStack = Math.max(maxPositiveStack, positiveSum);
+    minNegativeStack = Math.min(minNegativeStack, negativeSum);
+  });
+
+  const hasNegativeY = minNegativeStack < 0;
+  const maxValue = max ?? maxPositiveStack;
+  const minValue = minNegativeStack;
+  const range = maxValue - minValue;
+  const zeroPct = hasNegativeY ? ((0 - minValue) / range) * 100 : 0;
+
+  const negativeClass = hasNegativeY ? ' has-negative-y' : '';
+  let html = `<figure class="chart chart-stacked-column${animateClass}${negativeClass}">`;
 
   if (title) {
     html += `<figcaption class="chart-title">${escapeHtml(title)}`;
@@ -62,38 +76,92 @@ export function renderStackedColumn(config) {
 
   html += `<div class="chart-body">`;
 
-  // Y-axis
-  html += `<div class="chart-y-axis">`;
+  // Y-axis with --zero-position for label positioning
+  const yAxisStyle = hasNegativeY ? ` style="--zero-position: ${zeroPct.toFixed(2)}%"` : '';
+  html += `<div class="chart-y-axis"${yAxisStyle}>`;
   html += `<span class="axis-label">${maxValue}</span>`;
-  html += `<span class="axis-label">${Math.round(maxValue / 2)}</span>`;
-  html += `<span class="axis-label">0</span>`;
+  const midLabelY = hasNegativeY ? 0 : Math.round(maxValue / 2);
+  html += `<span class="axis-label">${midLabelY}</span>`;
+  html += `<span class="axis-label">${hasNegativeY ? minValue : 0}</span>`;
   html += `</div>`;
 
-  html += `<div class="chart-columns">`;
+  const columnsStyle = hasNegativeY ? ` style="--zero-position: ${zeroPct.toFixed(2)}%"` : '';
+  html += `<div class="chart-columns"${columnsStyle}>`;
 
   data.forEach(row => {
     const label = row.label ?? '';
-    const values = seriesKeys.map(key => {
-      const val = row[key];
-      return typeof val === 'number' ? val : parseFloat(val) || 0;
-    });
-    const total = values.reduce((sum, v) => sum + v, 0);
-    const percentages = calculatePercentages(values, maxValue);
-    const seriesLabels = legendLabels ?? seriesKeys;
+    html += `<div class="column-track" title="${escapeHtml(label)}">`;
 
-    html += `<div class="column-track" title="${escapeHtml(label)}: ${total}">`;
+    if (hasNegativeY) {
+      // Build segments first to identify stack ends
+      const segments = [];
+      let positiveBottom = zeroPct;
+      let negativeTop = zeroPct;
+      let lastPositiveIdx = -1;
+      let lastNegativeIdx = -1;
 
-    // Render segments
-    seriesKeys.forEach((key, i) => {
-      const pct = percentages[i];
-      const value = values[i];
-      if (pct > 0) {
+      seriesKeys.forEach((key, i) => {
+        const val = row[key];
+        const value = typeof val === 'number' ? val : parseFloat(val) || 0;
         const colorClass = `chart-color-${i + 1}`;
         const seriesClass = `chart-series-${slugify(key)}`;
-        const seriesLabel = seriesLabels[i] ?? key;
-        html += `<div class="column-segment ${colorClass} ${seriesClass}" style="--value: ${pct.toFixed(2)}%" title="${escapeHtml(seriesLabel)}: ${value}"></div>`;
-      }
-    });
+        const seriesLabel = legendLabels[i] ?? key;
+        const segmentHeight = range > 0 ? (Math.abs(value) / range) * 100 : 0;
+
+        if (value >= 0) {
+          segments.push({
+            classes: `column-segment ${colorClass} ${seriesClass}`,
+            bottom: positiveBottom,
+            height: segmentHeight,
+            title: `${escapeHtml(seriesLabel)}: ${value}`,
+            isNegative: false
+          });
+          lastPositiveIdx = segments.length - 1;
+          positiveBottom += segmentHeight;
+        } else {
+          negativeTop -= segmentHeight;
+          segments.push({
+            classes: `column-segment ${colorClass} ${seriesClass} is-negative`,
+            bottom: negativeTop,
+            height: segmentHeight,
+            title: `${escapeHtml(seriesLabel)}: ${value}`,
+            isNegative: true
+          });
+          lastNegativeIdx = segments.length - 1;
+        }
+      });
+
+      // Output segments with stack-end class on outermost segments
+      segments.forEach((seg, idx) => {
+        const endClass = (idx === lastPositiveIdx || idx === lastNegativeIdx) ? ' is-stack-end' : '';
+        html += `<div class="${seg.classes}${endClass}" `;
+        html += `style="--value-bottom: ${seg.bottom.toFixed(2)}%; --value-height: ${seg.height.toFixed(2)}%" `;
+        html += `title="${seg.title}"></div>`;
+      });
+    } else {
+      // Original stacked behavior for positive-only
+      const segmentData = [];
+
+      seriesKeys.forEach((key, i) => {
+        const val = row[key];
+        const value = typeof val === 'number' ? val : parseFloat(val) || 0;
+        const pct = maxValue > 0 ? (value / maxValue) * 100 : 0;
+        if (pct > 0) {
+          segmentData.push({ key, i, value, pct });
+        }
+      });
+
+      const lastIdx = segmentData.length - 1;
+      segmentData.forEach((seg, idx) => {
+        const colorClass = `chart-color-${seg.i + 1}`;
+        const seriesClass = `chart-series-${slugify(seg.key)}`;
+        const seriesLabel = legendLabels[seg.i] ?? seg.key;
+        const endClass = idx === lastIdx ? ' is-stack-end' : '';
+        html += `<div class="column-segment ${colorClass} ${seriesClass}${endClass}" `;
+        html += `style="--value: ${seg.pct.toFixed(2)}%" `;
+        html += `title="${escapeHtml(seriesLabel)}: ${seg.value}"></div>`;
+      });
+    }
 
     html += `</div>`;
   });

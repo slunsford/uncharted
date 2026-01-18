@@ -48,6 +48,20 @@ This page demonstrates all four chart types supported by the Uncharted plugin.
 
 {% chart "scatter" %}
 
+## Negative Values
+
+### Dot Chart with Negative Y
+
+{% chart "temperature" %}
+
+### Scatter with Negative X and Y
+
+{% chart "quadrant" %}
+
+### Column Chart with Negative Y
+
+{% chart "profit" %}
+
 ## Error Handling
 
 Below is a reference to a non-existent chart:

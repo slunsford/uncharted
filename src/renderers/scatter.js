@@ -44,15 +44,32 @@ export function renderScatter(config) {
   // Calculate bounds
   const xValues = dots.map(d => d.x);
   const yValues = dots.map(d => d.y);
-  const calcMaxX = maxX ?? Math.max(...xValues);
-  const calcMaxY = maxY ?? Math.max(...yValues);
+  const dataMaxX = Math.max(...xValues);
+  const dataMinX = Math.min(...xValues);
+  const dataMaxY = Math.max(...yValues);
+  const dataMinY = Math.min(...yValues);
+
+  const calcMaxX = maxX ?? dataMaxX;
+  const calcMaxY = maxY ?? dataMaxY;
+  const calcMinX = dataMinX < 0 ? dataMinX : 0;
+  const calcMinY = dataMinY < 0 ? dataMinY : 0;
+  const rangeX = calcMaxX - calcMinX;
+  const rangeY = calcMaxY - calcMinY;
+
+  const hasNegativeX = calcMinX < 0;
+  const hasNegativeY = calcMinY < 0;
+
+  // Calculate zero positions for axis lines
+  const zeroPctX = hasNegativeX ? ((0 - calcMinX) / rangeX) * 100 : 0;
+  const zeroPctY = hasNegativeY ? ((0 - calcMinY) / rangeY) * 100 : 0;
 
   // Get unique series
   const seriesSet = new Set(dots.map(d => d.series));
   const seriesList = Array.from(seriesSet);
   const seriesIndex = new Map(seriesList.map((s, i) => [s, i]));
 
-  let html = `<figure class="chart chart-scatter${animateClass}">`;
+  const negativeClasses = (hasNegativeX ? ' has-negative-x' : '') + (hasNegativeY ? ' has-negative-y' : '');
+  let html = `<figure class="chart chart-scatter${animateClass}${negativeClasses}">`;
 
   if (title) {
     html += `<figcaption class="chart-title">${escapeHtml(title)}`;
@@ -78,18 +95,26 @@ export function renderScatter(config) {
   html += `<div class="chart-body">`;
 
   // Y-axis
-  html += `<div class="chart-y-axis">`;
+  const yAxisStyle = hasNegativeY ? ` style="--zero-position-y: ${zeroPctY.toFixed(2)}%"` : '';
+  html += `<div class="chart-y-axis"${yAxisStyle}>`;
   html += `<span class="axis-label">${calcMaxY}</span>`;
-  html += `<span class="axis-label">${Math.round(calcMaxY / 2)}</span>`;
-  html += `<span class="axis-label">0</span>`;
+  const midLabelY = hasNegativeY ? 0 : Math.round((calcMaxY + calcMinY) / 2);
+  html += `<span class="axis-label">${midLabelY}</span>`;
+  html += `<span class="axis-label">${calcMinY}</span>`;
   html += `</div>`;
 
-  html += `<div class="scatter-container">`;
+  // Container gets zero position variables for axis line CSS
+  const containerStyles = [];
+  if (hasNegativeX) containerStyles.push(`--zero-position-x: ${zeroPctX.toFixed(2)}%`);
+  if (hasNegativeY) containerStyles.push(`--zero-position-y: ${zeroPctY.toFixed(2)}%`);
+  const containerStyle = containerStyles.length > 0 ? ` style="${containerStyles.join('; ')}"` : '';
+  html += `<div class="scatter-container"${containerStyle}>`;
   html += `<div class="dot-area">`;
+  html += `<div class="dot-field">`;
 
   dots.forEach((dot, i) => {
-    const xPct = calcMaxX > 0 ? (dot.x / calcMaxX) * 100 : 0;
-    const yPct = calcMaxY > 0 ? (dot.y / calcMaxY) * 100 : 0;
+    const xPct = rangeX > 0 ? ((dot.x - calcMinX) / rangeX) * 100 : 0;
+    const yPct = rangeY > 0 ? ((dot.y - calcMinY) / rangeY) * 100 : 0;
     const colorIndex = seriesIndex.get(dot.series) + 1;
     const colorClass = `chart-color-${colorIndex}`;
     const seriesClass = `chart-series-${slugify(dot.series)}`;
@@ -102,11 +127,14 @@ export function renderScatter(config) {
   });
 
   html += `</div>`;
+  html += `</div>`;
 
   // X-axis
-  html += `<div class="chart-x-axis">`;
-  html += `<span class="axis-label">0</span>`;
-  html += `<span class="axis-label">${Math.round(calcMaxX / 2)}</span>`;
+  const xAxisStyle = hasNegativeX ? ` style="--zero-position-x: ${zeroPctX.toFixed(2)}%"` : '';
+  html += `<div class="chart-x-axis"${xAxisStyle}>`;
+  html += `<span class="axis-label">${calcMinX}</span>`;
+  const midLabelX = hasNegativeX ? 0 : Math.round((calcMaxX + calcMinX) / 2);
+  html += `<span class="axis-label">${midLabelX}</span>`;
   html += `<span class="axis-label">${calcMaxX}</span>`;
   html += `</div>`;
 

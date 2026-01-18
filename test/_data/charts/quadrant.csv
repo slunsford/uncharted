@@ -1,0 +1,10 @@
+label,x,y,series
+A,-40,60,Group 1
+B,-20,40,Group 1
+C,30,-25,Group 2
+D,50,-45,Group 2
+E,-30,-35,Group 1
+F,40,50,Group 2
+G,20,30,Group 1
+H,-10,20,Group 2
+Origin,0,0,Group 1

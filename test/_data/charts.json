@@ -22,5 +22,27 @@
     "maxX": 100,
     "maxY": 100,
     "legend": ["Alpha Group", "Beta Group"]
+  },
+  "temperature": {
+    "type": "dot",
+    "title": "Temperature Range",
+    "subtitle": "Monthly highs and lows (°C)",
+    "file": "charts/temperature.csv",
+    "legend": ["Low", "High"]
+  },
+  "quadrant": {
+    "type": "scatter",
+    "title": "Quadrant Analysis",
+    "subtitle": "Data across all four quadrants",
+    "file": "charts/quadrant.csv",
+    "legend": ["Group 1", "Group 2"]
+  },
+  "profit": {
+    "type": "stacked-column",
+    "title": "Quarterly Revenue",
+    "subtitle": "Cost + Profit/Loss",
+    "file": "charts/profit.csv",
+    "legend": ["Cost", "Profit/Loss"],
+    "animate": true
   }
 }

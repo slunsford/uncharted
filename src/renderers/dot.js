@@ -24,20 +24,25 @@ export function renderDot(config) {
   const legendLabels = legend ?? seriesKeys;
   const animateClass = animate ? ' chart-animate' : '';
 
-  // Calculate max value for Y scaling
-  let maxValue = max;
-  if (!maxValue) {
-    maxValue = Math.max(
-      ...data.flatMap(row =>
-        seriesKeys.map(key => {
-          const val = row[key];
-          return typeof val === 'number' ? val : parseFloat(val) || 0;
-        })
-      )
-    );
-  }
+  // Calculate min and max values for Y scaling
+  const allValues = data.flatMap(row =>
+    seriesKeys.map(key => {
+      const val = row[key];
+      return typeof val === 'number' ? val : parseFloat(val) || 0;
+    })
+  );
+  const dataMax = Math.max(...allValues);
+  const dataMin = Math.min(...allValues);
+  const maxValue = max ?? dataMax;
+  const minValue = dataMin < 0 ? dataMin : 0;
+  const range = maxValue - minValue;
+  const hasNegativeY = minValue < 0;
 
-  let html = `<figure class="chart chart-dot${animateClass}">`;
+  // Calculate zero position for axis line
+  const zeroPct = hasNegativeY ? ((0 - minValue) / range) * 100 : 0;
+
+  const negativeClass = hasNegativeY ? ' has-negative-y' : '';
+  let html = `<figure class="chart chart-dot${animateClass}${negativeClass}">`;
 
   if (title) {
     html += `<figcaption class="chart-title">${escapeHtml(title)}`;
@@ -62,13 +67,17 @@ export function renderDot(config) {
   html += `<div class="chart-body">`;
 
   // Y-axis
-  html += `<div class="chart-y-axis">`;
+  const yAxisStyle = hasNegativeY ? ` style="--zero-position: ${zeroPct.toFixed(2)}%"` : '';
+  html += `<div class="chart-y-axis"${yAxisStyle}>`;
   html += `<span class="axis-label">${maxValue}</span>`;
-  html += `<span class="axis-label">${Math.round(maxValue / 2)}</span>`;
-  html += `<span class="axis-label">0</span>`;
+  const midLabelY = hasNegativeY ? 0 : Math.round((maxValue + minValue) / 2);
+  html += `<span class="axis-label">${midLabelY}</span>`;
+  html += `<span class="axis-label">${minValue}</span>`;
   html += `</div>`;
 
-  html += `<div class="dot-chart">`;
+  const zeroStyle = hasNegativeY ? ` style="--zero-position: ${zeroPct.toFixed(2)}%"` : '';
+  html += `<div class="dot-chart"${zeroStyle}>`;
+  html += `<div class="dot-field">`;
 
   // Each row becomes a column with dots for each series
   data.forEach(row => {
@@ -79,7 +88,7 @@ export function renderDot(config) {
     seriesKeys.forEach((key, i) => {
       const val = row[key];
       const value = typeof val === 'number' ? val : parseFloat(val) || 0;
-      const yPct = maxValue > 0 ? (value / maxValue) * 100 : 0;
+      const yPct = range > 0 ? ((value - minValue) / range) * 100 : 0;
       const colorClass = `chart-color-${i + 1}`;
       const seriesClass = `chart-series-${slugify(key)}`;
       const tooltipLabel = legendLabels[i] ?? key;
@@ -93,6 +102,7 @@ export function renderDot(config) {
     html += `</div>`;
   });
 
+  html += `</div>`;
   html += `</div>`;
   html += `</div>`;
 
