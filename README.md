@@ -15,14 +15,24 @@ npm install uncharted
 import uncharted from 'uncharted';
 
 export default function(eleventyConfig) {
-  eleventyConfig.addPlugin(uncharted, {
-    dataDir: '_data',  // where to find CSV files (default: '_data')
-    animate: true      // enable animations globally (default: false)
-  });
+  eleventyConfig.addPlugin(uncharted);
 }
 ```
 
-Include the stylesheet in your layout:
+That's it! The plugin automatically copies the CSS to your output directory and injects the stylesheet link into pages that contain charts.
+
+### Options
+
+```javascript
+eleventyConfig.addPlugin(uncharted, {
+  dataDir: '_data',              // where to find CSV files (default: '_data')
+  animate: true,                 // enable animations globally (default: false)
+  cssPath: '/css/uncharted.css', // output path for stylesheet (default: '/css/uncharted.css')
+  injectCss: false               // disable automatic CSS handling (default: true)
+});
+```
+
+If you set `injectCss: false`, you'll need to manually include the stylesheet in your layout:
 
 ```html
 <link rel="stylesheet" href="/css/uncharted.css">

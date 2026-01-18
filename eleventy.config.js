@@ -1,6 +1,9 @@
 import path from 'path';
+import { fileURLToPath } from 'url';
 import { renderers } from './src/renderers/index.js';
 import { loadCSV } from './src/csv.js';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /**
  * Uncharted - Eleventy CSS Charts Plugin
@@ -8,10 +11,53 @@ import { loadCSV } from './src/csv.js';
  * @param {Object} [options] - Plugin options
  * @param {string} [options.dataDir] - Data directory path (defaults to _data)
  * @param {boolean} [options.animate] - Enable animations globally (individual charts can override)
+ * @param {string} [options.cssPath] - Output path for stylesheet (default: '/css/uncharted.css')
+ * @param {boolean} [options.injectCss] - Automatically copy and inject CSS (default: true)
  */
 export default function(eleventyConfig, options = {}) {
   const dataDir = options.dataDir || '_data';
   const globalAnimate = options.animate ?? false;
+  const cssPath = options.cssPath || '/css/uncharted.css';
+  const injectCss = options.injectCss ?? true;
+
+  // Automatic CSS handling
+  if (injectCss) {
+    const cssSource = path.join(__dirname, 'css/uncharted.css');
+
+    // Copy plugin's CSS to output (strip leading slash for passthrough)
+    eleventyConfig.addPassthroughCopy({
+      [cssSource]: cssPath.replace(/^\//, '')
+    });
+
+    // Inject stylesheet link into pages with charts
+    eleventyConfig.addTransform('uncharted-css', function(content) {
+      const outputPath = this.page.outputPath || '';
+      if (!outputPath.endsWith('.html')) return content;
+
+      const hasCharts = content.includes('class="chart ');
+      const hasStylesheet = content.includes('uncharted.css');
+
+      if (hasCharts && !hasStylesheet) {
+        const link = `<link rel="stylesheet" href="${cssPath}">\n  `;
+
+        // Try to inject before first <style> or <link> in <head>
+        const headMatch = content.match(/<head[^>]*>([\s\S]*?)<\/head>/i);
+        if (headMatch) {
+          const firstTagMatch = headMatch[1].match(/^([\s\S]*?)(<(?:style|link)\b)/i);
+          if (firstTagMatch) {
+            const insertPos = content.indexOf(headMatch[0]) +
+                              headMatch[0].indexOf(headMatch[1]) +
+                              firstTagMatch[1].length;
+            return content.slice(0, insertPos) + link + content.slice(insertPos);
+          }
+        }
+
+        // Fallback: after <head>
+        return content.replace(/<head([^>]*)>/i, `<head$1>\n  ${link}`);
+      }
+      return content;
+    });
+  }
 
   eleventyConfig.addShortcode('chart', function(chartId) {
     // Resolve data directory relative to the current working directory

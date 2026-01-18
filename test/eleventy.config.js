@@ -7,11 +7,6 @@ export default function(eleventyConfig) {
     animate: true
   });
 
-  // Copy CSS to output
-  eleventyConfig.addPassthroughCopy({
-    '../css': 'css'
-  });
-
   return {
     dir: {
       input: '.',
