@@ -1,6 +1,6 @@
 # Uncharted
 
-A CSS-based charting plugin for Eleventy. Renders charts as pure HTML/CSS with no JavaScript dependencies.
+A CSS-based chart plugin for Eleventy. Renders charts as pure HTML/CSS with no JavaScript dependencies.
 
 ## Installation
 
