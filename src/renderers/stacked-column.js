@@ -6,13 +6,14 @@ import { slugify, getSeriesNames, escapeHtml } from '../utils.js';
  * @param {string} config.title - Chart title
  * @param {string} [config.subtitle] - Chart subtitle
  * @param {Object[]} config.data - Chart data
- * @param {number} [config.max] - Maximum value for percentage calculation
+ * @param {number} [config.max] - Maximum value for Y-axis scaling
+ * @param {number} [config.min] - Minimum value for Y-axis scaling (for negative values)
  * @param {string[]} [config.legend] - Legend labels (defaults to series names)
  * @param {boolean} [config.animate] - Enable animations
  * @returns {string} - HTML string
  */
 export function renderStackedColumn(config) {
-  const { title, subtitle, data, max, legend, animate } = config;
+  const { title, subtitle, data, max, min, legend, animate } = config;
 
   if (!data || data.length === 0) {
     return `<!-- Stacked column chart: no data provided -->`;
@@ -45,9 +46,9 @@ export function renderStackedColumn(config) {
     minNegativeStack = Math.min(minNegativeStack, negativeSum);
   });
 
-  const hasNegativeY = minNegativeStack < 0;
+  const hasNegativeY = minNegativeStack < 0 || min < 0;
   const maxValue = max ?? maxPositiveStack;
-  const minValue = minNegativeStack;
+  const minValue = min ?? minNegativeStack;
   const range = maxValue - minValue;
   const zeroPct = hasNegativeY ? ((0 - minValue) / range) * 100 : 0;
 

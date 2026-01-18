@@ -8,12 +8,14 @@ import { slugify, escapeHtml } from '../utils.js';
  * @param {Object[]} config.data - Chart data (with label, x, y, and optionally series)
  * @param {number} [config.maxX] - Maximum X value (defaults to max in data)
  * @param {number} [config.maxY] - Maximum Y value (defaults to max in data)
+ * @param {number} [config.minX] - Minimum X value (defaults to min in data or 0)
+ * @param {number} [config.minY] - Minimum Y value (defaults to min in data or 0)
  * @param {string[]} [config.legend] - Legend labels for series
  * @param {boolean} [config.animate] - Enable animations
  * @returns {string} - HTML string
  */
 export function renderScatter(config) {
-  const { title, subtitle, data, maxX, maxY, legend, animate } = config;
+  const { title, subtitle, data, maxX, maxY, minX, minY, legend, animate } = config;
 
   if (!data || data.length === 0) {
     return `<!-- Scatter chart: no data provided -->`;
@@ -51,8 +53,8 @@ export function renderScatter(config) {
 
   const calcMaxX = maxX ?? dataMaxX;
   const calcMaxY = maxY ?? dataMaxY;
-  const calcMinX = dataMinX < 0 ? dataMinX : 0;
-  const calcMinY = dataMinY < 0 ? dataMinY : 0;
+  const calcMinX = minX ?? (dataMinX < 0 ? dataMinX : 0);
+  const calcMinY = minY ?? (dataMinY < 0 ? dataMinY : 0);
   const rangeX = calcMaxX - calcMinX;
   const rangeY = calcMaxY - calcMinY;
 

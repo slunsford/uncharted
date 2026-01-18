@@ -153,9 +153,12 @@ The chart automatically calculates the range from the maximum positive stack to 
 | `subtitle` | string | Subtitle below title |
 | `file` | string | Path to CSV file (relative to dataDir) |
 | `data` | array | Inline data array |
-| `max` | number | Maximum value for scaling |
+| `max` | number | Maximum Y value for scaling |
+| `min` | number | Minimum Y value for scaling (column, dot) |
 | `maxX` | number | Maximum X value (scatter only) |
 | `maxY` | number | Maximum Y value (scatter only) |
+| `minX` | number | Minimum X value (scatter only) |
+| `minY` | number | Minimum Y value (scatter only) |
 | `legend` | array | Custom legend labels |
 | `center` | object | Donut center content (`value`, `label`) |
 | `animate` | boolean | Override global animation setting |

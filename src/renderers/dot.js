@@ -8,12 +8,13 @@ import { slugify, escapeHtml, getSeriesNames } from '../utils.js';
  * @param {string} [config.subtitle] - Chart subtitle
  * @param {Object[]} config.data - Chart data with label column and value columns
  * @param {number} [config.max] - Maximum Y value (defaults to max in data)
+ * @param {number} [config.min] - Minimum Y value (defaults to min in data or 0)
  * @param {string[]} [config.legend] - Legend labels (defaults to series names)
  * @param {boolean} [config.animate] - Enable animations
  * @returns {string} - HTML string
  */
 export function renderDot(config) {
-  const { title, subtitle, data, max, legend, animate } = config;
+  const { title, subtitle, data, max, min, legend, animate } = config;
 
   if (!data || data.length === 0) {
     return `<!-- Dot chart: no data provided -->`;
@@ -34,7 +35,7 @@ export function renderDot(config) {
   const dataMax = Math.max(...allValues);
   const dataMin = Math.min(...allValues);
   const maxValue = max ?? dataMax;
-  const minValue = dataMin < 0 ? dataMin : 0;
+  const minValue = min ?? (dataMin < 0 ? dataMin : 0);
   const range = maxValue - minValue;
   const hasNegativeY = minValue < 0;
 
