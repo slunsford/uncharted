@@ -190,16 +190,14 @@
    ========================================================================== */
 
 .chart-stacked-bar .chart-bars {
-  display: flex;
-  flex-direction: column;
-  gap: var(--chart-gap);
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: var(--chart-gap) 0.75rem;
+  align-items: center;
 }
 
 .chart-stacked-bar .bar-row {
-  display: grid;
-  grid-template-columns: minmax(6rem, auto) 1fr auto;
-  align-items: center;
-  gap: 0.75rem;
+  display: contents;  /* Children participate in parent grid */
 }
 
 .chart-stacked-bar .bar-label {

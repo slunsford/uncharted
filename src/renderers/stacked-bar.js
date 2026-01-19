@@ -26,6 +26,14 @@ export function renderStackedBar(config) {
   const legendLabels = legend ?? seriesKeys;
   const animateClass = animate ? ' chart-animate' : '';
 
+  // Calculate max total across all rows if not provided
+  const calculatedMax = max ?? Math.max(...data.map(row => {
+    return seriesKeys.reduce((sum, key) => {
+      const val = row[key];
+      return sum + (typeof val === 'number' ? val : parseFloat(val) || 0);
+    }, 0);
+  }));
+
   let html = `<figure class="chart chart-stacked-bar${animateClass}">`;
 
   if (title) {
@@ -57,7 +65,7 @@ export function renderStackedBar(config) {
       return typeof val === 'number' ? val : parseFloat(val) || 0;
     });
     const total = values.reduce((sum, v) => sum + v, 0);
-    const percentages = calculatePercentages(values, max);
+    const percentages = calculatePercentages(values, calculatedMax);
     const seriesLabels = legendLabels ?? seriesKeys;
 
     html += `<div class="bar-row">`;
