@@ -14,7 +14,11 @@
   --chart-color-5: #009688;  /* Teal */
   --chart-color-6: #9c27b0;  /* Purple */
   --chart-color-7: #e91e63;  /* Pink */
-  --chart-color-8: #78909c;  /* Gray */
+  --chart-color-8: #3f51b5;  /* Indigo */
+  --chart-color-9: #f44336;  /* Red */
+  --chart-color-10: #00bcd4; /* Cyan */
+  --chart-color-11: #cddc39; /* Lime */
+  --chart-color-12: #78909c; /* Gray */
 
   /* Backgrounds - neutral with opacity for light/dark adaptability */
   --chart-bg: rgba(128, 128, 128, 0.15);
@@ -40,6 +44,10 @@
 .chart-color-6 { --color: var(--chart-color-6); background-color: var(--chart-color-6); }
 .chart-color-7 { --color: var(--chart-color-7); background-color: var(--chart-color-7); }
 .chart-color-8 { --color: var(--chart-color-8); background-color: var(--chart-color-8); }
+.chart-color-9 { --color: var(--chart-color-9); background-color: var(--chart-color-9); }
+.chart-color-10 { --color: var(--chart-color-10); background-color: var(--chart-color-10); }
+.chart-color-11 { --color: var(--chart-color-11); background-color: var(--chart-color-11); }
+.chart-color-12 { --color: var(--chart-color-12); background-color: var(--chart-color-12); }
 
 /* ==========================================================================
    Base Chart Styles
@@ -71,7 +79,8 @@
 .chart-legend {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
+  column-gap: 1rem;
+  row-gap: 0.375rem;
   list-style: none;
   padding: 0;
   margin: 0 0 1rem 0;
