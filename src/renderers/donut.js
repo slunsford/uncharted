@@ -1,4 +1,5 @@
 import { slugify, escapeHtml, getLabelKey, getValueKey, getSeriesNames } from '../utils.js';
+import { formatNumber } from '../formatters.js';
 
 /**
  * Render a donut/pie chart using conic-gradient
@@ -14,7 +15,7 @@ import { slugify, escapeHtml, getLabelKey, getValueKey, getSeriesNames } from '.
  * @returns {string} - HTML string
  */
 export function renderDonut(config) {
-  const { title, subtitle, data, legend, center, animate } = config;
+  const { title, subtitle, data, legend, center, animate, format } = config;
 
   if (!data || data.length === 0) {
     return `<!-- Donut chart: no data provided -->`;
@@ -82,7 +83,8 @@ export function renderDonut(config) {
   if (center) {
     const centerValue = center.value === 'total' ? total : center.value;
     if (centerValue !== undefined) {
-      html += `<span class="donut-value">${escapeHtml(String(centerValue))}</span>`;
+      const displayValue = typeof centerValue === 'number' ? (formatNumber(centerValue, format) || centerValue) : centerValue;
+      html += `<span class="donut-value">${escapeHtml(String(displayValue))}</span>`;
     }
     if (center.label) {
       html += `<span class="donut-label">${escapeHtml(center.label)}</span>`;

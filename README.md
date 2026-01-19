@@ -48,6 +48,61 @@ If you set `injectCss: false`, you'll need to manually include the stylesheet in
 | `dot` | Categorical dot chart with Y-axis positioning | Yes |
 | `scatter` | XY scatter plot with continuous axes | Yes (X and Y) |
 
+## Value Formatting
+
+Format displayed numbers with thousands separators, compact notation, or currency symbols.
+Raw values are preserved for calculations; only display output is affected.
+
+### Options
+
+| Option | Type | Description |
+|--------|------|-------------|
+| `thousands` | boolean | Add commas: `1000` → `1,000` |
+| `compact` | boolean | Use suffixes: `1000` → `1K`, `1000000` → `1M` |
+| `decimals` | number | Decimal places (default: 0, or 1 if compact) |
+| `currency.symbol` | string | Currency symbol: `$`, `€`, etc. |
+| `currency.position` | string | `prefix` (default) or `suffix` |
+
+### Examples
+
+**Thousands separators:**
+
+```yaml
+format:
+  thousands: true
+# 1234567 → 1,234,567
+```
+
+**Compact notation:**
+
+```yaml
+format:
+  compact: true
+# 1500 → 1.5K, 2000000 → 2M
+```
+
+**Currency:**
+
+```yaml
+format:
+  thousands: true
+  currency:
+    symbol: "$"
+# 1234 → $1,234
+```
+
+**Scatter charts** support separate X/Y formatting:
+
+```yaml
+format:
+  x:
+    thousands: true
+  y:
+    compact: true
+    currency:
+      symbol: "$"
+```
+
 ## Usage
 
 ### Page Frontmatter
@@ -162,6 +217,7 @@ The chart automatically calculates the range from the maximum positive stack to 
 | `legend` | array | Custom legend labels |
 | `center` | object | Donut center content (`value`, `label`) |
 | `animate` | boolean | Override global animation setting |
+| `format` | object | Number formatting options (see Value Formatting) |
 
 ## Styling
 

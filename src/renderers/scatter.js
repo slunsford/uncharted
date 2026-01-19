@@ -1,4 +1,5 @@
 import { slugify, escapeHtml } from '../utils.js';
+import { formatNumber } from '../formatters.js';
 
 /**
  * Render a scatter plot (continuous X and Y axes)
@@ -15,7 +16,11 @@ import { slugify, escapeHtml } from '../utils.js';
  * @returns {string} - HTML string
  */
 export function renderScatter(config) {
-  const { title, subtitle, data, maxX, maxY, minX, minY, legend, animate } = config;
+  const { title, subtitle, data, maxX, maxY, minX, minY, legend, animate, format } = config;
+
+  // Handle nested X/Y format for scatter charts
+  const fmtX = format?.x || format || {};
+  const fmtY = format?.y || format || {};
 
   if (!data || data.length === 0) {
     return `<!-- Scatter chart: no data provided -->`;
@@ -99,10 +104,10 @@ export function renderScatter(config) {
   // Y-axis
   const yAxisStyle = hasNegativeY ? ` style="--zero-position-y: ${zeroPctY.toFixed(2)}%"` : '';
   html += `<div class="chart-y-axis"${yAxisStyle}>`;
-  html += `<span class="axis-label">${calcMaxY}</span>`;
+  html += `<span class="axis-label">${formatNumber(calcMaxY, fmtY) || calcMaxY}</span>`;
   const midLabelY = hasNegativeY ? 0 : Math.round((calcMaxY + calcMinY) / 2);
-  html += `<span class="axis-label">${midLabelY}</span>`;
-  html += `<span class="axis-label">${calcMinY}</span>`;
+  html += `<span class="axis-label">${formatNumber(midLabelY, fmtY) || midLabelY}</span>`;
+  html += `<span class="axis-label">${formatNumber(calcMinY, fmtY) || calcMinY}</span>`;
   html += `</div>`;
 
   // Container gets zero position variables for axis line CSS
@@ -120,7 +125,9 @@ export function renderScatter(config) {
     const colorIndex = seriesIndex.get(dot.series) + 1;
     const colorClass = `chart-color-${colorIndex}`;
     const seriesClass = `chart-series-${slugify(dot.series)}`;
-    const tooltipText = dot.label ? `${dot.label}: (${dot.x}, ${dot.y})` : `(${dot.x}, ${dot.y})`;
+    const fmtXVal = formatNumber(dot.x, fmtX) || dot.x;
+    const fmtYVal = formatNumber(dot.y, fmtY) || dot.y;
+    const tooltipText = dot.label ? `${dot.label}: (${fmtXVal}, ${fmtYVal})` : `(${fmtXVal}, ${fmtYVal})`;
 
     html += `<div class="dot ${colorClass} ${seriesClass}" `;
     html += `style="--dot-index: ${i}; --x: ${xPct.toFixed(2)}%; --value: ${yPct.toFixed(2)}%" `;
@@ -134,10 +141,10 @@ export function renderScatter(config) {
   // X-axis
   const xAxisStyle = hasNegativeX ? ` style="--zero-position-x: ${zeroPctX.toFixed(2)}%"` : '';
   html += `<div class="chart-x-axis"${xAxisStyle}>`;
-  html += `<span class="axis-label">${calcMinX}</span>`;
+  html += `<span class="axis-label">${formatNumber(calcMinX, fmtX) || calcMinX}</span>`;
   const midLabelX = hasNegativeX ? 0 : Math.round((calcMaxX + calcMinX) / 2);
-  html += `<span class="axis-label">${midLabelX}</span>`;
-  html += `<span class="axis-label">${calcMaxX}</span>`;
+  html += `<span class="axis-label">${formatNumber(midLabelX, fmtX) || midLabelX}</span>`;
+  html += `<span class="axis-label">${formatNumber(calcMaxX, fmtX) || calcMaxX}</span>`;
   html += `</div>`;
 
   html += `</div>`;

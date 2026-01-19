@@ -1,4 +1,5 @@
 import { slugify, calculatePercentages, getLabelKey, getSeriesNames, escapeHtml } from '../utils.js';
+import { formatNumber } from '../formatters.js';
 
 /**
  * Render a stacked bar chart (horizontal)
@@ -12,7 +13,7 @@ import { slugify, calculatePercentages, getLabelKey, getSeriesNames, escapeHtml 
  * @returns {string} - HTML string
  */
 export function renderStackedBar(config) {
-  const { title, subtitle, data, max, legend, animate } = config;
+  const { title, subtitle, data, max, legend, animate, format } = config;
 
   if (!data || data.length === 0) {
     return `<!-- Stacked bar chart: no data provided -->`;
@@ -62,7 +63,7 @@ export function renderStackedBar(config) {
     html += `<div class="bar-row">`;
     html += `<span class="bar-label">${escapeHtml(label)}</span>`;
     html += `<div class="bar-track">`;
-    html += `<div class="bar-fills" title="${escapeHtml(label)}: ${total}">`;
+    html += `<div class="bar-fills" title="${escapeHtml(label)}: ${formatNumber(total, format) || total}">`;
 
     seriesKeys.forEach((key, i) => {
       const pct = percentages[i];
@@ -71,7 +72,7 @@ export function renderStackedBar(config) {
         const colorClass = `chart-color-${i + 1}`;
         const seriesClass = `chart-series-${slugify(key)}`;
         const seriesLabel = seriesLabels[i] ?? key;
-        html += `<div class="bar-fill ${colorClass} ${seriesClass}" style="--value: ${pct.toFixed(2)}%" title="${escapeHtml(seriesLabel)}: ${value}"></div>`;
+        html += `<div class="bar-fill ${colorClass} ${seriesClass}" style="--value: ${pct.toFixed(2)}%" title="${escapeHtml(seriesLabel)}: ${formatNumber(value, format) || value}"></div>`;
       }
     });
 
@@ -79,7 +80,7 @@ export function renderStackedBar(config) {
     html += `</div>`;
 
     // Show total value
-    html += `<span class="bar-value">${total}</span>`;
+    html += `<span class="bar-value">${formatNumber(total, format) || total}</span>`;
     html += `</div>`;
   });
 

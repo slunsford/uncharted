@@ -1,4 +1,5 @@
 import { slugify, escapeHtml, getLabelKey, getSeriesNames } from '../utils.js';
+import { formatNumber } from '../formatters.js';
 
 /**
  * Render a categorical dot chart (columns with dots at different Y positions)
@@ -14,7 +15,7 @@ import { slugify, escapeHtml, getLabelKey, getSeriesNames } from '../utils.js';
  * @returns {string} - HTML string
  */
 export function renderDot(config) {
-  const { title, subtitle, data, max, min, legend, animate } = config;
+  const { title, subtitle, data, max, min, legend, animate, format } = config;
 
   if (!data || data.length === 0) {
     return `<!-- Dot chart: no data provided -->`;
@@ -71,10 +72,10 @@ export function renderDot(config) {
   // Y-axis
   const yAxisStyle = hasNegativeY ? ` style="--zero-position: ${zeroPct.toFixed(2)}%"` : '';
   html += `<div class="chart-y-axis"${yAxisStyle}>`;
-  html += `<span class="axis-label">${maxValue}</span>`;
+  html += `<span class="axis-label">${formatNumber(maxValue, format) || maxValue}</span>`;
   const midLabelY = hasNegativeY ? 0 : Math.round((maxValue + minValue) / 2);
-  html += `<span class="axis-label">${midLabelY}</span>`;
-  html += `<span class="axis-label">${minValue}</span>`;
+  html += `<span class="axis-label">${formatNumber(midLabelY, format) || midLabelY}</span>`;
+  html += `<span class="axis-label">${formatNumber(minValue, format) || minValue}</span>`;
   html += `</div>`;
 
   const zeroStyle = hasNegativeY ? ` style="--zero-position: ${zeroPct.toFixed(2)}%"` : '';
@@ -97,7 +98,7 @@ export function renderDot(config) {
 
       html += `<div class="dot ${colorClass} ${seriesClass}" `;
       html += `style="--value: ${yPct.toFixed(2)}%" `;
-      html += `title="${escapeHtml(label)}: ${value} ${escapeHtml(tooltipLabel)}"`;
+      html += `title="${escapeHtml(label)}: ${formatNumber(value, format) || value} ${escapeHtml(tooltipLabel)}"`;
       html += `></div>`;
     });
 

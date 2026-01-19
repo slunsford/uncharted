@@ -1,4 +1,5 @@
 import { slugify, getLabelKey, getSeriesNames, escapeHtml } from '../utils.js';
+import { formatNumber } from '../formatters.js';
 
 /**
  * Render a stacked column chart (vertical)
@@ -13,7 +14,7 @@ import { slugify, getLabelKey, getSeriesNames, escapeHtml } from '../utils.js';
  * @returns {string} - HTML string
  */
 export function renderStackedColumn(config) {
-  const { title, subtitle, data, max, min, legend, animate } = config;
+  const { title, subtitle, data, max, min, legend, animate, format } = config;
 
   if (!data || data.length === 0) {
     return `<!-- Stacked column chart: no data provided -->`;
@@ -81,10 +82,11 @@ export function renderStackedColumn(config) {
   // Y-axis with --zero-position for label positioning
   const yAxisStyle = hasNegativeY ? ` style="--zero-position: ${zeroPct.toFixed(2)}%"` : '';
   html += `<div class="chart-y-axis"${yAxisStyle}>`;
-  html += `<span class="axis-label">${maxValue}</span>`;
+  html += `<span class="axis-label">${formatNumber(maxValue, format) || maxValue}</span>`;
   const midLabelY = hasNegativeY ? 0 : Math.round(maxValue / 2);
-  html += `<span class="axis-label">${midLabelY}</span>`;
-  html += `<span class="axis-label">${hasNegativeY ? minValue : 0}</span>`;
+  html += `<span class="axis-label">${formatNumber(midLabelY, format) || midLabelY}</span>`;
+  const minLabelY = hasNegativeY ? minValue : 0;
+  html += `<span class="axis-label">${formatNumber(minLabelY, format) || minLabelY}</span>`;
   html += `</div>`;
 
   const columnsStyle = hasNegativeY ? ` style="--zero-position: ${zeroPct.toFixed(2)}%"` : '';
@@ -115,7 +117,7 @@ export function renderStackedColumn(config) {
             classes: `column-segment ${colorClass} ${seriesClass}`,
             bottom: positiveBottom,
             height: segmentHeight,
-            title: `${escapeHtml(seriesLabel)}: ${value}`,
+            title: `${escapeHtml(seriesLabel)}: ${formatNumber(value, format) || value}`,
             isNegative: false
           });
           lastPositiveIdx = segments.length - 1;
@@ -126,7 +128,7 @@ export function renderStackedColumn(config) {
             classes: `column-segment ${colorClass} ${seriesClass} is-negative`,
             bottom: negativeTop,
             height: segmentHeight,
-            title: `${escapeHtml(seriesLabel)}: ${value}`,
+            title: `${escapeHtml(seriesLabel)}: ${formatNumber(value, format) || value}`,
             isNegative: true
           });
           lastNegativeIdx = segments.length - 1;
@@ -161,7 +163,7 @@ export function renderStackedColumn(config) {
         const endClass = idx === lastIdx ? ' is-stack-end' : '';
         html += `<div class="column-segment ${colorClass} ${seriesClass}${endClass}" `;
         html += `style="--value: ${seg.pct.toFixed(2)}%" `;
-        html += `title="${escapeHtml(seriesLabel)}: ${seg.value}"></div>`;
+        html += `title="${escapeHtml(seriesLabel)}: ${formatNumber(seg.value, format) || seg.value}"></div>`;
       });
     }
 
