@@ -1,4 +1,4 @@
-import { slugify, escapeHtml } from '../utils.js';
+import { slugify, escapeHtml, getLabelKey, getValueKey, getSeriesNames } from '../utils.js';
 
 /**
  * Render a donut/pie chart using conic-gradient
@@ -22,18 +22,22 @@ export function renderDonut(config) {
 
   const animateClass = animate ? ' chart-animate' : '';
 
-  // Extract values - support both {label, value} format and series format
+  // Get column keys positionally
+  const labelKey = getLabelKey(data);
+  const valueKey = getValueKey(data);
+  const seriesKeys = getSeriesNames(data);
+
+  // Extract values - support both label/value format and series format
   let segments = [];
-  if (data[0].value !== undefined) {
-    // Direct {label, value} format
+  if (seriesKeys.length === 1) {
+    // Two columns: first is label, second is value (multiple rows)
     segments = data.map(item => ({
-      label: item.label,
-      value: typeof item.value === 'number' ? item.value : parseFloat(item.value) || 0
+      label: item[labelKey],
+      value: typeof item[valueKey] === 'number' ? item[valueKey] : parseFloat(item[valueKey]) || 0
     }));
   } else {
-    // Series format - first row only for donut
-    const seriesNames = Object.keys(data[0]).filter(k => k !== 'label');
-    segments = seriesNames.map(name => ({
+    // Series format - first row only, columns after the first are series
+    segments = seriesKeys.map(name => ({
       label: name,
       value: typeof data[0][name] === 'number' ? data[0][name] : parseFloat(data[0][name]) || 0
     }));

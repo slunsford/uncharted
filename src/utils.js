@@ -25,13 +25,33 @@ export function calculatePercentages(values, max) {
 }
 
 /**
- * Extract series names from CSV data (all columns except 'label')
+ * Get the label key (first column name) from CSV data
+ * @param {Object[]} data - Array of data objects
+ * @returns {string|undefined} - The first column name, or undefined if no data
+ */
+export function getLabelKey(data) {
+  if (!data || data.length === 0) return undefined;
+  return Object.keys(data[0])[0];
+}
+
+/**
+ * Get the value key (second column name) from CSV data
+ * @param {Object[]} data - Array of data objects
+ * @returns {string|undefined} - The second column name, or undefined if no data
+ */
+export function getValueKey(data) {
+  if (!data || data.length === 0) return undefined;
+  return Object.keys(data[0])[1];
+}
+
+/**
+ * Extract series names from CSV data (all columns except the first)
  * @param {Object[]} data - Array of data objects
  * @returns {string[]} - Array of series names
  */
 export function getSeriesNames(data) {
   if (!data || data.length === 0) return [];
-  return Object.keys(data[0]).filter(key => key !== 'label');
+  return Object.keys(data[0]).slice(1);
 }
 
 /**

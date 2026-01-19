@@ -1,4 +1,4 @@
-import { slugify, calculatePercentages, getSeriesNames, escapeHtml } from '../utils.js';
+import { slugify, calculatePercentages, getLabelKey, getSeriesNames, escapeHtml } from '../utils.js';
 
 /**
  * Render a stacked bar chart (horizontal)
@@ -18,7 +18,8 @@ export function renderStackedBar(config) {
     return `<!-- Stacked bar chart: no data provided -->`;
   }
 
-  // Get actual data keys from the first row (excluding 'label')
+  // Get label key (first column) and series keys (remaining columns)
+  const labelKey = getLabelKey(data);
   const seriesKeys = getSeriesNames(data);
   // Use legend for display labels, fall back to data keys
   const legendLabels = legend ?? seriesKeys;
@@ -49,7 +50,7 @@ export function renderStackedBar(config) {
   html += `<div class="chart-bars">`;
 
   data.forEach(row => {
-    const label = row.label ?? '';
+    const label = row[labelKey] ?? '';
     const values = seriesKeys.map(key => {
       const val = row[key];
       return typeof val === 'number' ? val : parseFloat(val) || 0;

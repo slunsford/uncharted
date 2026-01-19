@@ -201,6 +201,7 @@
   height: 100%;
   width: var(--value);
   transition: width 0.3s ease;
+  background-color: var(--color);
 }
 
 .chart-stacked-bar .bar-value {
@@ -243,6 +244,7 @@
   width: 100%;
   height: var(--value);
   transition: height 0.3s ease;
+  background-color: var(--color);
 }
 
 .chart-stacked-column .column-labels {
@@ -381,6 +383,7 @@
   bottom: var(--value);
   transform: translate(-50%, 50%);
   cursor: default;
+  background-color: var(--color);
 }
 
 .chart-dot .dot[title]:hover {
@@ -443,6 +446,7 @@
   bottom: var(--value);
   transform: translate(-50%, 50%);
   cursor: default;
+  background-color: var(--color);
 }
 
 .chart-scatter .dot[title]:hover {

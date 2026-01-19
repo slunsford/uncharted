@@ -1,4 +1,4 @@
-import { slugify, getSeriesNames, escapeHtml } from '../utils.js';
+import { slugify, getLabelKey, getSeriesNames, escapeHtml } from '../utils.js';
 
 /**
  * Render a stacked column chart (vertical)
@@ -19,7 +19,8 @@ export function renderStackedColumn(config) {
     return `<!-- Stacked column chart: no data provided -->`;
   }
 
-  // Get actual data keys from the first row (excluding 'label')
+  // Get label key (first column) and series keys (remaining columns)
+  const labelKey = getLabelKey(data);
   const seriesKeys = getSeriesNames(data);
   // Use legend for display labels, fall back to data keys
   const legendLabels = legend ?? seriesKeys;
@@ -90,7 +91,7 @@ export function renderStackedColumn(config) {
   html += `<div class="chart-columns"${columnsStyle}>`;
 
   data.forEach(row => {
-    const label = row.label ?? '';
+    const label = row[labelKey] ?? '';
     html += `<div class="column-track" title="${escapeHtml(label)}">`;
 
     if (hasNegativeY) {
@@ -173,7 +174,7 @@ export function renderStackedColumn(config) {
   // X-axis labels
   html += `<div class="column-labels">`;
   data.forEach(row => {
-    const label = row.label ?? '';
+    const label = row[labelKey] ?? '';
     html += `<span class="column-label">${escapeHtml(label)}</span>`;
   });
   html += `</div>`;

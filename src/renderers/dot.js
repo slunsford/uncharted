@@ -1,4 +1,4 @@
-import { slugify, escapeHtml, getSeriesNames } from '../utils.js';
+import { slugify, escapeHtml, getLabelKey, getSeriesNames } from '../utils.js';
 
 /**
  * Render a categorical dot chart (columns with dots at different Y positions)
@@ -20,7 +20,8 @@ export function renderDot(config) {
     return `<!-- Dot chart: no data provided -->`;
   }
 
-  // Get series keys from data columns (excluding 'label')
+  // Get label key (first column) and series keys (remaining columns)
+  const labelKey = getLabelKey(data);
   const seriesKeys = getSeriesNames(data);
   const legendLabels = legend ?? seriesKeys;
   const animateClass = animate ? ' chart-animate' : '';
@@ -82,7 +83,7 @@ export function renderDot(config) {
 
   // Each row becomes a column with dots for each series
   data.forEach(row => {
-    const label = row.label ?? '';
+    const label = row[labelKey] ?? '';
 
     html += `<div class="dot-col">`;
 
@@ -110,7 +111,7 @@ export function renderDot(config) {
   // X-axis labels
   html += `<div class="dot-labels">`;
   data.forEach(row => {
-    const label = row.label ?? '';
+    const label = row[labelKey] ?? '';
     html += `<span class="dot-label">${escapeHtml(label)}</span>`;
   });
   html += `</div>`;
