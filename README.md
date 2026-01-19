@@ -110,10 +110,10 @@ charts:
 
 ## CSV Format
 
-CSV files use the first column as labels and subsequent columns as data series:
+CSV files use the first column as labels and subsequent columns as data series. The column names can be anything descriptive:
 
 ```csv
-label,existing,new
+department,existing,new
 Finance,11,11
 Sales,16,2
 Core,8,0
@@ -135,7 +135,7 @@ Stacked column, dot, and scatter charts support negative values. When negative v
 For stacked columns, positive values stack upward from zero and negative values stack downward:
 
 ```csv
-label,Cost,Profit
+quarter,Cost,Profit
 Q1,20,10
 Q2,25,-10
 Q3,15,25
