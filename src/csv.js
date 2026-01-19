@@ -2,6 +2,51 @@ import fs from 'fs';
 import path from 'path';
 
 /**
+ * Parse a CSV line handling quoted fields
+ * @param {string} line - CSV line
+ * @returns {string[]} - Array of field values
+ */
+function parseCSVLine(line) {
+  const fields = [];
+  let current = '';
+  let inQuotes = false;
+
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+    const nextChar = line[i + 1];
+
+    if (inQuotes) {
+      if (char === '"' && nextChar === '"') {
+        // Escaped quote
+        current += '"';
+        i++;
+      } else if (char === '"') {
+        // End of quoted field
+        inQuotes = false;
+      } else {
+        current += char;
+      }
+    } else {
+      if (char === '"') {
+        // Start of quoted field
+        inQuotes = true;
+      } else if (char === ',') {
+        // Field separator
+        fields.push(current.trim());
+        current = '';
+      } else {
+        current += char;
+      }
+    }
+  }
+
+  // Push last field
+  fields.push(current.trim());
+
+  return fields;
+}
+
+/**
  * Parse CSV content into array of objects
  * @param {string} content - Raw CSV content
  * @returns {Object[]} - Array of row objects with header keys
@@ -14,11 +59,11 @@ export function parseCSV(content) {
 
   if (lines.length < 2) return [];
 
-  const headers = lines[0].split(',').map(h => h.trim());
+  const headers = parseCSVLine(lines[0]);
   const rows = [];
 
   for (let i = 1; i < lines.length; i++) {
-    const values = lines[i].split(',').map(v => v.trim());
+    const values = parseCSVLine(lines[i]);
     const row = {};
 
     headers.forEach((header, index) => {

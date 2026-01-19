@@ -6,17 +6,19 @@ import { formatNumber } from '../formatters.js';
  * @param {Object} config - Chart configuration
  * @param {string} config.title - Chart title
  * @param {string} [config.subtitle] - Chart subtitle
- * @param {Object[]} config.data - Chart data (with label, x, y, and optionally series)
+ * @param {Object[]} config.data - Chart data (positional: label, x, y, series)
  * @param {number} [config.maxX] - Maximum X value (defaults to max in data)
  * @param {number} [config.maxY] - Maximum Y value (defaults to max in data)
  * @param {number} [config.minX] - Minimum X value (defaults to min in data or 0)
  * @param {number} [config.minY] - Minimum Y value (defaults to min in data or 0)
  * @param {string[]} [config.legend] - Legend labels for series
  * @param {boolean} [config.animate] - Enable animations
+ * @param {string} [config.titleX] - X-axis title (defaults to column name)
+ * @param {string} [config.titleY] - Y-axis title (defaults to column name)
  * @returns {string} - HTML string
  */
 export function renderScatter(config) {
-  const { title, subtitle, data, maxX, maxY, minX, minY, legend, animate, format } = config;
+  const { title, subtitle, data, maxX, maxY, minX, minY, legend, animate, format, titleX, titleY } = config;
 
   // Handle nested X/Y format for scatter charts
   const fmtX = format?.x || format || {};
@@ -28,25 +30,24 @@ export function renderScatter(config) {
 
   const animateClass = animate ? ' chart-animate' : '';
 
-  // Normalize data format
-  let dots = [];
-  if (data[0].x !== undefined && data[0].y !== undefined) {
-    // Direct {label, x, y, series?} format
-    dots = data.map(item => ({
-      label: item.label ?? '',
-      x: typeof item.x === 'number' ? item.x : parseFloat(item.x) || 0,
-      y: typeof item.y === 'number' ? item.y : parseFloat(item.y) || 0,
-      series: item.series ?? 'default'
-    }));
-  } else if (data[0].value !== undefined) {
-    // Simple {label, value} format - use index as x, value as y
-    dots = data.map((item, i) => ({
-      label: item.label ?? '',
-      x: i,
-      y: typeof item.value === 'number' ? item.value : parseFloat(item.value) || 0,
-      series: 'default'
-    }));
-  }
+  // Get column keys positionally
+  const keys = Object.keys(data[0]);
+  const labelKey = keys[0];           // First column: point labels
+  const xKey = keys[1];               // Second column: X values
+  const yKey = keys[2];               // Third column: Y values
+  const seriesKey = keys[3];          // Fourth column (optional): series
+
+  // Axis titles: explicit config overrides column names
+  const xAxisTitle = titleX ?? xKey;
+  const yAxisTitle = titleY ?? yKey;
+
+  // Map data to dots using positional columns
+  const dots = data.map(item => ({
+    label: item[labelKey] ?? '',
+    x: typeof item[xKey] === 'number' ? item[xKey] : parseFloat(item[xKey]) || 0,
+    y: typeof item[yKey] === 'number' ? item[yKey] : parseFloat(item[yKey]) || 0,
+    series: seriesKey ? (item[seriesKey] ?? 'default') : 'default'
+  }));
 
   // Calculate bounds
   const xValues = dots.map(d => d.x);
@@ -108,6 +109,7 @@ export function renderScatter(config) {
   const midLabelY = hasNegativeY ? 0 : Math.round((calcMaxY + calcMinY) / 2);
   html += `<span class="axis-label">${formatNumber(midLabelY, fmtY) || midLabelY}</span>`;
   html += `<span class="axis-label">${formatNumber(calcMinY, fmtY) || calcMinY}</span>`;
+  html += `<span class="axis-title">${escapeHtml(yAxisTitle)}</span>`;
   html += `</div>`;
 
   // Container gets zero position variables for axis line CSS
@@ -145,6 +147,7 @@ export function renderScatter(config) {
   const midLabelX = hasNegativeX ? 0 : Math.round((calcMaxX + calcMinX) / 2);
   html += `<span class="axis-label">${formatNumber(midLabelX, fmtX) || midLabelX}</span>`;
   html += `<span class="axis-label">${formatNumber(calcMaxX, fmtX) || calcMaxX}</span>`;
+  html += `<span class="axis-title">${escapeHtml(xAxisTitle)}</span>`;
   html += `</div>`;
 
   html += `</div>`;

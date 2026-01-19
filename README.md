@@ -174,13 +174,24 @@ Sales,16,2
 Core,8,0
 ```
 
-For scatter plots, use `label`, `x`, `y`, and optionally `series`:
+For scatter plots, columns are positional: point label, X value, Y value, and optionally series. Column names become axis labels by default:
 
 ```csv
-label,x,y,series
-Point A,10,45,alpha
-Point B,25,78,alpha
-Point C,15,32,beta
+country,population,gdp,region
+USA,330,21,Americas
+China,1400,14,Asia
+Germany,83,4,Europe
+```
+
+This displays "population" as the X-axis title and "gdp" as the Y-axis title. Override with explicit titles:
+
+```yaml
+charts:
+  my-scatter:
+    type: scatter
+    file: charts/data.csv
+    titleX: "Population (millions)"
+    titleY: "GDP (trillions)"
 ```
 
 ## Negative Values
@@ -214,6 +225,8 @@ The chart automatically calculates the range from the maximum positive stack to 
 | `maxY` | number | Maximum Y value (scatter only) |
 | `minX` | number | Minimum X value (scatter only) |
 | `minY` | number | Minimum Y value (scatter only) |
+| `titleX` | string | X-axis title (scatter only, defaults to column name) |
+| `titleY` | string | Y-axis title (scatter only, defaults to column name) |
 | `legend` | array | Custom legend labels |
 | `center` | object | Donut center content (`value`, `label`) |
 | `animate` | boolean | Override global animation setting |
