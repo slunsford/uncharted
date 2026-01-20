@@ -250,8 +250,10 @@ Override the default color palette and sizing:
   --chart-color-7: #009688;
   --chart-color-8: #78909c;
   --chart-bg: rgba(128, 128, 128, 0.15);
-  --chart-height: 12rem;        /* Height of chart area */
-  --chart-column-width: 1rem;   /* Min width per column */
+  --chart-height: 12rem;           /* Height of bar/column/dot/scatter charts */
+  --chart-column-width: 1rem;      /* Min width per column */
+  --chart-donut-size: 12rem;       /* Donut chart diameter */
+  --chart-donut-thickness: 2.5rem; /* Donut ring thickness */
 }
 ```
 
