@@ -397,6 +397,20 @@
   min-width: 10rem;
 }
 
+/* Donut legend uses same variables as gradient for consistent overrides */
+.chart-donut .chart-color-1 { --color: var(--donut-1, var(--chart-color-1)); }
+.chart-donut .chart-color-2 { --color: var(--donut-2, var(--chart-color-2)); }
+.chart-donut .chart-color-3 { --color: var(--donut-3, var(--chart-color-3)); }
+.chart-donut .chart-color-4 { --color: var(--donut-4, var(--chart-color-4)); }
+.chart-donut .chart-color-5 { --color: var(--donut-5, var(--chart-color-5)); }
+.chart-donut .chart-color-6 { --color: var(--donut-6, var(--chart-color-6)); }
+.chart-donut .chart-color-7 { --color: var(--donut-7, var(--chart-color-7)); }
+.chart-donut .chart-color-8 { --color: var(--donut-8, var(--chart-color-8)); }
+.chart-donut .chart-color-9 { --color: var(--donut-9, var(--chart-color-9)); }
+.chart-donut .chart-color-10 { --color: var(--donut-10, var(--chart-color-10)); }
+.chart-donut .chart-color-11 { --color: var(--donut-11, var(--chart-color-11)); }
+.chart-donut .chart-color-12 { --color: var(--donut-12, var(--chart-color-12)); }
+
 .chart-donut .chart-legend-item .legend-label {
   flex: 1;
 }

@@ -49,23 +49,27 @@ export function renderDonut(config) {
     return `<!-- Donut chart: total is zero -->`;
   }
 
-  // Build conic-gradient stops
+  // Build conic-gradient stops and color variables
   let currentAngle = 0;
   const gradientStops = [];
+  const colorVars = [];
 
   segments.forEach((segment, i) => {
     const percentage = (segment.value / total) * 100;
     const startAngle = currentAngle;
     const endAngle = currentAngle + percentage;
 
-    gradientStops.push(`var(--chart-color-${i + 1}) ${startAngle.toFixed(2)}% ${endAngle.toFixed(2)}%`);
+    // Use segment-specific variable that defaults to chart color
+    colorVars.push(`--donut-${i + 1}: var(--chart-color-${i + 1})`);
+    gradientStops.push(`var(--donut-${i + 1}) ${startAngle.toFixed(2)}% ${endAngle.toFixed(2)}%`);
     currentAngle = endAngle;
   });
 
   const gradient = `conic-gradient(${gradientStops.join(', ')})`;
 
   const idClass = id ? ` chart-${id}` : '';
-  let html = `<figure class="chart chart-donut${animateClass}${idClass}">`;
+  const figureStyle = colorVars.join('; ');
+  let html = `<figure class="chart chart-donut${animateClass}${idClass}" style="${figureStyle}">`;
 
   if (title) {
     html += `<figcaption class="chart-title">${escapeHtml(title)}`;
