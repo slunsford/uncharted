@@ -27,8 +27,8 @@
   --chart-gap: 0.5rem;
   --chart-bar-height: 1.5rem;
   --chart-column-width: 1rem;
-  --chart-donut-size: 12rem;
-  --chart-donut-thickness: 2.5rem;
+  --chart-donut-size: 20rem;
+  --chart-donut-hole: 30%;
   --chart-dot-size: 0.75rem;
   --chart-height: 12rem;
 }
@@ -55,8 +55,10 @@
    ========================================================================== */
 
 .chart {
-  margin: 1.5rem 0;
   font-family: inherit;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
 .chart-title {
@@ -112,7 +114,7 @@
 
 .chart-legend-item .legend-value {
   opacity: 0.7;
-  margin-left: 0.25rem;
+  margin-left: 0.125rem;
 }
 
 /* ==========================================================================
@@ -122,6 +124,8 @@
 .chart-body {
   display: flex;
   gap: 0.5rem;
+  flex: 1;
+  min-height: var(--chart-height);
 }
 
 .chart-y-axis {
@@ -132,7 +136,7 @@
   align-items: flex-end;
   min-width: 2rem;
   box-sizing: border-box;
-  height: var(--chart-height);
+  min-height: var(--chart-height);
   padding-top: 0.5rem;
   padding-bottom: 0;
 }
@@ -202,8 +206,10 @@
 .chart-stacked-bar .chart-bars {
   display: grid;
   grid-template-columns: auto 1fr auto;
-  gap: var(--chart-gap) 0.75rem;
-  align-items: center;
+  grid-auto-rows: 1fr;
+  gap: clamp(0.375rem, 1.5cqi, 1rem) 0.75rem;
+  align-items: stretch;
+  min-height: var(--chart-height);
 }
 
 .chart-stacked-bar .bar-row {
@@ -213,10 +219,13 @@
 .chart-stacked-bar .bar-label {
   font-size: 0.875rem;
   text-align: right;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
 }
 
 .chart-stacked-bar .bar-track {
-  height: var(--chart-bar-height);
+  min-height: var(--chart-bar-height);
   border-radius: 3px;
   overflow: hidden;
   background: var(--chart-bg);
@@ -235,6 +244,8 @@
 }
 
 .chart-stacked-bar .bar-value {
+  display: flex;
+  align-items: center;
   font-size: 0.875rem;
   font-variant-numeric: tabular-nums;
   min-width: 2rem;
@@ -245,36 +256,36 @@
    ========================================================================== */
 
 .chart-stacked-column .chart-body {
-  align-items: stretch;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: 1fr auto;
+}
+
+.chart-stacked-column .chart-y-axis {
+  grid-row: 1;
+  grid-column: 1;
 }
 
 .chart-stacked-column .chart-scroll {
-  flex: 1;
+  grid-row: 1 / -1;
+  grid-column: 2;
+  display: grid;
+  grid-template-rows: subgrid;
   overflow-x: auto;
   overflow-y: visible;
-  position: relative;
-}
-
-.chart-stacked-column .chart-scroll::before {
-  content: '';
-  position: sticky;
-  left: 0;
-  display: block;
-  height: var(--chart-height);
-  margin-bottom: calc(-1 * var(--chart-height));
-  background: var(--chart-bg);
-  border-radius: 3px;
-  pointer-events: none;
 }
 
 .chart-stacked-column .chart-columns {
+  grid-row: 1;
   position: relative;
   display: flex;
-  gap: 0.25rem;
+  gap: clamp(0.375rem, 1.5cqi, 1rem);
   align-items: stretch;
-  height: var(--chart-height);
+  min-height: var(--chart-height);
   padding: 0.5rem 0.5rem 0 0.5rem;
   box-sizing: border-box;
+  background: var(--chart-bg);
+  border-radius: 3px;
 }
 
 .chart-stacked-column .column-track {
@@ -282,7 +293,6 @@
   flex-direction: column-reverse;
   flex: 1;
   min-width: var(--chart-column-width);
-  max-width: calc(var(--chart-column-width) * 2);
   border-radius: 3px 3px 0 0;
   overflow: hidden;
 }
@@ -295,15 +305,15 @@
 }
 
 .chart-stacked-column .column-labels {
+  grid-row: 2;
   display: flex;
-  gap: 0.25rem;
+  gap: clamp(0.375rem, 1.5cqi, 1rem);
   padding: 0.25rem 0.5rem 0;
 }
 
 .chart-stacked-column .column-label {
   flex: 1;
   min-width: var(--chart-column-width);
-  max-width: calc(var(--chart-column-width) * 2);
   font-size: 0.7rem;
   opacity: 0.6;
   text-align: center;
@@ -332,11 +342,6 @@
    ========================================================================== */
 
 .chart-donut {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  gap: 1rem;
   --donut-1: var(--chart-color-1);
   --donut-2: var(--chart-color-2);
   --donut-3: var(--chart-color-3);
@@ -351,34 +356,50 @@
   --donut-12: var(--chart-color-12);
 }
 
-.chart-donut > .chart-title {
-  flex-basis: 100%;
+.chart-donut .donut-body {
+  container-type: inline-size;
+  container-name: donut;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  align-content: center;
+  justify-content: center;
+  gap: 1rem;
+  flex: 1;
 }
 
 .chart-donut .donut-container {
   position: relative;
   display: flex;
   justify-content: center;
+  /* Size based on container width, clamped */
+  width: clamp(8rem, 80cqi, var(--chart-donut-size));
+  aspect-ratio: 1;
+}
+
+/* In portrait, legend takes full width to wrap below */
+.chart-donut .donut-body > .chart-legend {
+  flex: 0 0 100%;
+  justify-content: center;
 }
 
 .chart-donut .donut-ring {
-  width: var(--chart-donut-size);
-  height: var(--chart-donut-size);
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   /* Radial mask punches out the center hole */
-  --_hole-size: calc((var(--chart-donut-size) - var(--chart-donut-thickness) * 2) / 2);
   mask-image: radial-gradient(
     circle at center,
-    transparent var(--_hole-size),
-    black var(--_hole-size)
+    transparent var(--chart-donut-hole, 30%),
+    black var(--chart-donut-hole, 30%)
   );
   -webkit-mask-image: radial-gradient(
     circle at center,
-    transparent var(--_hole-size),
-    black var(--_hole-size)
+    transparent var(--chart-donut-hole, 30%),
+    black var(--chart-donut-hole, 30%)
   );
 }
 
@@ -406,12 +427,30 @@
 }
 
 .chart-donut .chart-legend {
-  flex-direction: column;
-  gap: 0.5rem;
+  /* Default (portrait): horizontal legend below donut */
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem 1rem;
 }
 
 .chart-donut .chart-legend-item {
-  min-width: 10rem;
+  min-width: 8rem;
+}
+
+/* Wide container: row layout with legend beside donut */
+@container donut (min-width: 24rem) {
+  .donut-container,
+  .chart-legend {
+    flex: 0 0 auto;
+  }
+
+  .chart-legend {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: center;
+    gap: 0.5rem;
+  }
 }
 
 /* Donut legend uses same variables as gradient for consistent overrides */
@@ -428,41 +467,38 @@
 .chart-donut .chart-color-11 { --color: var(--donut-11, var(--chart-color-11)); }
 .chart-donut .chart-color-12 { --color: var(--donut-12, var(--chart-color-12)); }
 
-.chart-donut .chart-legend-item .legend-label {
-  flex: 1;
-}
 
 /* ==========================================================================
    Dot Chart (Categorical - columns with dots at Y positions)
    ========================================================================== */
 
 .chart-dot .chart-body {
-  align-items: stretch;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: 1fr auto;
+}
+
+.chart-dot .chart-y-axis {
+  grid-row: 1;
+  grid-column: 1;
 }
 
 .chart-dot .chart-scroll {
-  flex: 1;
+  grid-row: 1 / -1;
+  grid-column: 2;
+  display: grid;
+  grid-template-rows: subgrid;
   overflow-x: auto;
   overflow-y: visible;
-  position: relative;
-}
-
-.chart-dot .chart-scroll::before {
-  content: '';
-  position: sticky;
-  left: 0;
-  display: block;
-  height: var(--chart-height);
-  margin-bottom: calc(-1 * var(--chart-height));
-  background: var(--chart-bg);
-  border-radius: 3px;
-  pointer-events: none;
 }
 
 .chart-dot .dot-chart {
+  grid-row: 1;
   position: relative;
-  height: var(--chart-height);
+  min-height: var(--chart-height);
   box-sizing: border-box;
+  background: var(--chart-bg);
+  border-radius: 3px;
 }
 
 /* Inner field sized to content area - dots position relative to this */
@@ -501,6 +537,7 @@
 }
 
 .chart-dot .dot-labels {
+  grid-row: 2;
   display: flex;
   gap: 6px;
   padding: 0 0.5rem;
@@ -545,7 +582,8 @@
 
 .chart-scatter .dot-area {
   position: relative;
-  height: var(--chart-height);
+  flex: 1;
+  min-height: var(--chart-height);
   background: var(--chart-bg);
   border-radius: 3px;
   box-sizing: border-box;
@@ -684,13 +722,12 @@
 }
 
 .chart-animate .donut-ring {
-  --_hole-size: calc((var(--chart-donut-size) - var(--chart-donut-thickness) * 2) / 2);
   mask-image:
-    radial-gradient(circle at center, transparent var(--_hole-size), black var(--_hole-size)),
+    radial-gradient(circle at center, transparent var(--chart-donut-hole, 30%), black var(--chart-donut-hole, 30%)),
     conic-gradient(from 0deg, black var(--donut-reveal), transparent var(--donut-reveal));
   mask-composite: intersect;
   -webkit-mask-image:
-    radial-gradient(circle at center, transparent var(--_hole-size), black var(--_hole-size)),
+    radial-gradient(circle at center, transparent var(--chart-donut-hole, 30%), black var(--chart-donut-hole, 30%)),
     conic-gradient(from 0deg, black var(--donut-reveal), transparent var(--donut-reveal));
   -webkit-mask-composite: source-in;
   animation: donut-clockwise 0.8s ease-out 0.1s forwards;

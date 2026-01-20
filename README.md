@@ -253,10 +253,19 @@ Override the default color palette and sizing:
   --chart-bg: rgba(128, 128, 128, 0.15);
   --chart-height: 12rem;           /* Height of bar/column/dot/scatter charts */
   --chart-column-width: 1rem;      /* Min width per column */
-  --chart-donut-size: 12rem;       /* Donut chart diameter */
-  --chart-donut-thickness: 2.5rem; /* Donut ring thickness */
+  --chart-donut-size: 20rem;       /* Donut chart max diameter */
+  --chart-donut-hole: 30%;         /* Donut hole size (percentage of diameter) */
 }
 ```
+
+### Responsive Donut Charts
+
+Donut charts automatically adapt to their container using CSS container queries:
+
+- **Narrow containers**: Donut on top, legend wraps below horizontally
+- **Wide containers** (24rem+): Donut and legend side by side
+
+The donut scales to 80% of container width (minimum 8rem, maximum `--chart-donut-size`).
 
 ### Per-Chart Styling
 

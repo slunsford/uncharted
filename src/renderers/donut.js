@@ -77,6 +77,9 @@ export function renderDonut(config) {
     html += `</figcaption>`;
   }
 
+  // Donut body wrapper (for container queries)
+  html += `<div class="donut-body">`;
+
   // Donut visual
   html += `<div class="donut-container">`;
   html += `<div class="donut-ring" style="background: ${gradient}"></div>`;
@@ -116,6 +119,8 @@ export function renderDonut(config) {
     html += `</li>`;
   });
   html += `</ul>`;
+
+  html += `</div>`; // Close donut-body
 
   html += `</figure>`;
 
