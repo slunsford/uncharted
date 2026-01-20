@@ -363,7 +363,6 @@
   flex-wrap: wrap;
   align-items: center;
   align-content: center;
-  justify-content: center;
   gap: 1rem;
   flex: 1;
 }
@@ -380,7 +379,6 @@
 /* In portrait, legend takes full width to wrap below */
 .chart-donut .donut-body > .chart-legend {
   flex: 0 0 100%;
-  justify-content: center;
 }
 
 .chart-donut .donut-ring {
@@ -430,7 +428,6 @@
   /* Default (portrait): horizontal legend below donut */
   flex-direction: row;
   flex-wrap: wrap;
-  justify-content: center;
   gap: 0.5rem 1rem;
 }
 
@@ -441,11 +438,11 @@
 /* Wide container: row layout with legend beside donut */
 @container donut (min-width: 24rem) {
   .donut-container,
-  .chart-legend {
+  .chart-donut .donut-body > .chart-legend {
     flex: 0 0 auto;
   }
 
-  .chart-legend {
+  .chart-donut .donut-body > .chart-legend {
     flex-direction: column;
     flex-wrap: nowrap;
     justify-content: center;
