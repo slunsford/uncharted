@@ -333,8 +333,10 @@
 
 .chart-donut {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  flex-wrap: wrap;
   align-items: flex-start;
+  gap: 1rem;
   --donut-1: var(--chart-color-1);
   --donut-2: var(--chart-color-2);
   --donut-3: var(--chart-color-3);
@@ -349,11 +351,14 @@
   --donut-12: var(--chart-color-12);
 }
 
+.chart-donut > .chart-title {
+  flex-basis: 100%;
+}
+
 .chart-donut .donut-container {
   position: relative;
   display: flex;
   justify-content: center;
-  margin-bottom: 1rem;
 }
 
 .chart-donut .donut-ring {

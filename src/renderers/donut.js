@@ -12,10 +12,11 @@ import { formatNumber } from '../formatters.js';
  * @param {string|number} [config.center.value] - Value to show in center (use "total" for auto-calculated)
  * @param {string} [config.center.label] - Label below the value
  * @param {boolean} [config.animate] - Enable animations
+ * @param {boolean} [config.showPercentages] - Show percentages instead of values in legend
  * @returns {string} - HTML string
  */
 export function renderDonut(config) {
-  const { title, subtitle, data, legend, center, animate, format, id } = config;
+  const { title, subtitle, data, legend, center, animate, format, id, showPercentages } = config;
 
   if (!data || data.length === 0) {
     return `<!-- Donut chart: no data provided -->`;
@@ -96,17 +97,22 @@ export function renderDonut(config) {
   html += `</div>`;
   html += `</div>`;
 
-  // Legend with percentages
+  // Legend with values (or percentages if showPercentages is true)
   const legendLabels = legend ?? segments.map(s => s.label);
   html += `<ul class="chart-legend">`;
   segments.forEach((segment, i) => {
     const label = legendLabels[i] ?? segment.label;
-    const percentage = ((segment.value / total) * 100).toFixed(1);
+    let displayValue;
+    if (showPercentages) {
+      displayValue = ((segment.value / total) * 100).toFixed(1) + '%';
+    } else {
+      displayValue = formatNumber(segment.value, format) || segment.value;
+    }
     const colorClass = `chart-color-${i + 1}`;
     const seriesClass = `chart-series-${slugify(segment.label)}`;
     html += `<li class="chart-legend-item ${colorClass} ${seriesClass}">`;
     html += `<span class="legend-label">${escapeHtml(label)}</span>`;
-    html += `<span class="legend-value">${percentage}%</span>`;
+    html += `<span class="legend-value">${escapeHtml(String(displayValue))}</span>`;
     html += `</li>`;
   });
   html += `</ul>`;

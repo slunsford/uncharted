@@ -229,6 +229,7 @@ The chart automatically calculates the range from the maximum positive stack to 
 | `titleY` | string | Y-axis title (scatter only, defaults to column name) |
 | `legend` | array | Custom legend labels |
 | `center` | object | Donut center content (`value`, `label`) |
+| `showPercentages` | boolean | Show percentages instead of values in donut legend |
 | `animate` | boolean | Override global animation setting |
 | `format` | object | Number formatting options (see Value Formatting) |
 | `rotateLabels` | boolean | Rotate X-axis labels vertically (stacked-column, dot) |
