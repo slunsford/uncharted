@@ -18,7 +18,7 @@ import { formatNumber } from '../formatters.js';
  * @returns {string} - HTML string
  */
 export function renderScatter(config) {
-  const { title, subtitle, data, maxX, maxY, minX, minY, legend, animate, format, titleX, titleY } = config;
+  const { title, subtitle, data, maxX, maxY, minX, minY, legend, animate, format, titleX, titleY, id } = config;
 
   // Handle nested X/Y format for scatter charts
   const fmtX = format?.x || format || {};
@@ -77,7 +77,8 @@ export function renderScatter(config) {
   const seriesIndex = new Map(seriesList.map((s, i) => [s, i]));
 
   const negativeClasses = (hasNegativeX ? ' has-negative-x' : '') + (hasNegativeY ? ' has-negative-y' : '');
-  let html = `<figure class="chart chart-scatter${animateClass}${negativeClasses}">`;
+  const idClass = id ? ` chart-${id}` : '';
+  let html = `<figure class="chart chart-scatter${animateClass}${negativeClasses}${idClass}">`;
 
   if (title) {
     html += `<figcaption class="chart-title">${escapeHtml(title)}`;

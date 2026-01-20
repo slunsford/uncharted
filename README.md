@@ -231,12 +231,13 @@ The chart automatically calculates the range from the maximum positive stack to 
 | `center` | object | Donut center content (`value`, `label`) |
 | `animate` | boolean | Override global animation setting |
 | `format` | object | Number formatting options (see Value Formatting) |
+| `rotateLabels` | boolean | Rotate X-axis labels vertically (stacked-column, dot) |
 
 ## Styling
 
 ### CSS Custom Properties
 
-Override the default color palette:
+Override the default color palette and sizing:
 
 ```css
 :root {
@@ -249,6 +250,27 @@ Override the default color palette:
   --chart-color-7: #009688;
   --chart-color-8: #78909c;
   --chart-bg: rgba(128, 128, 128, 0.15);
+  --chart-height: 12rem;        /* Height of chart area */
+  --chart-column-width: 1rem;   /* Min width per column */
+}
+```
+
+### Per-Chart Styling
+
+Each chart gets a class based on its ID for targeted styling:
+
+```yaml
+charts:
+  sales-growth:
+    type: stacked-column
+    file: charts/sales.csv
+```
+
+```css
+/* Target this specific chart */
+.chart-sales-growth {
+  --chart-height: 16rem;
+  --chart-color-1: #ff6b6b;
 }
 ```
 

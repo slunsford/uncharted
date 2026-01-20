@@ -26,10 +26,11 @@
   /* Spacing and sizing */
   --chart-gap: 0.5rem;
   --chart-bar-height: 1.5rem;
-  --chart-column-width: 2.5rem;
+  --chart-column-width: 1rem;
   --chart-donut-size: 12rem;
   --chart-donut-thickness: 2.5rem;
   --chart-dot-size: 0.75rem;
+  --chart-height: 12rem;
 }
 
 /* ==========================================================================
@@ -131,7 +132,7 @@
   align-items: flex-end;
   min-width: 2rem;
   box-sizing: border-box;
-  height: 12rem;
+  height: var(--chart-height);
   padding-top: 0.5rem;
   padding-bottom: 0;
 }
@@ -247,14 +248,31 @@
   align-items: stretch;
 }
 
-.chart-stacked-column .chart-columns {
-  display: flex;
-  gap: var(--chart-gap);
-  align-items: stretch;
-  height: 12rem;
+.chart-stacked-column .chart-scroll {
   flex: 1;
+  overflow-x: auto;
+  overflow-y: visible;
+  position: relative;
+}
+
+.chart-stacked-column .chart-scroll::before {
+  content: '';
+  position: sticky;
+  left: 0;
+  display: block;
+  height: var(--chart-height);
+  margin-bottom: calc(-1 * var(--chart-height));
   background: var(--chart-bg);
   border-radius: 3px;
+  pointer-events: none;
+}
+
+.chart-stacked-column .chart-columns {
+  position: relative;
+  display: flex;
+  gap: 0.25rem;
+  align-items: stretch;
+  height: var(--chart-height);
   padding: 0.5rem 0.5rem 0 0.5rem;
   box-sizing: border-box;
 }
@@ -278,20 +296,35 @@
 
 .chart-stacked-column .column-labels {
   display: flex;
-  gap: var(--chart-gap);
+  gap: 0.25rem;
   padding: 0.25rem 0.5rem 0;
-  margin-left: 2.5rem;
 }
 
 .chart-stacked-column .column-label {
   flex: 1;
   min-width: var(--chart-column-width);
   max-width: calc(var(--chart-column-width) * 2);
-  font-size: 0.75rem;
+  font-size: 0.7rem;
+  opacity: 0.6;
   text-align: center;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* Rotated column labels (opt-in via rotateLabels config) */
+.chart-stacked-column.rotate-labels .column-labels {
+  padding-top: 0.5rem;
+  align-items: flex-start;
+}
+
+.chart-stacked-column.rotate-labels .column-label {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  display: flex;
+  align-items: center;
+  overflow: visible;
+  text-overflow: clip;
 }
 
 /* ==========================================================================
@@ -376,13 +409,29 @@
   align-items: stretch;
 }
 
-.chart-dot .dot-chart {
-  height: 12rem;
+.chart-dot .chart-scroll {
+  flex: 1;
+  overflow-x: auto;
+  overflow-y: visible;
+  position: relative;
+}
+
+.chart-dot .chart-scroll::before {
+  content: '';
+  position: sticky;
+  left: 0;
+  display: block;
+  height: var(--chart-height);
+  margin-bottom: calc(-1 * var(--chart-height));
   background: var(--chart-bg);
   border-radius: 3px;
-  flex: 1;
-  box-sizing: border-box;
+  pointer-events: none;
+}
+
+.chart-dot .dot-chart {
   position: relative;
+  height: var(--chart-height);
+  box-sizing: border-box;
 }
 
 /* Inner field sized to content area - dots position relative to this */
@@ -425,7 +474,6 @@
   gap: 6px;
   padding: 0 0.5rem;
   margin-top: 0.5rem;
-  margin-left: calc(2rem + 0.5rem); /* y-axis width + gap */
 }
 
 .chart-dot .dot-label {
@@ -433,6 +481,21 @@
   font-size: 0.75rem;
   text-align: center;
   min-width: 1.5rem;
+}
+
+/* Rotated dot labels (opt-in via rotateLabels config) */
+.chart-dot.rotate-labels .dot-labels {
+  padding-top: 0.5rem;
+  align-items: flex-start;
+}
+
+.chart-dot.rotate-labels .dot-label {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  display: flex;
+  align-items: center;
+  overflow: visible;
+  text-overflow: clip;
 }
 
 /* ==========================================================================
@@ -451,7 +514,7 @@
 
 .chart-scatter .dot-area {
   position: relative;
-  height: 12rem;
+  height: var(--chart-height);
   background: var(--chart-bg);
   border-radius: 3px;
   box-sizing: border-box;
@@ -490,41 +553,13 @@
    ========================================================================== */
 
 /* Row/column index for staggered delays */
-.bar-row:nth-child(1) { --row-index: 0; }
-.bar-row:nth-child(2) { --row-index: 1; }
-.bar-row:nth-child(3) { --row-index: 2; }
-.bar-row:nth-child(4) { --row-index: 3; }
-.bar-row:nth-child(5) { --row-index: 4; }
-.bar-row:nth-child(6) { --row-index: 5; }
-.bar-row:nth-child(7) { --row-index: 6; }
-.bar-row:nth-child(8) { --row-index: 7; }
-
-.column-track:nth-child(1) { --col-index: 0; }
-.column-track:nth-child(2) { --col-index: 1; }
-.column-track:nth-child(3) { --col-index: 2; }
-.column-track:nth-child(4) { --col-index: 3; }
-.column-track:nth-child(5) { --col-index: 4; }
-.column-track:nth-child(6) { --col-index: 5; }
-.column-track:nth-child(7) { --col-index: 6; }
-.column-track:nth-child(8) { --col-index: 7; }
-.column-track:nth-child(9) { --col-index: 8; }
-.column-track:nth-child(10) { --col-index: 9; }
-.column-track:nth-child(11) { --col-index: 10; }
-.column-track:nth-child(12) { --col-index: 11; }
-
-.dot-col:nth-child(1) { --col-index: 0; }
-.dot-col:nth-child(2) { --col-index: 1; }
-.dot-col:nth-child(3) { --col-index: 2; }
-.dot-col:nth-child(4) { --col-index: 3; }
-.dot-col:nth-child(5) { --col-index: 4; }
-.dot-col:nth-child(6) { --col-index: 5; }
-.dot-col:nth-child(7) { --col-index: 6; }
-.dot-col:nth-child(8) { --col-index: 7; }
+/* Row, column, and dot indices set via inline styles in renderers */
 
 /* Bar chart: clip-path on fills wrapper, reveals left-to-right */
 .chart-animate .bar-fills {
+  clip-path: inset(0 100% 0 0);
   animation: bar-reveal 1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-  animation-delay: calc(var(--row-index, 0) * 0.08s);
+  animation-delay: calc(var(--row-index, 0) * var(--delay-step, 0.08s));
 }
 
 @keyframes bar-reveal {
@@ -534,8 +569,9 @@
 
 /* Column chart: clip-path on track, reveals bottom-to-top */
 .chart-animate .column-track {
+  clip-path: inset(100% 0 0 0);
   animation: column-reveal 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-  animation-delay: calc(var(--col-index, 0) * 0.05s);
+  animation-delay: calc(var(--col-index, 0) * var(--delay-step, 0.05s));
 }
 
 @keyframes column-reveal {
@@ -547,7 +583,7 @@
 .chart-animate.has-negative-y .column-track {
   --zero-from-top: calc(100% - var(--zero-position, 0%));
   animation: column-expand-from-zero 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-  animation-delay: calc(var(--col-index, 0) * 0.05s);
+  animation-delay: calc(var(--col-index, 0) * var(--delay-step, 0.05s));
   clip-path: polygon(
     0% var(--zero-from-top),
     100% var(--zero-from-top),
@@ -573,7 +609,7 @@
 /* Dot chart: dots rise from bottom with staggered delays */
 .chart-animate.chart-dot .dot {
   animation: dot-rise 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-  animation-delay: calc(var(--col-index, 0) * 0.08s);
+  animation-delay: calc(var(--col-index, 0) * var(--delay-step, 0.08s));
   opacity: 0;
 }
 
@@ -593,7 +629,7 @@
 /* Dot chart with negatives: dots move from zero axis */
 .chart-animate.chart-dot.has-negative-y .dot {
   animation: dot-from-zero 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-  animation-delay: calc(var(--col-index, 0) * 0.08s);
+  animation-delay: calc(var(--col-index, 0) * var(--delay-step, 0.08s));
   opacity: 0;
 }
 

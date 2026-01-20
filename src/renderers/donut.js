@@ -15,7 +15,7 @@ import { formatNumber } from '../formatters.js';
  * @returns {string} - HTML string
  */
 export function renderDonut(config) {
-  const { title, subtitle, data, legend, center, animate, format } = config;
+  const { title, subtitle, data, legend, center, animate, format, id } = config;
 
   if (!data || data.length === 0) {
     return `<!-- Donut chart: no data provided -->`;
@@ -64,7 +64,8 @@ export function renderDonut(config) {
 
   const gradient = `conic-gradient(${gradientStops.join(', ')})`;
 
-  let html = `<figure class="chart chart-donut${animateClass}">`;
+  const idClass = id ? ` chart-${id}` : '';
+  let html = `<figure class="chart chart-donut${animateClass}${idClass}">`;
 
   if (title) {
     html += `<figcaption class="chart-title">${escapeHtml(title)}`;

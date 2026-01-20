@@ -13,7 +13,7 @@ import { formatNumber } from '../formatters.js';
  * @returns {string} - HTML string
  */
 export function renderStackedBar(config) {
-  const { title, subtitle, data, max, legend, animate, format } = config;
+  const { title, subtitle, data, max, legend, animate, format, id } = config;
 
   if (!data || data.length === 0) {
     return `<!-- Stacked bar chart: no data provided -->`;
@@ -34,7 +34,8 @@ export function renderStackedBar(config) {
     }, 0);
   }));
 
-  let html = `<figure class="chart chart-stacked-bar${animateClass}">`;
+  const idClass = id ? ` chart-${id}` : '';
+  let html = `<figure class="chart chart-stacked-bar${animateClass}${idClass}">`;
 
   if (title) {
     html += `<figcaption class="chart-title">${escapeHtml(title)}`;
@@ -56,9 +57,13 @@ export function renderStackedBar(config) {
     html += `</ul>`;
   }
 
-  html += `<div class="chart-bars">`;
+  // Calculate delay step to cap total stagger at 1s
+  const maxStagger = 1; // seconds
+  const defaultDelay = 0.08; // seconds
+  const delayStep = data.length > 1 ? Math.min(defaultDelay, maxStagger / (data.length - 1)) : 0;
+  html += `<div class="chart-bars" style="--delay-step: ${delayStep.toFixed(3)}s">`;
 
-  data.forEach(row => {
+  data.forEach((row, rowIndex) => {
     const label = row[labelKey] ?? '';
     const values = seriesKeys.map(key => {
       const val = row[key];
@@ -68,7 +73,7 @@ export function renderStackedBar(config) {
     const percentages = calculatePercentages(values, calculatedMax);
     const seriesLabels = legendLabels ?? seriesKeys;
 
-    html += `<div class="bar-row">`;
+    html += `<div class="bar-row" style="--row-index: ${rowIndex}">`;
     html += `<span class="bar-label">${escapeHtml(label)}</span>`;
     html += `<div class="bar-track">`;
     html += `<div class="bar-fills" title="${escapeHtml(label)}: ${formatNumber(total, format) || total}">`;

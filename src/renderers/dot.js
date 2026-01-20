@@ -15,7 +15,7 @@ import { formatNumber } from '../formatters.js';
  * @returns {string} - HTML string
  */
 export function renderDot(config) {
-  const { title, subtitle, data, max, min, legend, animate, format } = config;
+  const { title, subtitle, data, max, min, legend, animate, format, id, rotateLabels } = config;
 
   if (!data || data.length === 0) {
     return `<!-- Dot chart: no data provided -->`;
@@ -45,7 +45,9 @@ export function renderDot(config) {
   const zeroPct = hasNegativeY ? ((0 - minValue) / range) * 100 : 0;
 
   const negativeClass = hasNegativeY ? ' has-negative-y' : '';
-  let html = `<figure class="chart chart-dot${animateClass}${negativeClass}">`;
+  const idClass = id ? ` chart-${id}` : '';
+  const rotateClass = rotateLabels ? ' rotate-labels' : '';
+  let html = `<figure class="chart chart-dot${animateClass}${negativeClass}${idClass}${rotateClass}">`;
 
   if (title) {
     html += `<figcaption class="chart-title">${escapeHtml(title)}`;
@@ -78,15 +80,23 @@ export function renderDot(config) {
   html += `<span class="axis-label">${formatNumber(minValue, format) || minValue}</span>`;
   html += `</div>`;
 
-  const zeroStyle = hasNegativeY ? ` style="--zero-position: ${zeroPct.toFixed(2)}%"` : '';
-  html += `<div class="dot-chart"${zeroStyle}>`;
+  // Scroll wrapper for chart + labels
+  html += `<div class="chart-scroll">`;
+
+  // Calculate delay step to cap total stagger at 1s
+  const maxStagger = 1; // seconds
+  const defaultDelay = 0.08; // seconds
+  const delayStep = data.length > 1 ? Math.min(defaultDelay, maxStagger / (data.length - 1)) : 0;
+  const styleVars = [`--delay-step: ${delayStep.toFixed(3)}s`];
+  if (hasNegativeY) styleVars.push(`--zero-position: ${zeroPct.toFixed(2)}%`);
+  html += `<div class="dot-chart" style="${styleVars.join('; ')}">`;
   html += `<div class="dot-field">`;
 
   // Each row becomes a column with dots for each series
-  data.forEach(row => {
+  data.forEach((row, colIndex) => {
     const label = row[labelKey] ?? '';
 
-    html += `<div class="dot-col">`;
+    html += `<div class="dot-col" style="--col-index: ${colIndex}">`;
 
     seriesKeys.forEach((key, i) => {
       const val = row[key];
@@ -98,14 +108,13 @@ export function renderDot(config) {
 
       html += `<div class="dot ${colorClass} ${seriesClass}" `;
       html += `style="--value: ${yPct.toFixed(2)}%" `;
-      html += `title="${escapeHtml(label)}: ${formatNumber(value, format) || value} ${escapeHtml(tooltipLabel)}"`;
+      html += `title="${escapeHtml(tooltipLabel)}: ${formatNumber(value, format) || value}"`;
       html += `></div>`;
     });
 
     html += `</div>`;
   });
 
-  html += `</div>`;
   html += `</div>`;
   html += `</div>`;
 
@@ -117,6 +126,8 @@ export function renderDot(config) {
   });
   html += `</div>`;
 
+  html += `</div>`; // close chart-scroll
+  html += `</div>`; // close chart-body
   html += `</figure>`;
 
   return html;

@@ -14,7 +14,7 @@ import { formatNumber } from '../formatters.js';
  * @returns {string} - HTML string
  */
 export function renderStackedColumn(config) {
-  const { title, subtitle, data, max, min, legend, animate, format } = config;
+  const { title, subtitle, data, max, min, legend, animate, format, id, rotateLabels } = config;
 
   if (!data || data.length === 0) {
     return `<!-- Stacked column chart: no data provided -->`;
@@ -55,7 +55,9 @@ export function renderStackedColumn(config) {
   const zeroPct = hasNegativeY ? ((0 - minValue) / range) * 100 : 0;
 
   const negativeClass = hasNegativeY ? ' has-negative-y' : '';
-  let html = `<figure class="chart chart-stacked-column${animateClass}${negativeClass}">`;
+  const idClass = id ? ` chart-${id}` : '';
+  const rotateClass = rotateLabels ? ' rotate-labels' : '';
+  let html = `<figure class="chart chart-stacked-column${animateClass}${negativeClass}${idClass}${rotateClass}">`;
 
   if (title) {
     html += `<figcaption class="chart-title">${escapeHtml(title)}`;
@@ -89,12 +91,20 @@ export function renderStackedColumn(config) {
   html += `<span class="axis-label">${formatNumber(minLabelY, format) || minLabelY}</span>`;
   html += `</div>`;
 
-  const columnsStyle = hasNegativeY ? ` style="--zero-position: ${zeroPct.toFixed(2)}%"` : '';
-  html += `<div class="chart-columns"${columnsStyle}>`;
+  // Scroll wrapper for columns + labels
+  html += `<div class="chart-scroll">`;
 
-  data.forEach(row => {
+  // Calculate delay step to cap total stagger at 1s
+  const maxStagger = 1; // seconds
+  const defaultDelay = 0.05; // seconds
+  const delayStep = data.length > 1 ? Math.min(defaultDelay, maxStagger / (data.length - 1)) : 0;
+  const styleVars = [`--delay-step: ${delayStep.toFixed(3)}s`];
+  if (hasNegativeY) styleVars.push(`--zero-position: ${zeroPct.toFixed(2)}%`);
+  html += `<div class="chart-columns" style="${styleVars.join('; ')}">`;
+
+  data.forEach((row, colIndex) => {
     const label = row[labelKey] ?? '';
-    html += `<div class="column-track" title="${escapeHtml(label)}">`;
+    html += `<div class="column-track" style="--col-index: ${colIndex}" title="${escapeHtml(label)}">`;
 
     if (hasNegativeY) {
       // Build segments first to identify stack ends
@@ -171,7 +181,6 @@ export function renderStackedColumn(config) {
   });
 
   html += `</div>`;
-  html += `</div>`;
 
   // X-axis labels
   html += `<div class="column-labels">`;
@@ -180,6 +189,9 @@ export function renderStackedColumn(config) {
     html += `<span class="column-label">${escapeHtml(label)}</span>`;
   });
   html += `</div>`;
+
+  html += `</div>`; // close chart-scroll
+  html += `</div>`; // close chart-body
   html += `</figure>`;
 
   return html;

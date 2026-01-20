@@ -101,6 +101,7 @@ export default function(eleventyConfig, options = {}) {
     const animate = chartConfig.animate ?? globalAnimate;
     return renderer({
       ...chartConfig,
+      id: chartId,
       data,
       animate
     });
