@@ -56,9 +56,9 @@ The `test/` directory contains a complete Eleventy site for testing all chart ty
 
 ## Publishing
 
-The package is published to npm automatically via GitHub Actions when a release is created. The workflow (`.github/workflows/publish.yml`) uses OIDC trusted publishing—no npm token secret is needed.
+The package is published to npm automatically via GitHub Actions when a version tag is pushed. The workflow (`.github/workflows/publish.yml`) uses OIDC trusted publishing—no npm token secret is needed. The trusted publisher is configured on npmjs.com to allow publishes from the `slunsford/uncharted` repository's `publish.yml` workflow.
 
 To release a new version:
 1. Update version with `npm version patch|minor|major` (creates commit and tag)
 2. Push with tags: `git push && git push --tags`
-3. Create a GitHub release from the tag
+3. Create a GitHub release from the tag (optional, for release notes)
