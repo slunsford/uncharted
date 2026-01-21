@@ -1,6 +1,6 @@
 # Uncharted
 
-A CSS-based chart plugin for Eleventy. Renders charts as pure HTML/CSS with no JavaScript dependencies.
+A CSS-based chart plugin for Eleventy. Renders charts as pure HTML/CSS.
 
 ## Installation
 
@@ -19,7 +19,7 @@ export default function(eleventyConfig) {
 }
 ```
 
-That's it! The plugin automatically copies the CSS to your output directory and injects the stylesheet link into pages that contain charts.
+The plugin automatically copies the CSS to your output directory and injects the stylesheet link into pages that contain charts.
 
 ### Options
 
@@ -365,7 +365,3 @@ charts:
 ```
 
 For scroll-triggered animations, add your own Intersection Observer to toggle the `.chart-animate` class.
-
-## License
-
-MIT
