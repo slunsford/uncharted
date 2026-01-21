@@ -363,7 +363,7 @@
   flex-wrap: wrap;
   align-items: center;
   align-content: center;
-  gap: 1rem;
+  gap: 2rem;
   flex: 1;
 }
 
@@ -371,14 +371,14 @@
   position: relative;
   display: flex;
   justify-content: center;
-  /* Size based on container width, clamped */
-  width: clamp(8rem, 80cqi, var(--chart-donut-size));
+  flex: 0 0 var(--chart-donut-size, 20rem);
+  max-width: 100%;
   aspect-ratio: 1;
 }
 
-/* In portrait, legend takes full width to wrap below */
 .chart-donut .donut-body > .chart-legend {
-  flex: 0 0 100%;
+  flex: 0 0 auto;
+  justify-content: center;
 }
 
 .chart-donut .donut-ring {
@@ -425,28 +425,26 @@
 }
 
 .chart-donut .chart-legend {
-  /* Default (portrait): horizontal legend below donut */
+  /* Default: horizontal legend (when below donut) */
   flex-direction: row;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 0.5rem 1rem;
 }
 
-.chart-donut .chart-legend-item {
-  min-width: 8rem;
-}
-
-/* Wide container: row layout with legend beside donut */
-@container donut (min-width: 24rem) {
-  .donut-container,
-  .chart-donut .donut-body > .chart-legend {
-    flex: 0 0 auto;
-  }
-
-  .chart-donut .donut-body > .chart-legend {
+/* Wide container: legend beside donut, stack items vertically
+   Threshold ≈ --chart-donut-size (20rem) + gap (2rem) + legend-min (8rem) */
+@container donut (min-width: 30rem) {
+  .chart-donut .chart-legend {
     flex-direction: column;
     flex-wrap: nowrap;
-    justify-content: center;
     gap: 0.5rem;
+    width: max-content;
+  }
+
+  .chart-donut .legend-value {
+    margin-left: auto;
+    padding-left: 0.5rem;
   }
 }
 
