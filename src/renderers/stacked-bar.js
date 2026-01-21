@@ -1,4 +1,4 @@
-import { slugify, calculatePercentages, getLabelKey, getSeriesNames, escapeHtml } from '../utils.js';
+import { slugify, calculatePercentages, getLabelKey, getSeriesNames, escapeHtml, renderDownloadLink } from '../utils.js';
 import { formatNumber } from '../formatters.js';
 
 /**
@@ -13,7 +13,7 @@ import { formatNumber } from '../formatters.js';
  * @returns {string} - HTML string
  */
 export function renderStackedBar(config) {
-  const { title, subtitle, data, max, legend, animate, format, id } = config;
+  const { title, subtitle, data, max, legend, animate, format, id, download, downloadUrl } = config;
 
   if (!data || data.length === 0) {
     return `<!-- Stacked bar chart: no data provided -->`;
@@ -98,6 +98,7 @@ export function renderStackedBar(config) {
   });
 
   html += `</div>`;
+  html += renderDownloadLink(downloadUrl, download);
   html += `</figure>`;
 
   return html;

@@ -4,7 +4,9 @@ export default function(eleventyConfig) {
   // Register the uncharted plugin
   eleventyConfig.addPlugin(uncharted, {
     dataDir: '_data',
-    animate: true
+    animate: true,
+    dataPassthrough: true,
+    download: true
   });
 
   return {

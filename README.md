@@ -28,7 +28,10 @@ eleventyConfig.addPlugin(uncharted, {
   dataDir: '_data',              // where to find CSV files (default: '_data')
   animate: true,                 // enable animations globally (default: false)
   cssPath: '/css/uncharted.css', // output path for stylesheet (default: '/css/uncharted.css')
-  injectCss: false               // disable automatic CSS handling (default: true)
+  injectCss: false,              // disable automatic CSS handling (default: true)
+  download: true,                // enable download links globally (default: false)
+  dataPassthrough: true,         // copy CSV files to public path (default: false)
+  dataPath: '/data/'             // public URL path for CSV files (default: '/data/')
 });
 ```
 
@@ -233,6 +236,49 @@ The chart automatically calculates the range from the maximum positive stack to 
 | `animate` | boolean | Override global animation setting |
 | `format` | object | Number formatting options (see Value Formatting) |
 | `rotateLabels` | boolean | Rotate X-axis labels vertically (stacked-column, dot) |
+| `download` | boolean/string | Enable download link (`true`, `false`, or custom label) |
+
+## Download Links
+
+Add download links below charts so users can download the source CSV data.
+
+### Setup
+
+Enable globally in plugin options:
+
+```javascript
+eleventyConfig.addPlugin(uncharted, {
+  download: true,         // show download links on all charts
+  dataPassthrough: true,  // copy CSV files to output
+  dataPath: '/data/'      // URL path for files (default)
+});
+```
+
+### Per-Chart Override
+
+```yaml
+charts:
+  # Uses global setting
+  revenue:
+    type: stacked-bar
+    file: charts/revenue.csv
+
+  # Custom label
+  expenses:
+    type: stacked-column
+    file: charts/expenses.csv
+    download: "Download expense report"
+
+  # Disable for this chart
+  internal:
+    type: donut
+    file: charts/internal.csv
+    download: false
+```
+
+### Without Passthrough
+
+If `dataPassthrough` is false, you're responsible for ensuring CSV files are available at the expected URLs. The plugin generates links based on `dataPath` + `file`.
 
 ## Styling
 

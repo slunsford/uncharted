@@ -4,7 +4,8 @@
     "title": "Release Cadence",
     "subtitle": "By quarter",
     "file": "charts/releases.csv",
-    "legend": ["Production", "Hotfix", "Beta"]
+    "legend": ["Production", "Hotfix", "Beta"],
+    "download": "Download release data (CSV)"
   },
   "adoption": {
     "type": "dot",
@@ -43,6 +44,7 @@
     "subtitle": "Cost + Profit/Loss",
     "file": "charts/profit.csv",
     "legend": ["Cost", "Profit/Loss"],
-    "animate": true
+    "animate": true,
+    "download": false
   }
 }

@@ -43,6 +43,13 @@ Charts use `--value` CSS custom property for positioning/sizing elements. Animat
 - Dot/Scatter: 0.8s, 0.08s stagger
 - Donut: 0.8s clockwise reveal using `@property`
 
+## Documentation
+
+When adding or modifying plugin options or per-chart configuration options, update `README.md` to reflect these changes. This includes:
+- Plugin options in the Setup > Options section
+- Chart options in the Configuration Options table
+- Any new feature sections as needed
+
 ## Test Site
 
 The `test/` directory contains a complete Eleventy site for testing all chart types. It has its own `eleventy.config.js` that imports the plugin from the parent directory.
@@ -52,6 +59,6 @@ The `test/` directory contains a complete Eleventy site for testing all chart ty
 The package is published to npm automatically via GitHub Actions when a release is created. The workflow (`.github/workflows/publish.yml`) uses OIDC trusted publishing—no npm token secret is needed.
 
 To release a new version:
-1. Update version in `package.json`
-2. Commit and push
-3. Create a GitHub release with a tag matching the version (e.g., `v0.3.2` for version `0.3.2`)
+1. Update version with `npm version patch|minor|major` (creates commit and tag)
+2. Push with tags: `git push && git push --tags`
+3. Create a GitHub release from the tag

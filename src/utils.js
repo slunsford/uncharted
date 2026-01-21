@@ -70,3 +70,15 @@ export function escapeHtml(str) {
   return String(str).replace(/[&<>"']/g, char => htmlEntities[char]);
 }
 
+/**
+ * Render a download link for chart data
+ * @param {string} url - URL to the CSV file
+ * @param {boolean|string} label - true for default label, or custom string
+ * @returns {string} - HTML string for the download link, or empty string if no URL
+ */
+export function renderDownloadLink(url, label) {
+  if (!url) return '';
+  const text = typeof label === 'string' ? label : '↓ Download data';
+  return `<a href="${escapeHtml(url)}" class="chart-download" download>${escapeHtml(text)}</a>`;
+}
+

@@ -1,4 +1,4 @@
-import { slugify, escapeHtml } from '../utils.js';
+import { slugify, escapeHtml, renderDownloadLink } from '../utils.js';
 import { formatNumber } from '../formatters.js';
 
 /**
@@ -18,7 +18,7 @@ import { formatNumber } from '../formatters.js';
  * @returns {string} - HTML string
  */
 export function renderScatter(config) {
-  const { title, subtitle, data, maxX, maxY, minX, minY, legend, animate, format, titleX, titleY, id } = config;
+  const { title, subtitle, data, maxX, maxY, minX, minY, legend, animate, format, titleX, titleY, id, download, downloadUrl } = config;
 
   // Handle nested X/Y format for scatter charts
   const fmtX = format?.x || format || {};
@@ -153,7 +153,7 @@ export function renderScatter(config) {
 
   html += `</div>`;
   html += `</div>`;
-
+  html += renderDownloadLink(downloadUrl, download);
   html += `</figure>`;
 
   return html;
