@@ -199,6 +199,14 @@
   margin-top: 0.5rem;
 }
 
+/* Category labels (X-axis labels for vertical charts) */
+.column-label,
+.dot-label {
+  font-size: 0.7rem;
+  opacity: 0.6;
+  text-align: center;
+}
+
 /* ==========================================================================
    Stacked Bar Chart (Horizontal)
    ========================================================================== */
@@ -314,9 +322,6 @@
 .chart-stacked-column .column-label {
   flex: 1;
   min-width: var(--chart-column-width);
-  font-size: 0.7rem;
-  opacity: 0.6;
-  text-align: center;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -541,8 +546,6 @@
 
 .chart-dot .dot-label {
   flex: 1;
-  font-size: 0.75rem;
-  text-align: center;
   min-width: 1.5rem;
 }
 
