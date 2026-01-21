@@ -46,3 +46,12 @@ Charts use `--value` CSS custom property for positioning/sizing elements. Animat
 ## Test Site
 
 The `test/` directory contains a complete Eleventy site for testing all chart types. It has its own `eleventy.config.js` that imports the plugin from the parent directory.
+
+## Publishing
+
+The package is published to npm automatically via GitHub Actions when a release is created. The workflow (`.github/workflows/publish.yml`) uses OIDC trusted publishing—no npm token secret is needed.
+
+To release a new version:
+1. Update version in `package.json`
+2. Commit and push
+3. Create a GitHub release with a tag matching the version (e.g., `v0.3.2` for version `0.3.2`)
