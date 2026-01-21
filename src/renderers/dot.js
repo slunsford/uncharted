@@ -15,7 +15,7 @@ import { formatNumber } from '../formatters.js';
  * @returns {string} - HTML string
  */
 export function renderDot(config) {
-  const { title, subtitle, data, max, min, legend, animate, format, id, rotateLabels, download, downloadUrl } = config;
+  const { title, subtitle, data, max, min, legend, animate, format, id, rotateLabels, downloadData, downloadDataUrl } = config;
 
   if (!data || data.length === 0) {
     return `<!-- Dot chart: no data provided -->`;
@@ -128,7 +128,7 @@ export function renderDot(config) {
 
   html += `</div>`; // close chart-scroll
   html += `</div>`; // close chart-body
-  html += renderDownloadLink(downloadUrl, download);
+  html += renderDownloadLink(downloadDataUrl, downloadData);
   html += `</figure>`;
 
   return html;

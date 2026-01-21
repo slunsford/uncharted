@@ -15,7 +15,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
  * @param {boolean} [options.injectCss] - Automatically copy and inject CSS (default: true)
  * @param {boolean} [options.dataPassthrough] - Copy CSV files to public dataPath (default: false)
  * @param {string} [options.dataPath] - Public URL path for CSV files (default: '/data/')
- * @param {boolean|string} [options.download] - Enable download links globally (individual charts can override)
+ * @param {boolean|string} [options.downloadData] - Enable download links globally (individual charts can override)
  */
 export default function(eleventyConfig, options = {}) {
   const dataDir = options.dataDir || '_data';
@@ -24,7 +24,7 @@ export default function(eleventyConfig, options = {}) {
   const injectCss = options.injectCss ?? true;
   const dataPassthrough = options.dataPassthrough ?? false;
   const dataPath = options.dataPath || '/data/';
-  const globalDownload = options.download ?? false;
+  const globalDownloadData = options.downloadData ?? false;
 
   // Automatic CSS handling
   if (injectCss) {
@@ -113,13 +113,13 @@ export default function(eleventyConfig, options = {}) {
 
     // Render the chart (chart-specific settings override global)
     const animate = chartConfig.animate ?? globalAnimate;
-    const download = chartConfig.download ?? globalDownload;
+    const downloadData = chartConfig.downloadData ?? globalDownloadData;
 
     // Calculate download URL if download is enabled and file is specified
-    let downloadUrl = null;
-    if (download && chartConfig.file) {
+    let downloadDataUrl = null;
+    if (downloadData && chartConfig.file) {
       const normalizedDataPath = dataPath.endsWith('/') ? dataPath : dataPath + '/';
-      downloadUrl = normalizedDataPath + chartConfig.file;
+      downloadDataUrl = normalizedDataPath + chartConfig.file;
     }
 
     return renderer({
@@ -127,8 +127,8 @@ export default function(eleventyConfig, options = {}) {
       id: chartId,
       data,
       animate,
-      download,
-      downloadUrl
+      downloadData,
+      downloadDataUrl
     });
   });
 }

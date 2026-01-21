@@ -13,7 +13,7 @@ import { formatNumber } from '../formatters.js';
  * @returns {string} - HTML string
  */
 export function renderStackedBar(config) {
-  const { title, subtitle, data, max, legend, animate, format, id, download, downloadUrl } = config;
+  const { title, subtitle, data, max, legend, animate, format, id, downloadData, downloadDataUrl } = config;
 
   if (!data || data.length === 0) {
     return `<!-- Stacked bar chart: no data provided -->`;
@@ -98,7 +98,7 @@ export function renderStackedBar(config) {
   });
 
   html += `</div>`;
-  html += renderDownloadLink(downloadUrl, download);
+  html += renderDownloadLink(downloadDataUrl, downloadData);
   html += `</figure>`;
 
   return html;

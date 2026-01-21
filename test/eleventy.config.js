@@ -6,7 +6,7 @@ export default function(eleventyConfig) {
     dataDir: '_data',
     animate: true,
     dataPassthrough: true,
-    download: true
+    downloadData: true
   });
 
   return {

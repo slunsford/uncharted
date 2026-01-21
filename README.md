@@ -29,7 +29,7 @@ eleventyConfig.addPlugin(uncharted, {
   animate: true,                 // enable animations globally (default: false)
   cssPath: '/css/uncharted.css', // output path for stylesheet (default: '/css/uncharted.css')
   injectCss: false,              // disable automatic CSS handling (default: true)
-  download: true,                // enable download links globally (default: false)
+  downloadData: true,            // enable download links globally (default: false)
   dataPassthrough: true,         // copy CSV files to public path (default: false)
   dataPath: '/data/'             // public URL path for CSV files (default: '/data/')
 });
@@ -236,7 +236,7 @@ The chart automatically calculates the range from the maximum positive stack to 
 | `animate` | boolean | Override global animation setting |
 | `format` | object | Number formatting options (see Value Formatting) |
 | `rotateLabels` | boolean | Rotate X-axis labels vertically (stacked-column, dot) |
-| `download` | boolean/string | Enable download link (`true`, `false`, or custom label) |
+| `downloadData` | boolean/string | Enable download link (`true`, `false`, or custom label) |
 
 ## Download Links
 
@@ -248,7 +248,7 @@ Enable globally in plugin options:
 
 ```javascript
 eleventyConfig.addPlugin(uncharted, {
-  download: true,         // show download links on all charts
+  downloadData: true,     // show download links on all charts
   dataPassthrough: true,  // copy CSV files to output
   dataPath: '/data/'      // URL path for files (default)
 });
@@ -267,13 +267,13 @@ charts:
   expenses:
     type: stacked-column
     file: charts/expenses.csv
-    download: "Download expense report"
+    downloadData: "Download expense report"
 
   # Disable for this chart
   internal:
     type: donut
     file: charts/internal.csv
-    download: false
+    downloadData: false
 ```
 
 ### Without Passthrough

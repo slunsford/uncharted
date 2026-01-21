@@ -16,7 +16,7 @@ import { formatNumber } from '../formatters.js';
  * @returns {string} - HTML string
  */
 export function renderDonut(config) {
-  const { title, subtitle, data, legend, center, animate, format, id, showPercentages, download, downloadUrl } = config;
+  const { title, subtitle, data, legend, center, animate, format, id, showPercentages, downloadData, downloadDataUrl } = config;
 
   if (!data || data.length === 0) {
     return `<!-- Donut chart: no data provided -->`;
@@ -122,7 +122,7 @@ export function renderDonut(config) {
 
   html += `</div>`; // Close donut-body
 
-  html += renderDownloadLink(downloadUrl, download);
+  html += renderDownloadLink(downloadDataUrl, downloadData);
   html += `</figure>`;
 
   return html;
