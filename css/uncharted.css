@@ -569,22 +569,34 @@
    ========================================================================== */
 
 .chart-scatter .chart-body {
-  align-items: stretch;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: 1fr auto;
+}
+
+.chart-scatter .chart-y-axis {
+  grid-row: 1;
+  grid-column: 1;
 }
 
 .chart-scatter .scatter-container {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
+  grid-row: 1 / -1;
+  grid-column: 2;
+  display: grid;
+  grid-template-rows: subgrid;
 }
 
 .chart-scatter .dot-area {
+  grid-row: 1;
   position: relative;
-  flex: 1;
   min-height: var(--chart-height);
   background: var(--chart-bg);
   border-radius: 3px;
   box-sizing: border-box;
+}
+
+.chart-scatter .chart-x-axis {
+  grid-row: 2;
 }
 
 /* Inner field sized to content area - dots position relative to this */
@@ -867,7 +879,7 @@
   background-color: currentColor;
   opacity: 0.4;
   pointer-events: none;
-  z-index: -1;
+  z-index: 0;
 }
 
 .chart-scatter.has-negative-y .dot-field::after {
@@ -880,7 +892,7 @@
   background-color: currentColor;
   opacity: 0.4;
   pointer-events: none;
-  z-index: -1;
+  z-index: 0;
 }
 
 .chart-scatter.has-negative-x .dot-field::before {
@@ -893,7 +905,7 @@
   background-color: currentColor;
   opacity: 0.4;
   pointer-events: none;
-  z-index: -1;
+  z-index: 0;
 }
 
 /* ==========================================================================
