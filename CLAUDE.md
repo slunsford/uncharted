@@ -45,10 +45,8 @@ Charts use `--value` CSS custom property for positioning/sizing elements. Animat
 
 ## Documentation
 
-When adding or modifying plugin options or per-chart configuration options, update `README.md` to reflect these changes. This includes:
-- Plugin options in the Setup > Options section
-- Chart options in the Configuration Options table
-- Any new feature sections as needed
+- Docs site: https://uncharted.docs.seanlunsford.com/
+- Docs repo: https://github.com/seanlunsford/uncharted-docs
 
 ## Test Site
 
