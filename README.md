@@ -1,6 +1,6 @@
 # Uncharted
 
-A CSS-based chart plugin for Eleventy. Renders charts as pure HTML/CSS.
+A CSS-based chart plugin for Eleventy. Renders charts from CSV files or frontmatter as pure HTML/CSS.
 
 **[Full Documentation](https://uncharted.docs.seanlunsford.com/)**
 
@@ -23,7 +23,18 @@ export default function(eleventyConfig) {
 
 ## Quick Example
 
-Define a chart in frontmatter and render with the shortcode:
+Create a CSV file with your data:
+
+```csv
+# charts/sales.csv
+label,Cost,Profit
+Q1,20,10
+Q2,25,-10
+Q3,15,25
+Q4,30,-10
+```
+
+Define the chart in frontmatter and render with the shortcode:
 
 ```markdown
 ---
