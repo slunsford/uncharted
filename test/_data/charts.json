@@ -46,5 +46,31 @@
     "legend": ["Cost", "Profit/Loss"],
     "animate": true,
     "download": false
+  },
+  "sankey-basic": {
+    "type": "sankey",
+    "title": "Budget Allocation",
+    "subtitle": "Simple 2-level flow",
+    "file": "charts/sankey-basic.csv",
+    "legend": true,
+    "format": {
+      "compact": true,
+      "currency": {
+        "symbol": "$"
+      }
+    }
+  },
+  "sankey-multi": {
+    "type": "sankey",
+    "title": "Budget to Revenue",
+    "subtitle": "Multi-level flow diagram",
+    "file": "charts/sankey-multi.csv",
+    "animate": true,
+    "format": {
+      "compact": true,
+      "currency": {
+        "symbol": "$"
+      }
+    }
   }
 }

@@ -630,6 +630,103 @@
 }
 
 /* ==========================================================================
+   Sankey Chart
+   ========================================================================== */
+
+.chart-sankey {
+  --sankey-node-width: var(--node-width, 20px);
+  --sankey-flow-opacity: 0.5;
+  --sankey-min-height: 16rem;
+}
+
+.chart-sankey-container {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--grid-columns);
+  min-height: calc(var(--sankey-min-height) * var(--height-scale, 1));
+  padding: 1rem 0;
+}
+
+.chart-sankey-level {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: var(--sankey-node-width);
+  grid-row: 1;
+  z-index: 1;
+}
+
+.chart-sankey-node {
+  position: absolute;
+  top: var(--top);
+  height: var(--height);
+  width: var(--sankey-node-width);
+  background-color: var(--color);
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  cursor: default;
+}
+
+.chart-sankey-node-label {
+  position: absolute;
+  white-space: nowrap;
+  font-size: 0.75rem;
+  padding: 0 0.5rem;
+}
+
+/* Labels for first level (sources) - positioned to the left */
+.chart-sankey-level:first-child .chart-sankey-node-label {
+  right: 100%;
+  text-align: right;
+}
+
+/* Labels for last level (sinks) - positioned to the left (inside) */
+.chart-sankey-level:last-child .chart-sankey-node-label {
+  right: 100%;
+  text-align: right;
+}
+
+/* Labels for middle levels - positioned to the right */
+.chart-sankey-level:not(:first-child):not(:last-child) .chart-sankey-node-label {
+  left: 100%;
+  text-align: left;
+}
+
+/* Option: last level labels outside (on the right) */
+.chart-sankey-end-labels-outside .chart-sankey-level:last-child .chart-sankey-node-label {
+  right: auto;
+  left: 100%;
+  text-align: left;
+}
+
+.chart-sankey-end-labels-outside .chart-sankey-container {
+  padding-right: var(--end-label-width);
+}
+
+/* Flows as grid children */
+.chart-sankey-flow {
+  grid-row: 1 / -1;  /* Span full height */
+  pointer-events: auto;
+  opacity: var(--sankey-flow-opacity);
+  background: linear-gradient(to right, var(--from-color), var(--to-color));
+  z-index: 0;
+
+  /* Trapezoid shape connecting source to target */
+  clip-path: polygon(
+    0% var(--from-top),
+    0% calc(var(--from-top) + var(--from-height)),
+    100% calc(var(--to-top) + var(--to-height)),
+    100% var(--to-top)
+  );
+}
+
+.chart-sankey-flow:hover {
+  opacity: 0.8;
+}
+
+
+/* ==========================================================================
    Animations (Optional)
    Add 'animate: true' to chart config to enable
    Clip-path applied to track containers for smooth whole-bar reveals
@@ -771,13 +868,45 @@
   }
 }
 
+/* Sankey chart: flows fade and expand from left to right */
+.chart-animate.chart-sankey .chart-sankey-flow {
+  clip-path: polygon(
+    0% var(--from-top),
+    0% calc(var(--from-top) + var(--from-height)),
+    0% calc(var(--from-top) + var(--from-height)),
+    0% var(--from-top)
+  );
+  animation: sankey-flow-reveal 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  animation-delay: calc(var(--from-level, 0) * 0.2s + var(--flow-index, 0) * var(--delay-step, 0.05s));
+}
+
+@keyframes sankey-flow-reveal {
+  from {
+    clip-path: polygon(
+      0% var(--from-top),
+      0% calc(var(--from-top) + var(--from-height)),
+      0% calc(var(--from-top) + var(--from-height)),
+      0% var(--from-top)
+    );
+  }
+  to {
+    clip-path: polygon(
+      0% var(--from-top),
+      0% calc(var(--from-top) + var(--from-height)),
+      100% calc(var(--to-top) + var(--to-height)),
+      100% var(--to-top)
+    );
+  }
+}
+
 /* Reduced motion preference */
 @media (prefers-reduced-motion: reduce) {
   .chart-animate .bar-fills,
   .chart-animate .column-track,
   .chart-animate.chart-dot .dot,
   .chart-animate.chart-scatter .dot,
-  .chart-animate .donut-ring::before {
+  .chart-animate .donut-ring::before,
+  .chart-animate.chart-sankey .chart-sankey-flow {
     animation: none;
   }
 
@@ -789,6 +918,15 @@
 
   .chart-animate.has-negative-y .column-track {
     clip-path: none;
+  }
+
+  .chart-animate.chart-sankey .chart-sankey-flow {
+    clip-path: polygon(
+      0% var(--from-top),
+      0% calc(var(--from-top) + var(--from-height)),
+      100% calc(var(--to-top) + var(--to-height)),
+      100% var(--to-top)
+    );
   }
 }
 

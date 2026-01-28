@@ -1,0 +1,15 @@
+source,target,value
+Budget,Engineering,500000
+Budget,Marketing,300000
+Budget,Operations,200000
+Engineering,Product A,300000
+Engineering,Product B,200000
+Marketing,Product A,150000
+Marketing,Product B,100000
+Marketing,Brand,50000
+Operations,Product A,100000
+Operations,Support,100000
+Product A,Revenue,550000
+Product B,Revenue,300000
+Brand,Revenue,50000
+Support,Revenue,100000

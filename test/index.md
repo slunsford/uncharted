@@ -62,6 +62,16 @@ This page demonstrates all four chart types supported by the Uncharted plugin.
 
 {% chart "profit" %}
 
+## Sankey Charts
+
+### Basic Sankey (2-Level)
+
+{% chart "sankey-basic" %}
+
+### Multi-Level Sankey
+
+{% chart "sankey-multi" %}
+
 ## Error Handling
 
 Below is a reference to a non-existent chart:
