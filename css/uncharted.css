@@ -645,6 +645,7 @@
   grid-template-columns: var(--grid-columns);
   min-height: calc(var(--sankey-min-height) * var(--height-scale, 1));
   padding: 1rem 0;
+  overflow-x: auto;
 }
 
 .chart-sankey-level {
@@ -662,10 +663,18 @@
   height: var(--height);
   width: var(--sankey-node-width);
   background-color: var(--color);
-  border-radius: 3px;
   display: flex;
   align-items: center;
   cursor: default;
+}
+
+/* Round outer corners only (where no flows connect) */
+.chart-sankey-level-first .chart-sankey-node {
+  border-radius: 3px 0 0 3px;
+}
+
+.chart-sankey-level-last .chart-sankey-node {
+  border-radius: 0 3px 3px 0;
 }
 
 .chart-sankey-node-label {
@@ -675,26 +684,26 @@
   padding: 0 0.5rem;
 }
 
-/* Labels for first level (sources) - positioned to the left */
-.chart-sankey-level:first-child .chart-sankey-node-label {
-  right: 100%;
-  text-align: right;
+/* Labels for first level (sources) - positioned to the right */
+.chart-sankey-level-first .chart-sankey-node-label {
+  left: 100%;
+  text-align: left;
 }
 
 /* Labels for last level (sinks) - positioned to the left (inside) */
-.chart-sankey-level:last-child .chart-sankey-node-label {
+.chart-sankey-level-last .chart-sankey-node-label {
   right: 100%;
   text-align: right;
 }
 
 /* Labels for middle levels - positioned to the right */
-.chart-sankey-level:not(:first-child):not(:last-child) .chart-sankey-node-label {
+.chart-sankey-level:not(.chart-sankey-level-first):not(.chart-sankey-level-last) .chart-sankey-node-label {
   left: 100%;
   text-align: left;
 }
 
 /* Option: last level labels outside (on the right) */
-.chart-sankey-end-labels-outside .chart-sankey-level:last-child .chart-sankey-node-label {
+.chart-sankey-end-labels-outside .chart-sankey-level-last .chart-sankey-node-label {
   right: auto;
   left: 100%;
   text-align: left;

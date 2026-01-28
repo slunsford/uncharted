@@ -121,6 +121,28 @@ export function renderSankey(config) {
     levels[nodeLevel.get(n)].push(n);
   });
 
+  // Calculate max label width per level (character count × 0.5rem + padding)
+  const maxLabelWidthPerLevel = levels.map(levelNodes => {
+    const maxChars = Math.max(...levelNodes.map(node => node.length));
+    return maxChars * 0.5 + 1; // 0.5rem per char + 1rem padding
+  });
+
+  // Calculate minimum flow column width
+  // For each flow column between levels i and i+1:
+  // - Level i labels extend right into the flow column
+  // - Level i+1 labels extend left into the flow column (only if it's the last level AND !endLabelsOutside)
+  let minFlowWidth = 0;
+  for (let i = 0; i < levelCount - 1; i++) {
+    let width = maxLabelWidthPerLevel[i]; // Labels from level i (pointing right)
+    const isNextLevelLast = (i + 1 === levelCount - 1);
+    if (isNextLevelLast && !endLabelsOutside) {
+      width += maxLabelWidthPerLevel[i + 1]; // Labels from last level pointing left
+    }
+    if (width > minFlowWidth) {
+      minFlowWidth = width;
+    }
+  }
+
   // Calculate node throughput (max of in/out flow) for sizing
   const nodeThroughput = new Map();
   nodes.forEach(n => {
@@ -354,9 +376,9 @@ export function renderSankey(config) {
   });
 
   // Build HTML
-  // Generate grid columns: alternating node-width and 1fr
-  // For n levels: node-width (1fr node-width) * (n-1)
-  const gridColumns = Array(levelCount).fill('var(--sankey-node-width)').join(' 1fr ');
+  // Generate grid columns: alternating node-width and minmax(min-flow-width, 1fr)
+  // For n levels: node-width (minmax node-width) * (n-1)
+  const gridColumns = Array(levelCount).fill('var(--sankey-node-width)').join(' minmax(var(--min-flow-width), 1fr) ');
 
   // Calculate end label width if labels are outside
   let endLabelWidthStyle = '';
@@ -370,7 +392,7 @@ export function renderSankey(config) {
 
   const idClass = id ? ` chart-${id}` : '';
   const endLabelsOutsideClass = endLabelsOutside ? ' chart-sankey-end-labels-outside' : '';
-  let html = `<figure class="chart chart-sankey${animateClass}${idClass}${endLabelsOutsideClass}" style="--node-width: ${nodeWidth}px; --level-count: ${levelCount}; --grid-columns: ${gridColumns}; --height-scale: ${heightScale.toFixed(2)};${endLabelWidthStyle}">`;
+  let html = `<figure class="chart chart-sankey${animateClass}${idClass}${endLabelsOutsideClass}" style="--node-width: ${nodeWidth}px; --level-count: ${levelCount}; --grid-columns: ${gridColumns}; --min-flow-width: ${minFlowWidth.toFixed(1)}rem; --height-scale: ${heightScale.toFixed(2)};${endLabelWidthStyle}">`;
 
   if (title) {
     html += `<figcaption class="chart-title">${escapeHtml(title)}`;
@@ -423,7 +445,10 @@ export function renderSankey(config) {
   // Nodes grouped by level
   levels.forEach((levelNodes, levelIndex) => {
     // Level i goes in column (2*i + 1) using 1-based indexing
-    html += `<div class="chart-sankey-level" style="grid-column: ${levelIndex * 2 + 1}">`;
+    const isFirst = levelIndex === 0;
+    const isLast = levelIndex === levels.length - 1;
+    const levelClass = isFirst ? ' chart-sankey-level-first' : isLast ? ' chart-sankey-level-last' : '';
+    html += `<div class="chart-sankey-level${levelClass}" style="grid-column: ${levelIndex * 2 + 1}">`;
     levelNodes.forEach(node => {
       const pos = nodePosition.get(node);
       const colorIndex = nodeColors.get(node);
