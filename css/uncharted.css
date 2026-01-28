@@ -713,24 +713,23 @@
   padding-right: var(--end-label-width);
 }
 
-/* Flows as grid children */
+/* Flows as SVG grid children */
 .chart-sankey-flow {
   grid-row: 1 / -1;  /* Span full height */
-  pointer-events: auto;
-  opacity: var(--sankey-flow-opacity);
-  background: linear-gradient(to right, var(--from-color), var(--to-color));
+  width: 100%;
+  height: 100%;
   z-index: 0;
-
-  /* Trapezoid shape connecting source to target */
-  clip-path: polygon(
-    0% var(--from-top),
-    0% calc(var(--from-top) + var(--from-height)),
-    100% calc(var(--to-top) + var(--to-height)),
-    100% var(--to-top)
-  );
+  overflow: visible;
+  pointer-events: none;  /* Pass through to path children */
 }
 
-.chart-sankey-flow:hover {
+.chart-sankey-flow path {
+  opacity: var(--sankey-flow-opacity);
+  pointer-events: auto;
+  cursor: default;
+}
+
+.chart-sankey-flow path:hover {
   opacity: 0.8;
 }
 
@@ -877,35 +876,16 @@
   }
 }
 
-/* Sankey chart: flows fade and expand from left to right */
+/* Sankey chart: SVG flows reveal from left to right */
 .chart-animate.chart-sankey .chart-sankey-flow {
-  clip-path: polygon(
-    0% var(--from-top),
-    0% calc(var(--from-top) + var(--from-height)),
-    0% calc(var(--from-top) + var(--from-height)),
-    0% var(--from-top)
-  );
+  clip-path: inset(0 100% 0 0);
   animation: sankey-flow-reveal 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
   animation-delay: calc(var(--from-level, 0) * 0.2s + var(--flow-index, 0) * var(--delay-step, 0.05s));
 }
 
 @keyframes sankey-flow-reveal {
-  from {
-    clip-path: polygon(
-      0% var(--from-top),
-      0% calc(var(--from-top) + var(--from-height)),
-      0% calc(var(--from-top) + var(--from-height)),
-      0% var(--from-top)
-    );
-  }
-  to {
-    clip-path: polygon(
-      0% var(--from-top),
-      0% calc(var(--from-top) + var(--from-height)),
-      100% calc(var(--to-top) + var(--to-height)),
-      100% var(--to-top)
-    );
-  }
+  from { clip-path: inset(0 100% 0 0); }
+  to { clip-path: inset(0 0 0 0); }
 }
 
 /* Reduced motion preference */
@@ -930,12 +910,7 @@
   }
 
   .chart-animate.chart-sankey .chart-sankey-flow {
-    clip-path: polygon(
-      0% var(--from-top),
-      0% calc(var(--from-top) + var(--from-height)),
-      100% calc(var(--to-top) + var(--to-height)),
-      100% var(--to-top)
-    );
+    clip-path: none;
   }
 }
 

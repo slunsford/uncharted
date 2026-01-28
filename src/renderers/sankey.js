@@ -256,15 +256,6 @@ export function renderSankey(config) {
     }
   });
 
-  // Calculate flow positions (where each flow connects on source and target nodes)
-  // Track cumulative position for stacking flows on each side of a node
-  const nodeOutOffset = new Map(); // Current outflow offset per node
-  const nodeInOffset = new Map();  // Current inflow offset per node
-  nodes.forEach(n => {
-    nodeOutOffset.set(n, 0);
-    nodeInOffset.set(n, 0);
-  });
-
   // Sort edges by source level, then target level for consistent rendering
   aggregatedEdges.sort((a, b) => {
     const aSourceLevel = nodeLevel.get(a.source);
@@ -275,34 +266,126 @@ export function renderSankey(config) {
     return aTargetLevel - bTargetLevel;
   });
 
-  // Calculate flow positions
-  const flows = aggregatedEdges.map((edge, index) => {
+  // Calculate flow heights and determine consistent height (max of source/target proportions)
+  const flowData = aggregatedEdges.map((edge, index) => {
     const sourcePos = nodePosition.get(edge.source);
     const targetPos = nodePosition.get(edge.target);
     const sourceThroughput = nodeThroughput.get(edge.source);
     const targetThroughput = nodeThroughput.get(edge.target);
 
-    // Flow height proportional to value
+    // Flow height proportional to value at each end
     const flowHeightSource = (edge.value / sourceThroughput) * sourcePos.height;
     const flowHeightTarget = (edge.value / targetThroughput) * targetPos.height;
 
-    // Get current offsets
-    const sourceOffset = nodeOutOffset.get(edge.source);
-    const targetOffset = nodeInOffset.get(edge.target);
-
-    // Update offsets
-    nodeOutOffset.set(edge.source, sourceOffset + flowHeightSource);
-    nodeInOffset.set(edge.target, targetOffset + flowHeightTarget);
+    // Use max for consistent height across the flow
+    const height = Math.max(flowHeightSource, flowHeightTarget);
 
     return {
       ...edge,
       fromLevel: sourcePos.level,
-      fromTop: sourcePos.top + sourceOffset,
-      fromHeight: flowHeightSource,
       toLevel: targetPos.level,
-      toTop: targetPos.top + targetOffset,
-      toHeight: flowHeightTarget,
+      height,
       index
+    };
+  });
+
+  // Check if consistent heights cause overflow and adjust node heights if needed
+  const nodeOutTotal = new Map(); // Total outflow heights per node
+  const nodeInTotal = new Map();  // Total inflow heights per node
+  flowData.forEach(f => {
+    nodeOutTotal.set(f.source, (nodeOutTotal.get(f.source) || 0) + f.height);
+    nodeInTotal.set(f.target, (nodeInTotal.get(f.target) || 0) + f.height);
+  });
+
+  // Expand nodes that need more height for their flows
+  let needsRepositioning = false;
+  nodes.forEach(node => {
+    const pos = nodePosition.get(node);
+    const outTotal = nodeOutTotal.get(node) || 0;
+    const inTotal = nodeInTotal.get(node) || 0;
+    const neededHeight = Math.max(outTotal, inTotal);
+    if (neededHeight > pos.height) {
+      pos.height = neededHeight;
+      needsRepositioning = true;
+    }
+  });
+
+  // Reposition nodes within levels if any heights changed
+  if (needsRepositioning) {
+    levels.forEach((levelNodes, levelIndex) => {
+      let currentTop = 0;
+      levelNodes.forEach(node => {
+        const pos = nodePosition.get(node);
+        pos.top = currentTop;
+        currentTop += pos.height + paddingPct;
+      });
+    });
+
+    // Recalculate maxLevelHeight and scale
+    let newMaxLevelHeight = 100;
+    levels.forEach(levelNodes => {
+      if (levelNodes.length === 0) return;
+      let maxBottom = 0;
+      levelNodes.forEach(node => {
+        const pos = nodePosition.get(node);
+        const bottom = pos.top + pos.height;
+        if (bottom > maxBottom) maxBottom = bottom;
+      });
+      if (maxBottom > newMaxLevelHeight) newMaxLevelHeight = maxBottom;
+    });
+
+    // Scale if needed
+    if (newMaxLevelHeight > 100) {
+      const scale = newMaxLevelHeight / 100;
+      nodePosition.forEach(pos => {
+        pos.top = pos.top / scale;
+        pos.height = pos.height / scale;
+      });
+      flowData.forEach(f => {
+        f.height = f.height / scale;
+      });
+    }
+
+    // Re-center levels
+    levels.forEach(levelNodes => {
+      if (levelNodes.length === 0) return;
+      let maxBottom = 0;
+      levelNodes.forEach(node => {
+        const pos = nodePosition.get(node);
+        const bottom = pos.top + pos.height;
+        if (bottom > maxBottom) maxBottom = bottom;
+      });
+      const centerOffset = (100 - maxBottom) / 2;
+      if (centerOffset > 0) {
+        levelNodes.forEach(node => {
+          nodePosition.get(node).top += centerOffset;
+        });
+      }
+    });
+  }
+
+  // Calculate flow positions with consistent heights
+  const nodeOutOffset = new Map();
+  const nodeInOffset = new Map();
+  nodes.forEach(n => {
+    nodeOutOffset.set(n, 0);
+    nodeInOffset.set(n, 0);
+  });
+
+  const flows = flowData.map(f => {
+    const sourcePos = nodePosition.get(f.source);
+    const targetPos = nodePosition.get(f.target);
+
+    const sourceOffset = nodeOutOffset.get(f.source);
+    const targetOffset = nodeInOffset.get(f.target);
+
+    nodeOutOffset.set(f.source, sourceOffset + f.height);
+    nodeInOffset.set(f.target, targetOffset + f.height);
+
+    return {
+      ...f,
+      fromTop: sourcePos.top + sourceOffset,
+      toTop: targetPos.top + targetOffset
     };
   });
 
@@ -420,7 +503,7 @@ export function renderSankey(config) {
 
   html += `<div class="chart-sankey-container">`;
 
-  // Flows (rendered as direct grid children, behind nodes via z-index)
+  // Flows (rendered as SVG paths with bezier curves)
   const delayStep = flows.length > 1 ? Math.min(0.1, 1 / (flows.length - 1)) : 0;
   flows.forEach((flow, i) => {
     const sourceColor = nodeColors.get(flow.source);
@@ -428,18 +511,32 @@ export function renderSankey(config) {
     const tooltipText = `${flow.source} → ${flow.target}: ${formatNumber(flow.value, format) || flow.value}`;
 
     // Flow spans from after source node column to target node column
-    // Source at column (2*fromLevel + 1), so flow starts at (2*fromLevel + 2)
-    // Target at column (2*toLevel + 1), flow ends before it
     const colStart = flow.fromLevel * 2 + 2;
     const colEnd = flow.toLevel * 2 + 1;
 
-    html += `<div class="chart-sankey-flow" `;
-    html += `style="grid-column: ${colStart} / ${colEnd}; `;
-    html += `--from-level: ${flow.fromLevel}; --from-top: ${flow.fromTop.toFixed(2)}%; --from-height: ${flow.fromHeight.toFixed(2)}%; `;
-    html += `--to-top: ${flow.toTop.toFixed(2)}%; --to-height: ${flow.toHeight.toFixed(2)}%; `;
-    html += `--from-color: var(--chart-color-${sourceColor}); --to-color: var(--chart-color-${targetColor}); `;
-    html += `--flow-index: ${i}; --delay-step: ${delayStep.toFixed(3)}s" `;
-    html += `title="${escapeHtml(tooltipText)}"></div>`;
+    // SVG path coordinates (0-100 viewBox)
+    const y1 = flow.fromTop;
+    const y2 = flow.toTop;
+    const h = flow.height;
+
+    // Bezier control points at 40% and 60% for smooth S-curve
+    const cx1 = 40;
+    const cx2 = 60;
+
+    // Path: top edge (left to right with curve), then bottom edge (right to left with curve)
+    // Extend slightly past 0/100 to overlap with node columns and prevent subpixel gaps
+    const x0 = -2;
+    const x1end = 102;
+    const pathD = `M ${x0},${y1.toFixed(2)} C ${cx1},${y1.toFixed(2)} ${cx2},${y2.toFixed(2)} ${x1end},${y2.toFixed(2)} L ${x1end},${(y2 + h).toFixed(2)} C ${cx2},${(y2 + h).toFixed(2)} ${cx1},${(y1 + h).toFixed(2)} ${x0},${(y1 + h).toFixed(2)} Z`;
+
+    html += `<svg class="chart-sankey-flow" viewBox="0 0 100 100" preserveAspectRatio="none" `;
+    html += `style="grid-column: ${colStart} / ${colEnd}; --from-level: ${flow.fromLevel}; --flow-index: ${i}; --delay-step: ${delayStep.toFixed(3)}s">`;
+    html += `<defs><linearGradient id="sankey-grad-${id || 'default'}-${i}">`;
+    html += `<stop offset="0%" style="stop-color: var(--chart-color-${sourceColor})" />`;
+    html += `<stop offset="100%" style="stop-color: var(--chart-color-${targetColor})" />`;
+    html += `</linearGradient></defs>`;
+    html += `<path d="${pathD}" fill="url(#sankey-grad-${id || 'default'}-${i})"><title>${escapeHtml(tooltipText)}</title></path>`;
+    html += `</svg>`;
   });
 
   // Nodes grouped by level
