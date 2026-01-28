@@ -12,10 +12,11 @@ import { formatNumber } from '../formatters.js';
  * @param {number} [config.nodeWidth] - Width of node bars in pixels (default: 20)
  * @param {number} [config.nodePadding] - Vertical gap between nodes in pixels (default: 10)
  * @param {boolean} [config.endLabelsOutside] - Position last level labels outside/right (default: false)
+ * @param {boolean} [config.proportional] - Force proportional node heights for data integrity (default: false)
  * @returns {string} - HTML string
  */
 export function renderSankey(config) {
-  const { title, subtitle, data, legend, animate, format, id, downloadData, downloadDataUrl, nodeWidth = 20, nodePadding = 10, endLabelsOutside = false } = config;
+  const { title, subtitle, data, legend, animate, format, id, downloadData, downloadDataUrl, nodeWidth = 20, nodePadding = 10, endLabelsOutside = false, proportional = false } = config;
 
   if (!data || data.length === 0) {
     return `<!-- Sankey chart: no data provided -->`;
@@ -168,42 +169,51 @@ export function renderSankey(config) {
   // Track maximum height needed across all levels
   let maxLevelHeight = 100;
 
+  // When proportional mode is on, scale the entire chart so the smallest node
+  // is at least ~1px visible, preserving true proportions
+  // 0.4% of base 16rem min-height ≈ 1px
+  const proportionalMinHeight = 0.4;
+  let proportionalScale = 1;
+  if (proportional) {
+    const smallestHeight = Math.min(...nodes.map(n => (nodeThroughput.get(n) / maxLevelThroughput) * 100));
+    if (smallestHeight > 0 && smallestHeight < proportionalMinHeight) {
+      proportionalScale = proportionalMinHeight / smallestHeight;
+    }
+  }
+
   levels.forEach((levelNodes, levelIndex) => {
-    const totalThroughput = levelThroughput[levelIndex];
-
-    // Count nodes that will hit minimum height to determine if we need larger gaps
-    const smallNodeCount = levelNodes.filter(node => {
-      const throughput = nodeThroughput.get(node);
-      const proportionalHeight = (throughput / maxLevelThroughput) * 100;
-      return proportionalHeight < minNodeHeight;
-    }).length;
-
-    // If more than half the nodes are small, use minimum gap to prevent label overlap
-    const effectivePadding = smallNodeCount > levelNodes.length / 2
-      ? Math.max(paddingPct, minGapHeight)
-      : paddingPct;
-
     // Calculate proportional heights based on full 100% (not reduced by padding)
-    // This preserves true proportions; padding is added separately
     const nodeHeights = levelNodes.map(node => {
       const throughput = nodeThroughput.get(node);
       return {
         node,
-        height: (throughput / maxLevelThroughput) * 100
+        height: (throughput / maxLevelThroughput) * 100 * proportionalScale
       };
     });
 
-    // Enforce minimum heights (container will scale to fit)
-    // Node must be tall enough for: 1) visibility, 2) all connected flows
-    nodeHeights.forEach(n => {
-      const outFlows = nodeOutFlowCount.get(n.node) || 0;
-      const inFlows = nodeInFlowCount.get(n.node) || 0;
-      const flowBasedMin = Math.max(outFlows, inFlows) * minFlowHeightBase;
-      const nodeMin = Math.max(minNodeHeight, flowBasedMin);
-      if (n.height < nodeMin) {
-        n.height = nodeMin;
+    let effectivePadding = paddingPct;
+
+    if (!proportional) {
+      // Count nodes that will hit minimum height to determine if we need larger gaps
+      const smallNodeCount = nodeHeights.filter(n => n.height < minNodeHeight).length;
+
+      // If more than half the nodes are small, use minimum gap to prevent label overlap
+      if (smallNodeCount > levelNodes.length / 2) {
+        effectivePadding = Math.max(paddingPct, minGapHeight);
       }
-    });
+
+      // Enforce minimum heights (container will scale to fit)
+      // Node must be tall enough for: 1) visibility, 2) all connected flows
+      nodeHeights.forEach(n => {
+        const outFlows = nodeOutFlowCount.get(n.node) || 0;
+        const inFlows = nodeInFlowCount.get(n.node) || 0;
+        const flowBasedMin = Math.max(outFlows, inFlows) * minFlowHeightBase;
+        const nodeMin = Math.max(minNodeHeight, flowBasedMin);
+        if (n.height < nodeMin) {
+          n.height = nodeMin;
+        }
+      });
+    }
 
     // Assign positions (padding adds to total, may exceed 100%)
     let currentTop = 0;
@@ -226,7 +236,7 @@ export function renderSankey(config) {
   // Calculate height scale factor if content exceeds 100%
   const heightScale = maxLevelHeight / 100;
 
-  // Normalize positions if needed
+  // Normalize positions to 0-100 range; container grows via --height-scale CSS variable
   if (heightScale > 1) {
     nodePosition.forEach((pos, node) => {
       pos.top = pos.top / heightScale;
