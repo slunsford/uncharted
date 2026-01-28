@@ -4,6 +4,7 @@ import { renderDonut } from './donut.js';
 import { renderDot } from './dot.js';
 import { renderScatter } from './scatter.js';
 import { renderSankey } from './sankey.js';
+import { renderLine } from './line.js';
 
 export const renderers = {
   'stacked-bar': renderStackedBar,
@@ -11,7 +12,8 @@ export const renderers = {
   'donut': renderDonut,
   'dot': renderDot,
   'scatter': renderScatter,
-  'sankey': renderSankey
+  'sankey': renderSankey,
+  'line': renderLine
 };
 
-export { renderStackedBar, renderStackedColumn, renderDonut, renderDot, renderScatter, renderSankey };
+export { renderStackedBar, renderStackedColumn, renderDonut, renderDot, renderScatter, renderSankey, renderLine };

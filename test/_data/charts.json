@@ -47,12 +47,23 @@
     "animate": true,
     "download": false
   },
+  "line": {
+    "type": "line",
+    "title": "AI-Assisted Development",
+    "subtitle": "PRs and commits by month (line)",
+    "file": "charts/adoption.csv",
+    "max": 60,
+    "legend": ["Pull Requests", "Commits"],
+    "animate": true,
+    "dots": true
+  },
   "sankey-basic": {
     "type": "sankey",
     "title": "Budget Allocation",
     "subtitle": "Simple 2-level flow",
     "file": "charts/sankey-basic.csv",
     "legend": true,
+    "proportional": true,
     "format": {
       "compact": true,
       "currency": {
@@ -66,6 +77,7 @@
     "subtitle": "Multi-level flow diagram",
     "file": "charts/sankey-multi.csv",
     "animate": true,
+    "proportional": true,
     "format": {
       "compact": true,
       "currency": {

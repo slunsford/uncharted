@@ -15,7 +15,7 @@ import { formatNumber } from '../formatters.js';
  * @returns {string} - HTML string
  */
 export function renderDot(config) {
-  const { title, subtitle, data, max, min, legend, animate, format, id, rotateLabels, downloadData, downloadDataUrl } = config;
+  const { title, subtitle, data, max, min, legend, animate, format, id, rotateLabels, downloadData, downloadDataUrl, connectDots, dots: showDots = true, chartType = 'dot' } = config;
 
   if (!data || data.length === 0) {
     return `<!-- Dot chart: no data provided -->`;
@@ -47,7 +47,8 @@ export function renderDot(config) {
   const negativeClass = hasNegativeY ? ' has-negative-y' : '';
   const idClass = id ? ` chart-${id}` : '';
   const rotateClass = rotateLabels ? ' rotate-labels' : '';
-  let html = `<figure class="chart chart-dot${animateClass}${negativeClass}${idClass}${rotateClass}">`;
+  const dotsClass = !showDots ? ' no-dots' : '';
+  let html = `<figure class="chart chart-${chartType}${animateClass}${negativeClass}${idClass}${rotateClass}${dotsClass}">`;
 
   if (title) {
     html += `<figcaption class="chart-title">${escapeHtml(title)}`;
@@ -92,31 +93,56 @@ export function renderDot(config) {
   html += `<div class="dot-chart" style="${styleVars.join('; ')}">`;
   html += `<div class="dot-field">`;
 
-  // Each row becomes a column with dots for each series
-  data.forEach((row, colIndex) => {
-    const label = row[labelKey] ?? '';
-
-    html += `<div class="dot-col" style="--col-index: ${colIndex}">`;
-
+  // CSS line segments connecting dots (rendered before dot-cols so they stack behind)
+  if (connectDots && data.length > 1) {
+    let segIndex = 0;
     seriesKeys.forEach((key, i) => {
-      const val = row[key];
-      const value = typeof val === 'number' ? val : parseFloat(val) || 0;
-      const yPct = range > 0 ? ((value - minValue) / range) * 100 : 0;
       const colorClass = `chart-color-${i + 1}`;
       const seriesClass = `chart-series-${slugify(key)}`;
-      const tooltipLabel = legendLabels[i] ?? key;
-
-      html += `<div class="dot ${colorClass} ${seriesClass}" `;
-      html += `style="--value: ${yPct.toFixed(2)}%" `;
-      html += `title="${escapeHtml(tooltipLabel)}: ${formatNumber(value, format) || value}"`;
-      html += `></div>`;
+      for (let colIndex = 0; colIndex < data.length - 1; colIndex++) {
+        const val1 = data[colIndex][key];
+        const val2 = data[colIndex + 1][key];
+        const v1 = typeof val1 === 'number' ? val1 : parseFloat(val1) || 0;
+        const v2 = typeof val2 === 'number' ? val2 : parseFloat(val2) || 0;
+        const y1 = range > 0 ? ((v1 - minValue) / range) * 100 : 0;
+        const y2 = range > 0 ? ((v2 - minValue) / range) * 100 : 0;
+        const x1 = ((colIndex + 0.5) / data.length) * 100;
+        const x2 = ((colIndex + 1.5) / data.length) * 100;
+        html += `<div class="chart-line-segment ${colorClass} ${seriesClass}" `;
+        html += `style="--x1: ${x1.toFixed(2)}; --y1: ${y1.toFixed(2)}; --x2: ${x2.toFixed(2)}; --y2: ${y2.toFixed(2)}; --seg-index: ${segIndex}">`;
+        html += `</div>`;
+        segIndex++;
+      }
     });
+  }
 
-    html += `</div>`;
-  });
+  // Each row becomes a column with dots for each series
+  if (showDots) {
+    data.forEach((row, colIndex) => {
+      const label = row[labelKey] ?? '';
 
-  html += `</div>`;
-  html += `</div>`;
+      html += `<div class="dot-col" style="--col-index: ${colIndex}">`;
+
+      seriesKeys.forEach((key, i) => {
+        const val = row[key];
+        const value = typeof val === 'number' ? val : parseFloat(val) || 0;
+        const yPct = range > 0 ? ((value - minValue) / range) * 100 : 0;
+        const colorClass = `chart-color-${i + 1}`;
+        const seriesClass = `chart-series-${slugify(key)}`;
+        const tooltipLabel = legendLabels[i] ?? key;
+
+        html += `<div class="dot ${colorClass} ${seriesClass}" `;
+        html += `style="--value: ${yPct.toFixed(2)}%" `;
+        html += `title="${escapeHtml(tooltipLabel)}: ${formatNumber(value, format) || value}"`;
+        html += `></div>`;
+      });
+
+      html += `</div>`;
+    });
+  }
+
+  html += `</div>`; // close dot-field
+  html += `</div>`; // close dot-chart
 
   // X-axis labels
   html += `<div class="dot-labels">`;

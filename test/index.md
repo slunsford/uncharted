@@ -26,7 +26,7 @@ charts:
 
 # Uncharted Charts Demo
 
-This page demonstrates all four chart types supported by the Uncharted plugin.
+This page demonstrates all chart types supported by the Uncharted plugin.
 
 ## Stacked Bar Chart (Page Frontmatter)
 
@@ -43,6 +43,10 @@ This page demonstrates all four chart types supported by the Uncharted plugin.
 ## Dot Chart (Categorical)
 
 {% chart "adoption" %}
+
+## Line Chart
+
+{% chart "line" %}
 
 ## Scatter Plot
 
