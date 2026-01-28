@@ -1,6 +1,6 @@
 {
   "name": "eleventy-plugin-uncharted",
-  "version": "0.4.3",
+  "version": "0.5.0",
   "description": "An Eleventy plugin that renders CSS-based charts from CSV data using shortcodes",
   "main": "eleventy.config.js",
   "type": "module",
