@@ -164,7 +164,7 @@ export function renderSankey(config) {
   const paddingPct = (nodePadding / 400) * 100; // Convert px to approximate %
   const minNodeHeight = 2; // Minimum node height in percentage points
   const minGapHeight = 4; // Minimum gap to prevent label overlap (%)
-  const minFlowHeightBase = 1.5; // Base minimum flow height (before scaling)
+  const minFlowHeightBase = 0.4; // Base minimum flow height (before scaling)
 
   // Track maximum height needed across all levels
   let maxLevelHeight = 100;
@@ -276,105 +276,25 @@ export function renderSankey(config) {
     return aTargetLevel - bTargetLevel;
   });
 
-  // Calculate flow heights and determine consistent height (max of source/target proportions)
+  // Calculate flow heights proportional to each end's node height.
+  // Flows taper between source and target, naturally filling both nodes.
   const flowData = aggregatedEdges.map((edge, index) => {
     const sourcePos = nodePosition.get(edge.source);
     const targetPos = nodePosition.get(edge.target);
     const sourceThroughput = nodeThroughput.get(edge.source);
     const targetThroughput = nodeThroughput.get(edge.target);
 
-    // Flow height proportional to value at each end
-    const flowHeightSource = (edge.value / sourceThroughput) * sourcePos.height;
-    const flowHeightTarget = (edge.value / targetThroughput) * targetPos.height;
-
-    // Use max for consistent height across the flow
-    const height = Math.max(flowHeightSource, flowHeightTarget);
-
     return {
       ...edge,
       fromLevel: sourcePos.level,
       toLevel: targetPos.level,
-      height,
+      fromHeight: (edge.value / sourceThroughput) * sourcePos.height,
+      toHeight: (edge.value / targetThroughput) * targetPos.height,
       index
     };
   });
 
-  // Check if consistent heights cause overflow and adjust node heights if needed
-  const nodeOutTotal = new Map(); // Total outflow heights per node
-  const nodeInTotal = new Map();  // Total inflow heights per node
-  flowData.forEach(f => {
-    nodeOutTotal.set(f.source, (nodeOutTotal.get(f.source) || 0) + f.height);
-    nodeInTotal.set(f.target, (nodeInTotal.get(f.target) || 0) + f.height);
-  });
-
-  // Expand nodes that need more height for their flows
-  let needsRepositioning = false;
-  nodes.forEach(node => {
-    const pos = nodePosition.get(node);
-    const outTotal = nodeOutTotal.get(node) || 0;
-    const inTotal = nodeInTotal.get(node) || 0;
-    const neededHeight = Math.max(outTotal, inTotal);
-    if (neededHeight > pos.height) {
-      pos.height = neededHeight;
-      needsRepositioning = true;
-    }
-  });
-
-  // Reposition nodes within levels if any heights changed
-  if (needsRepositioning) {
-    levels.forEach((levelNodes, levelIndex) => {
-      let currentTop = 0;
-      levelNodes.forEach(node => {
-        const pos = nodePosition.get(node);
-        pos.top = currentTop;
-        currentTop += pos.height + paddingPct;
-      });
-    });
-
-    // Recalculate maxLevelHeight and scale
-    let newMaxLevelHeight = 100;
-    levels.forEach(levelNodes => {
-      if (levelNodes.length === 0) return;
-      let maxBottom = 0;
-      levelNodes.forEach(node => {
-        const pos = nodePosition.get(node);
-        const bottom = pos.top + pos.height;
-        if (bottom > maxBottom) maxBottom = bottom;
-      });
-      if (maxBottom > newMaxLevelHeight) newMaxLevelHeight = maxBottom;
-    });
-
-    // Scale if needed
-    if (newMaxLevelHeight > 100) {
-      const scale = newMaxLevelHeight / 100;
-      nodePosition.forEach(pos => {
-        pos.top = pos.top / scale;
-        pos.height = pos.height / scale;
-      });
-      flowData.forEach(f => {
-        f.height = f.height / scale;
-      });
-    }
-
-    // Re-center levels
-    levels.forEach(levelNodes => {
-      if (levelNodes.length === 0) return;
-      let maxBottom = 0;
-      levelNodes.forEach(node => {
-        const pos = nodePosition.get(node);
-        const bottom = pos.top + pos.height;
-        if (bottom > maxBottom) maxBottom = bottom;
-      });
-      const centerOffset = (100 - maxBottom) / 2;
-      if (centerOffset > 0) {
-        levelNodes.forEach(node => {
-          nodePosition.get(node).top += centerOffset;
-        });
-      }
-    });
-  }
-
-  // Calculate flow positions with consistent heights
+  // Calculate flow positions within each node
   const nodeOutOffset = new Map();
   const nodeInOffset = new Map();
   nodes.forEach(n => {
@@ -389,8 +309,8 @@ export function renderSankey(config) {
     const sourceOffset = nodeOutOffset.get(f.source);
     const targetOffset = nodeInOffset.get(f.target);
 
-    nodeOutOffset.set(f.source, sourceOffset + f.height);
-    nodeInOffset.set(f.target, targetOffset + f.height);
+    nodeOutOffset.set(f.source, sourceOffset + f.fromHeight);
+    nodeInOffset.set(f.target, targetOffset + f.toHeight);
 
     return {
       ...f,
@@ -527,17 +447,19 @@ export function renderSankey(config) {
     // SVG path coordinates (0-100 viewBox)
     const y1 = flow.fromTop;
     const y2 = flow.toTop;
-    const h = flow.height;
+    const fh = flow.fromHeight;
+    const th = flow.toHeight;
 
     // Bezier control points at 40% and 60% for smooth S-curve
     const cx1 = 40;
     const cx2 = 60;
 
     // Path: top edge (left to right with curve), then bottom edge (right to left with curve)
+    // Flow tapers between fromHeight at source and toHeight at target
     // Extend slightly past 0/100 to overlap with node columns and prevent subpixel gaps
     const x0 = -2;
     const x1end = 102;
-    const pathD = `M ${x0},${y1.toFixed(2)} C ${cx1},${y1.toFixed(2)} ${cx2},${y2.toFixed(2)} ${x1end},${y2.toFixed(2)} L ${x1end},${(y2 + h).toFixed(2)} C ${cx2},${(y2 + h).toFixed(2)} ${cx1},${(y1 + h).toFixed(2)} ${x0},${(y1 + h).toFixed(2)} Z`;
+    const pathD = `M ${x0},${y1.toFixed(2)} C ${cx1},${y1.toFixed(2)} ${cx2},${y2.toFixed(2)} ${x1end},${y2.toFixed(2)} L ${x1end},${(y2 + th).toFixed(2)} C ${cx2},${(y2 + th).toFixed(2)} ${cx1},${(y1 + fh).toFixed(2)} ${x0},${(y1 + fh).toFixed(2)} Z`;
 
     html += `<svg class="chart-sankey-flow" viewBox="0 0 100 100" preserveAspectRatio="none" `;
     html += `style="grid-column: ${colStart} / ${colEnd}; --from-level: ${flow.fromLevel}; --flow-index: ${i}; --delay-step: ${delayStep.toFixed(3)}s">`;
