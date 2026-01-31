@@ -431,6 +431,29 @@ export function renderSankey(config) {
     html += `</ul>`;
   }
 
+  // Build neighbor map for node hover highlighting
+  const nodeNeighbors = new Map();
+  nodes.forEach(n => nodeNeighbors.set(n, new Set()));
+  aggregatedEdges.forEach(({ source, target }) => {
+    nodeNeighbors.get(source).add(target);
+    nodeNeighbors.get(target).add(source);
+  });
+
+  // Generate per-node hover rules: brighten connected flows and nodes, dim the rest
+  html += `<style>`;
+  nodes.forEach(node => {
+    const slug = slugify(node);
+    const prefix = `.chart-sankey-container:has(.chart-series-${slug}:hover)`;
+    // Brighten connected flows
+    html += `${prefix} .chart-flow-${slug} path{opacity:0.8}`;
+    // Brighten hovered node + its neighbors
+    html += `${prefix} .chart-series-${slug}{opacity:1}`;
+    nodeNeighbors.get(node).forEach(neighbor => {
+      html += `${prefix} .chart-series-${slugify(neighbor)}{opacity:1}`;
+    });
+  });
+  html += `</style>`;
+
   html += `<div class="chart-sankey-container">`;
 
   // Flows (rendered as SVG paths with bezier curves)
@@ -461,7 +484,9 @@ export function renderSankey(config) {
     const x1end = 102;
     const pathD = `M ${x0},${y1.toFixed(2)} C ${cx1},${y1.toFixed(2)} ${cx2},${y2.toFixed(2)} ${x1end},${y2.toFixed(2)} L ${x1end},${(y2 + th).toFixed(2)} C ${cx2},${(y2 + th).toFixed(2)} ${cx1},${(y1 + fh).toFixed(2)} ${x0},${(y1 + fh).toFixed(2)} Z`;
 
-    html += `<svg class="chart-sankey-flow" viewBox="0 0 100 100" preserveAspectRatio="none" `;
+    const sourceSlug = slugify(flow.source);
+    const targetSlug = slugify(flow.target);
+    html += `<svg class="chart-sankey-flow chart-flow-${sourceSlug} chart-flow-${targetSlug}" viewBox="0 0 100 100" preserveAspectRatio="none" `;
     html += `style="grid-column: ${colStart} / ${colEnd}; --from-level: ${flow.fromLevel}; --flow-index: ${i}; --delay-step: ${delayStep.toFixed(3)}s">`;
     html += `<defs><linearGradient id="sankey-grad-${id || 'default'}-${i}">`;
     html += `<stop offset="0%" style="stop-color: var(--chart-color-${sourceColor})" />`;

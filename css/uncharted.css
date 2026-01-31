@@ -761,6 +761,15 @@
   opacity: 0.8;
 }
 
+/* Dim all flows and nodes when hovering a node; per-chart inline styles brighten connected ones */
+.chart-sankey-container:has(.chart-sankey-node:hover) .chart-sankey-flow path {
+  opacity: 0.1;
+}
+
+.chart-sankey-container:has(.chart-sankey-node:hover) .chart-sankey-node {
+  opacity: 0.2;
+}
+
 
 /* ==========================================================================
    Animations (Optional)
