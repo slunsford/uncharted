@@ -45,8 +45,8 @@ Charts use `--value` CSS custom property for positioning/sizing elements. Animat
 
 ## Documentation
 
-- Docs site: https://uncharted.docs.seanlunsford.com/
-- Docs repo: https://github.com/seanlunsford/uncharted-docs
+- Docs site: https://uncharted.seanlunsford.com/
+- Docs repo: https://github.com/slunsford/uncharted-docs
 
 ## Test Site
 

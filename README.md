@@ -2,7 +2,7 @@
 
 A CSS-based chart plugin for Eleventy. Renders charts as pure HTML/CSS.
 
-**[Full Documentation](https://uncharted.docs.seanlunsford.com/)**
+**[Full Documentation](https://uncharted.seanlunsford.com/)**
 
 ## Installation
 
