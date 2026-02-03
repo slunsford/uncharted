@@ -18,7 +18,7 @@ import { formatNumber } from '../formatters.js';
  * @returns {string} - HTML string
  */
 export function renderScatter(config) {
-  const { title, subtitle, data, maxX, maxY, minX, minY, legend, animate, format, titleX, titleY, id, downloadData, downloadDataUrl, proportional } = config;
+  const { title, subtitle, data, maxX, maxY, minX, minY, legend, legendTitle, animate, format, titleX, titleY, id, downloadData, downloadDataUrl, proportional } = config;
 
   // Handle nested X/Y format for scatter charts
   const fmtX = format?.x || format || {};
@@ -90,9 +90,13 @@ export function renderScatter(config) {
     html += `</figcaption>`;
   }
 
-  // Legend (if multiple series)
-  if (seriesList.length > 1 || legend) {
+  // Legend (if multiple series or legendTitle specified)
+  if (seriesList.length > 1 || legend || legendTitle) {
     const legendLabels = legend ?? seriesList;
+    const titleText = legendTitle === true ? seriesKey : legendTitle;
+    if (titleText) {
+      html += `<span class="chart-legend-title">${escapeHtml(titleText)}</span>`;
+    }
     html += `<ul class="chart-legend">`;
     seriesList.forEach((series, i) => {
       const label = legendLabels[i] ?? series;
