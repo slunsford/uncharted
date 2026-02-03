@@ -18,7 +18,7 @@ import { formatNumber } from '../formatters.js';
  * @returns {string} - HTML string
  */
 export function renderScatter(config) {
-  const { title, subtitle, data, maxX, maxY, minX, minY, legend, animate, format, titleX, titleY, id, downloadData, downloadDataUrl } = config;
+  const { title, subtitle, data, maxX, maxY, minX, minY, legend, animate, format, titleX, titleY, id, downloadData, downloadDataUrl, proportional } = config;
 
   // Handle nested X/Y format for scatter charts
   const fmtX = format?.x || format || {};
@@ -63,6 +63,7 @@ export function renderScatter(config) {
   const calcMinY = minY ?? (dataMinY < 0 ? dataMinY : 0);
   const rangeX = calcMaxX - calcMinX;
   const rangeY = calcMaxY - calcMinY;
+  const dataAspectRatio = rangeY > 0 ? rangeX / rangeY : 1;
 
   const hasNegativeX = calcMinX < 0;
   const hasNegativeY = calcMinY < 0;
@@ -77,8 +78,9 @@ export function renderScatter(config) {
   const seriesIndex = new Map(seriesList.map((s, i) => [s, i]));
 
   const negativeClasses = (hasNegativeX ? ' has-negative-x' : '') + (hasNegativeY ? ' has-negative-y' : '');
+  const proportionalClass = proportional ? ' chart-proportional' : '';
   const idClass = id ? ` chart-${id}` : '';
-  let html = `<figure class="chart chart-scatter${animateClass}${negativeClasses}${idClass}">`;
+  let html = `<figure class="chart chart-scatter${animateClass}${negativeClasses}${proportionalClass}${idClass}">`;
 
   if (title) {
     html += `<figcaption class="chart-title">${escapeHtml(title)}`;
@@ -119,7 +121,8 @@ export function renderScatter(config) {
   if (hasNegativeY) containerStyles.push(`--zero-position-y: ${zeroPctY.toFixed(2)}%`);
   const containerStyle = containerStyles.length > 0 ? ` style="${containerStyles.join('; ')}"` : '';
   html += `<div class="scatter-container"${containerStyle}>`;
-  html += `<div class="dot-area">`;
+  const dotAreaStyle = proportional ? ` style="--data-aspect-ratio: ${dataAspectRatio.toFixed(4)}"` : '';
+  html += `<div class="dot-area"${dotAreaStyle}>`;
   html += `<div class="dot-field">`;
 
   dots.forEach((dot, i) => {

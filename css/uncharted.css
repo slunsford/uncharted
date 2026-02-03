@@ -657,6 +657,19 @@
   z-index: 1;
 }
 
+/* Proportional scatter: maintain data aspect ratio */
+.chart-scatter.chart-proportional .chart-body,
+.chart-scatter.chart-proportional .chart-y-axis {
+  min-height: auto;
+}
+
+.chart-scatter.chart-proportional .dot-area {
+  aspect-ratio: var(--data-aspect-ratio, 1);
+  min-height: auto;
+  width: 100%;
+  height: auto;
+}
+
 /* ==========================================================================
    Sankey Chart
    ========================================================================== */
