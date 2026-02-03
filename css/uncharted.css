@@ -7,18 +7,33 @@
    ========================================================================== */
 
 :root {
-  --chart-color-1: #2196f3;  /* Blue */
-  --chart-color-2: #4caf50;  /* Green */
-  --chart-color-3: #ff7043;  /* Orange */
-  --chart-color-4: #ffc107;  /* Amber */
-  --chart-color-5: #009688;  /* Teal */
-  --chart-color-6: #9c27b0;  /* Purple */
-  --chart-color-7: #e91e63;  /* Pink */
-  --chart-color-8: #3f51b5;  /* Indigo */
-  --chart-color-9: #f44336;  /* Red */
-  --chart-color-10: #00bcd4; /* Cyan */
-  --chart-color-11: #cddc39; /* Lime */
-  --chart-color-12: #78909c; /* Gray */
+  /* Descriptive color names */
+  --chart-color-blue: #2196f3;
+  --chart-color-green: #4caf50;
+  --chart-color-orange: #ff7043;
+  --chart-color-yellow: #ffc107;
+  --chart-color-teal: #009688;
+  --chart-color-purple: #9c27b0;
+  --chart-color-pink: #e91e63;
+  --chart-color-indigo: #3f51b5;
+  --chart-color-red: #f44336;
+  --chart-color-cyan: #00bcd4;
+  --chart-color-lime: #cddc39;
+  --chart-color-gray: #78909c;
+
+  /* Numeric aliases (for chart data series) */
+  --chart-color-1: var(--chart-color-blue);
+  --chart-color-2: var(--chart-color-green);
+  --chart-color-3: var(--chart-color-orange);
+  --chart-color-4: var(--chart-color-yellow);
+  --chart-color-5: var(--chart-color-teal);
+  --chart-color-6: var(--chart-color-purple);
+  --chart-color-7: var(--chart-color-pink);
+  --chart-color-8: var(--chart-color-indigo);
+  --chart-color-9: var(--chart-color-red);
+  --chart-color-10: var(--chart-color-cyan);
+  --chart-color-11: var(--chart-color-lime);
+  --chart-color-12: var(--chart-color-gray);
 
   /* Backgrounds - neutral with opacity for light/dark adaptability */
   --chart-bg: rgba(128, 128, 128, 0.15);
