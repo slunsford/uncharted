@@ -200,9 +200,13 @@
   transform: translateY(50%);
 }
 
+.chart-y-axis:has(.axis-title) {
+  padding-left: 1.25rem;
+}
+
 .chart-y-axis .axis-title {
   position: absolute;
-  left: -0.5rem;
+  left: 0.25rem;
   top: 50%;
   transform: rotate(-90deg) translateX(-50%);
   transform-origin: left center;
