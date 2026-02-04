@@ -15,7 +15,7 @@ import { formatNumber } from '../formatters.js';
  * @returns {string} - HTML string
  */
 export function renderDot(config) {
-  const { title, subtitle, data, max, min, legend, animate, format, id, rotateLabels, downloadData, downloadDataUrl, connectDots, dots: showDots = true, chartType = 'dot' } = config;
+  const { title, subtitle, data, max, min, legend, legendTitle, animate, format, id, rotateLabels, downloadData, downloadDataUrl, connectDots, dots: showDots = true, chartType = 'dot' } = config;
 
   if (!data || data.length === 0) {
     return `<!-- Dot chart: no data provided -->`;
@@ -56,18 +56,6 @@ export function renderDot(config) {
       html += `<span class="chart-subtitle">${escapeHtml(subtitle)}</span>`;
     }
     html += `</figcaption>`;
-  }
-
-  // Legend
-  if (seriesKeys.length > 0) {
-    html += `<ul class="chart-legend">`;
-    seriesKeys.forEach((key, i) => {
-      const label = legendLabels[i] ?? key;
-      const colorClass = `chart-color-${i + 1}`;
-      const seriesClass = `chart-series-${slugify(key)}`;
-      html += `<li class="chart-legend-item ${colorClass} ${seriesClass}">${escapeHtml(label)}</li>`;
-    });
-    html += `</ul>`;
   }
 
   html += `<div class="chart-body">`;
@@ -154,6 +142,22 @@ export function renderDot(config) {
 
   html += `</div>`; // close chart-scroll
   html += `</div>`; // close chart-body
+
+  // Legend
+  if (seriesKeys.length > 0 || legendTitle) {
+    if (legendTitle) {
+      html += `<span class="chart-legend-title">${escapeHtml(legendTitle)}</span>`;
+    }
+    html += `<ul class="chart-legend">`;
+    seriesKeys.forEach((key, i) => {
+      const label = legendLabels[i] ?? key;
+      const colorClass = `chart-color-${i + 1}`;
+      const seriesClass = `chart-series-${slugify(key)}`;
+      html += `<li class="chart-legend-item ${colorClass} ${seriesClass}">${escapeHtml(label)}</li>`;
+    });
+    html += `</ul>`;
+  }
+
   html += renderDownloadLink(downloadDataUrl, downloadData);
   html += `</figure>`;
 

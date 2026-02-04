@@ -13,7 +13,7 @@ import { formatNumber } from '../formatters.js';
  * @returns {string} - HTML string
  */
 export function renderStackedBar(config) {
-  const { title, subtitle, data, max, legend, animate, format, id, downloadData, downloadDataUrl } = config;
+  const { title, subtitle, data, max, legend, legendTitle, animate, format, id, downloadData, downloadDataUrl } = config;
 
   if (!data || data.length === 0) {
     return `<!-- Stacked bar chart: no data provided -->`;
@@ -46,7 +46,10 @@ export function renderStackedBar(config) {
   }
 
   // Legend
-  if (seriesKeys.length > 0) {
+  if (seriesKeys.length > 0 || legendTitle) {
+    if (legendTitle) {
+      html += `<span class="chart-legend-title">${escapeHtml(legendTitle)}</span>`;
+    }
     html += `<ul class="chart-legend">`;
     seriesKeys.forEach((key, i) => {
       const label = legendLabels[i] ?? key;

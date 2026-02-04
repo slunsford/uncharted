@@ -67,18 +67,6 @@ export function renderStackedColumn(config) {
     html += `</figcaption>`;
   }
 
-  // Legend
-  if (seriesKeys.length > 0) {
-    html += `<ul class="chart-legend">`;
-    seriesKeys.forEach((key, i) => {
-      const label = legendLabels[i] ?? key;
-      const colorClass = `chart-color-${i + 1}`;
-      const seriesClass = `chart-series-${slugify(key)}`;
-      html += `<li class="chart-legend-item ${colorClass} ${seriesClass}">${escapeHtml(label)}</li>`;
-    });
-    html += `</ul>`;
-  }
-
   html += `<div class="chart-body">`;
 
   // Y-axis with --zero-position for label positioning
@@ -192,6 +180,19 @@ export function renderStackedColumn(config) {
 
   html += `</div>`; // close chart-scroll
   html += `</div>`; // close chart-body
+
+  // Legend
+  if (seriesKeys.length > 0) {
+    html += `<ul class="chart-legend">`;
+    seriesKeys.forEach((key, i) => {
+      const label = legendLabels[i] ?? key;
+      const colorClass = `chart-color-${i + 1}`;
+      const seriesClass = `chart-series-${slugify(key)}`;
+      html += `<li class="chart-legend-item ${colorClass} ${seriesClass}">${escapeHtml(label)}</li>`;
+    });
+    html += `</ul>`;
+  }
+
   html += renderDownloadLink(downloadDataUrl, downloadData);
   html += `</figure>`;
 

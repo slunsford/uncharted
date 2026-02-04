@@ -100,6 +100,8 @@ export function renderDonut(config) {
   html += `</div>`;
   html += `</div>`;
 
+  html += `</div>`; // Close donut-body
+
   // Legend with values (or percentages if showPercentages is true)
   const legendLabels = legend ?? segments.map(s => s.label);
   html += `<ul class="chart-legend">`;
@@ -119,8 +121,6 @@ export function renderDonut(config) {
     html += `</li>`;
   });
   html += `</ul>`;
-
-  html += `</div>`; // Close donut-body
 
   html += renderDownloadLink(downloadDataUrl, downloadData);
   html += `</figure>`;

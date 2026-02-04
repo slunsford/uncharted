@@ -415,22 +415,6 @@ export function renderSankey(config) {
     html += `</figcaption>`;
   }
 
-  // Legend (optional)
-  if (legend) {
-    html += `<ul class="chart-legend">`;
-    nodes.forEach((node, i) => {
-      const colorClass = `chart-color-${nodeColors.get(node)}`;
-      const seriesClass = `chart-series-${slugify(node)}`;
-      const throughput = nodeThroughput.get(node);
-      html += `<li class="chart-legend-item ${colorClass} ${seriesClass}">${escapeHtml(node)}`;
-      if (format) {
-        html += ` <span class="legend-value">${formatNumber(throughput, format) || throughput}</span>`;
-      }
-      html += `</li>`;
-    });
-    html += `</ul>`;
-  }
-
   // Build neighbor map for node hover highlighting
   const nodeNeighbors = new Map();
   nodes.forEach(n => nodeNeighbors.set(n, new Set()));
@@ -521,6 +505,23 @@ export function renderSankey(config) {
   });
 
   html += `</div>`;
+
+  // Legend (optional)
+  if (legend) {
+    html += `<ul class="chart-legend">`;
+    nodes.forEach((node, i) => {
+      const colorClass = `chart-color-${nodeColors.get(node)}`;
+      const seriesClass = `chart-series-${slugify(node)}`;
+      const throughput = nodeThroughput.get(node);
+      html += `<li class="chart-legend-item ${colorClass} ${seriesClass}">${escapeHtml(node)}`;
+      if (format) {
+        html += ` <span class="legend-value">${formatNumber(throughput, format) || throughput}</span>`;
+      }
+      html += `</li>`;
+    });
+    html += `</ul>`;
+  }
+
   html += renderDownloadLink(downloadDataUrl, downloadData);
   html += `</figure>`;
 
