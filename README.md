@@ -39,4 +39,4 @@ charts:
 
 Chart types: `donut`, `stacked-bar`, `stacked-column`, `dot`, `scatter`
 
-See the [documentation](https://uncharted.docs.seanlunsford.com/) for configuration options, styling, animations, and more.
+See the [documentation](https://uncharted.seanlunsford.com/) for configuration options, styling, animations, and more.
