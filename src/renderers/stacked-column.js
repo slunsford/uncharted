@@ -1,31 +1,43 @@
 import { slugify, getLabelKey, getSeriesNames, escapeHtml, renderDownloadLink } from '../utils.js';
 import { formatNumber } from '../formatters.js';
+import { getAxisMax, getAxisMin, getAxisFormat, getRotateLabels } from '../config.js';
 
 /**
  * Render a stacked column chart (vertical)
- * @param {Object} config - Chart configuration
+ * @param {Object} config - Chart configuration (normalized)
  * @param {string} config.title - Chart title
  * @param {string} [config.subtitle] - Chart subtitle
  * @param {Object[]} config.data - Chart data
- * @param {number} [config.max] - Maximum value for Y-axis scaling
- * @param {number} [config.min] - Minimum value for Y-axis scaling (for negative values)
+ * @param {Object} [config.y] - Y-axis configuration { max, min, format }
  * @param {string[]} [config.legend] - Legend labels (defaults to series names)
  * @param {boolean} [config.animate] - Enable animations
+ * @param {Object} [config._columns] - Resolved column mappings
  * @returns {string} - HTML string
  */
 export function renderStackedColumn(config) {
-  const { title, subtitle, data, max, min, legend, animate, format, id, rotateLabels, downloadData, downloadDataUrl } = config;
+  const { title, subtitle, data, max, min, legend, animate, format, id, downloadData, downloadDataUrl, _columns } = config;
 
   if (!data || data.length === 0) {
     return `<!-- Stacked column chart: no data provided -->`;
   }
 
-  // Get label key (first column) and series keys (remaining columns)
-  const labelKey = getLabelKey(data);
-  const seriesKeys = getSeriesNames(data);
-  // Use legend for display labels, fall back to data keys
-  const legendLabels = legend ?? seriesKeys;
+  // Get label key and series keys (use resolved columns if available)
+  const labelKey = _columns?.label ?? getLabelKey(data);
+  const seriesKeys = _columns?.values?.length > 0 ? _columns.values : getSeriesNames(data);
+
+  // Build legend labels from: 1) yLabels (new), 2) legend array (deprecated), 3) column names
+  const yLabels = _columns?.yLabels || {};
+  const getSeriesLabel = (key, index) => {
+    if (yLabels[key]) return yLabels[key];
+    if (Array.isArray(legend)) return legend[index] ?? key;
+    return key;
+  };
+
   const animateClass = animate ? ' chart-animate' : '';
+  const rotateLabels = getRotateLabels(config, config.id);
+
+  // Get Y-axis format
+  const yFormat = getAxisFormat(config, 'y');
 
   // Calculate stacked totals for positive and negative values separately
   // Positives stack up from zero, negatives stack down from zero
@@ -48,9 +60,12 @@ export function renderStackedColumn(config) {
     minNegativeStack = Math.min(minNegativeStack, negativeSum);
   });
 
-  const hasNegativeY = minNegativeStack < 0 || min < 0;
-  const maxValue = max ?? maxPositiveStack;
-  const minValue = min ?? minNegativeStack;
+  // Use normalized axis config, fall back to legacy top-level max/min
+  const configMaxY = getAxisMax(config, 'y') ?? max;
+  const configMinY = getAxisMin(config, 'y') ?? min;
+  const hasNegativeY = minNegativeStack < 0 || configMinY < 0;
+  const maxValue = configMaxY ?? maxPositiveStack;
+  const minValue = configMinY ?? minNegativeStack;
   const range = maxValue - minValue;
   const zeroPct = hasNegativeY ? ((0 - minValue) / range) * 100 : 0;
 
@@ -72,11 +87,11 @@ export function renderStackedColumn(config) {
   // Y-axis with --zero-position for label positioning
   const yAxisStyle = hasNegativeY ? ` style="--zero-position: ${zeroPct.toFixed(2)}%"` : '';
   html += `<div class="chart-y-axis"${yAxisStyle}>`;
-  html += `<span class="axis-label">${formatNumber(maxValue, format) || maxValue}</span>`;
+  html += `<span class="axis-label">${formatNumber(maxValue, yFormat) || maxValue}</span>`;
   const midLabelY = hasNegativeY ? 0 : Math.round(maxValue / 2);
-  html += `<span class="axis-label">${formatNumber(midLabelY, format) || midLabelY}</span>`;
+  html += `<span class="axis-label">${formatNumber(midLabelY, yFormat) || midLabelY}</span>`;
   const minLabelY = hasNegativeY ? minValue : 0;
-  html += `<span class="axis-label">${formatNumber(minLabelY, format) || minLabelY}</span>`;
+  html += `<span class="axis-label">${formatNumber(minLabelY, yFormat) || minLabelY}</span>`;
   html += `</div>`;
 
   // Scroll wrapper for columns + labels
@@ -107,7 +122,7 @@ export function renderStackedColumn(config) {
         const value = typeof val === 'number' ? val : parseFloat(val) || 0;
         const colorClass = `chart-color-${i + 1}`;
         const seriesClass = `chart-series-${slugify(key)}`;
-        const seriesLabel = legendLabels[i] ?? key;
+        const seriesLabel = getSeriesLabel(key, i);
         const segmentHeight = range > 0 ? (Math.abs(value) / range) * 100 : 0;
 
         if (value >= 0) {
@@ -115,7 +130,7 @@ export function renderStackedColumn(config) {
             classes: `column-segment ${colorClass} ${seriesClass}`,
             bottom: positiveBottom,
             height: segmentHeight,
-            title: `${escapeHtml(seriesLabel)}: ${formatNumber(value, format) || value}`,
+            title: `${escapeHtml(seriesLabel)}: ${formatNumber(value, yFormat) || value}`,
             isNegative: false
           });
           lastPositiveIdx = segments.length - 1;
@@ -126,7 +141,7 @@ export function renderStackedColumn(config) {
             classes: `column-segment ${colorClass} ${seriesClass} is-negative`,
             bottom: negativeTop,
             height: segmentHeight,
-            title: `${escapeHtml(seriesLabel)}: ${formatNumber(value, format) || value}`,
+            title: `${escapeHtml(seriesLabel)}: ${formatNumber(value, yFormat) || value}`,
             isNegative: true
           });
           lastNegativeIdx = segments.length - 1;
@@ -157,11 +172,11 @@ export function renderStackedColumn(config) {
       segmentData.forEach((seg, idx) => {
         const colorClass = `chart-color-${seg.i + 1}`;
         const seriesClass = `chart-series-${slugify(seg.key)}`;
-        const seriesLabel = legendLabels[seg.i] ?? seg.key;
+        const seriesLabel = getSeriesLabel(seg.key, seg.i);
         const endClass = idx === lastIdx ? ' is-stack-end' : '';
         html += `<div class="column-segment ${colorClass} ${seriesClass}${endClass}" `;
         html += `style="--value: ${seg.pct.toFixed(2)}%" `;
-        html += `title="${escapeHtml(seriesLabel)}: ${formatNumber(seg.value, format) || seg.value}"></div>`;
+        html += `title="${escapeHtml(seriesLabel)}: ${formatNumber(seg.value, yFormat) || seg.value}"></div>`;
       });
     }
 
@@ -181,11 +196,12 @@ export function renderStackedColumn(config) {
   html += `</div>`; // close chart-scroll
   html += `</div>`; // close chart-body
 
-  // Legend
-  if (seriesKeys.length > 0) {
+  // Legend (show if legend !== false and we have series keys)
+  const showLegend = config.legend !== false && seriesKeys.length > 0;
+  if (showLegend) {
     html += `<ul class="chart-legend">`;
     seriesKeys.forEach((key, i) => {
-      const label = legendLabels[i] ?? key;
+      const label = getSeriesLabel(key, i);
       const colorClass = `chart-color-${i + 1}`;
       const seriesClass = `chart-series-${slugify(key)}`;
       html += `<li class="chart-legend-item ${colorClass} ${seriesClass}">${escapeHtml(label)}</li>`;

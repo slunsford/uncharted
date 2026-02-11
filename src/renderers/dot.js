@@ -1,31 +1,44 @@
 import { slugify, escapeHtml, getLabelKey, getSeriesNames, renderDownloadLink } from '../utils.js';
 import { formatNumber } from '../formatters.js';
+import { getAxisMax, getAxisMin, getAxisFormat, getRotateLabels } from '../config.js';
 
 /**
  * Render a categorical dot chart (columns with dots at different Y positions)
  * Like atlas-wrapped's adoption chart - discrete X axis, continuous Y axis
- * @param {Object} config - Chart configuration
+ * @param {Object} config - Chart configuration (normalized)
  * @param {string} config.title - Chart title
  * @param {string} [config.subtitle] - Chart subtitle
  * @param {Object[]} config.data - Chart data with label column and value columns
- * @param {number} [config.max] - Maximum Y value (defaults to max in data)
- * @param {number} [config.min] - Minimum Y value (defaults to min in data or 0)
+ * @param {Object} [config.y] - Y-axis configuration { max, min, format }
  * @param {string[]} [config.legend] - Legend labels (defaults to series names)
  * @param {boolean} [config.animate] - Enable animations
+ * @param {Object} [config._columns] - Resolved column mappings
  * @returns {string} - HTML string
  */
 export function renderDot(config) {
-  const { title, subtitle, data, max, min, legend, legendTitle, animate, format, id, rotateLabels, downloadData, downloadDataUrl, connectDots, dots: showDots = true, chartType = 'dot' } = config;
+  const { title, subtitle, data, max, min, legend, legendTitle, animate, format, id, downloadData, downloadDataUrl, connectDots, dots: showDots = true, chartType = 'dot', _columns } = config;
 
   if (!data || data.length === 0) {
     return `<!-- Dot chart: no data provided -->`;
   }
 
-  // Get label key (first column) and series keys (remaining columns)
-  const labelKey = getLabelKey(data);
-  const seriesKeys = getSeriesNames(data);
-  const legendLabels = legend ?? seriesKeys;
+  // Get label key and series keys (use resolved columns if available)
+  const labelKey = _columns?.label ?? getLabelKey(data);
+  const seriesKeys = _columns?.values?.length > 0 ? _columns.values : getSeriesNames(data);
+
+  // Build legend labels from: 1) yLabels (new), 2) legend array (deprecated), 3) column names
+  const yLabels = _columns?.yLabels || {};
+  const getSeriesLabel = (key, index) => {
+    if (yLabels[key]) return yLabels[key];
+    if (Array.isArray(legend)) return legend[index] ?? key;
+    return key;
+  };
+
   const animateClass = animate ? ' chart-animate' : '';
+  const rotateLabels = getRotateLabels(config, config.id);
+
+  // Get Y-axis format
+  const yFormat = getAxisFormat(config, 'y');
 
   // Calculate min and max values for Y scaling
   const allValues = data.flatMap(row =>
@@ -36,8 +49,10 @@ export function renderDot(config) {
   );
   const dataMax = Math.max(...allValues);
   const dataMin = Math.min(...allValues);
-  const maxValue = max ?? dataMax;
-  const minValue = min ?? (dataMin < 0 ? dataMin : 0);
+
+  // Use normalized axis config, fall back to legacy top-level max/min
+  const maxValue = getAxisMax(config, 'y') ?? max ?? dataMax;
+  const minValue = getAxisMin(config, 'y') ?? min ?? (dataMin < 0 ? dataMin : 0);
   const range = maxValue - minValue;
   const hasNegativeY = minValue < 0;
 
@@ -63,10 +78,10 @@ export function renderDot(config) {
   // Y-axis
   const yAxisStyle = hasNegativeY ? ` style="--zero-position: ${zeroPct.toFixed(2)}%"` : '';
   html += `<div class="chart-y-axis"${yAxisStyle}>`;
-  html += `<span class="axis-label">${formatNumber(maxValue, format) || maxValue}</span>`;
+  html += `<span class="axis-label">${formatNumber(maxValue, yFormat) || maxValue}</span>`;
   const midLabelY = hasNegativeY ? 0 : Math.round((maxValue + minValue) / 2);
-  html += `<span class="axis-label">${formatNumber(midLabelY, format) || midLabelY}</span>`;
-  html += `<span class="axis-label">${formatNumber(minValue, format) || minValue}</span>`;
+  html += `<span class="axis-label">${formatNumber(midLabelY, yFormat) || midLabelY}</span>`;
+  html += `<span class="axis-label">${formatNumber(minValue, yFormat) || minValue}</span>`;
   html += `</div>`;
 
   // Scroll wrapper for chart + labels
@@ -117,11 +132,11 @@ export function renderDot(config) {
         const yPct = range > 0 ? ((value - minValue) / range) * 100 : 0;
         const colorClass = `chart-color-${i + 1}`;
         const seriesClass = `chart-series-${slugify(key)}`;
-        const tooltipLabel = legendLabels[i] ?? key;
+        const tooltipLabel = getSeriesLabel(key, i);
 
         html += `<div class="dot ${colorClass} ${seriesClass}" `;
         html += `style="--value: ${yPct.toFixed(2)}%" `;
-        html += `title="${escapeHtml(tooltipLabel)}: ${formatNumber(value, format) || value}"`;
+        html += `title="${escapeHtml(tooltipLabel)}: ${formatNumber(value, yFormat) || value}"`;
         html += `></div>`;
       });
 
@@ -143,14 +158,15 @@ export function renderDot(config) {
   html += `</div>`; // close chart-scroll
   html += `</div>`; // close chart-body
 
-  // Legend
-  if (seriesKeys.length > 0 || legendTitle) {
+  // Legend (show if legend !== false and we have series keys or legendTitle)
+  const showLegend = config.legend !== false && (seriesKeys.length > 0 || legendTitle);
+  if (showLegend) {
     if (legendTitle) {
       html += `<span class="chart-legend-title">${escapeHtml(legendTitle)}</span>`;
     }
     html += `<ul class="chart-legend">`;
     seriesKeys.forEach((key, i) => {
-      const label = legendLabels[i] ?? key;
+      const label = getSeriesLabel(key, i);
       const colorClass = `chart-color-${i + 1}`;
       const seriesClass = `chart-series-${slugify(key)}`;
       html += `<li class="chart-legend-item ${colorClass} ${seriesClass}">${escapeHtml(label)}</li>`;

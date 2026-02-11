@@ -3,7 +3,7 @@ import { formatNumber } from '../formatters.js';
 
 /**
  * Render a Sankey diagram
- * @param {Object} config - Chart configuration
+ * @param {Object} config - Chart configuration (normalized)
  * @param {string} config.title - Chart title
  * @param {string} [config.subtitle] - Chart subtitle
  * @param {Object[]} config.data - Chart data (source, target, value columns)
@@ -13,10 +13,11 @@ import { formatNumber } from '../formatters.js';
  * @param {number} [config.nodePadding] - Vertical gap between nodes in pixels (default: 10)
  * @param {boolean} [config.endLabelsOutside] - Position last level labels outside/right (default: false)
  * @param {boolean} [config.proportional] - Force proportional node heights for data integrity (default: false)
+ * @param {Object} [config._columns] - Resolved column mappings
  * @returns {string} - HTML string
  */
 export function renderSankey(config) {
-  const { title, subtitle, data, legend, animate, format, id, downloadData, downloadDataUrl, nodeWidth = 20, nodePadding = 10, endLabelsOutside = false, proportional = false } = config;
+  const { title, subtitle, data, legend, animate, format, id, downloadData, downloadDataUrl, nodeWidth = 20, nodePadding = 10, endLabelsOutside = false, proportional = false, _columns } = config;
 
   if (!data || data.length === 0) {
     return `<!-- Sankey chart: no data provided -->`;
@@ -24,11 +25,14 @@ export function renderSankey(config) {
 
   const animateClass = animate ? ' chart-animate' : '';
 
-  // Get column keys positionally
+  // Get column keys (use resolved columns if available)
   const keys = Object.keys(data[0]);
-  const sourceKey = keys[0];  // First column: source
-  const targetKey = keys[1];  // Second column: target
-  const valueKey = keys[2];   // Third column: value
+  const sourceKey = _columns?.source ?? keys[0];  // First column: source
+  const targetKey = _columns?.target ?? keys[1];  // Second column: target
+  const valueKey = _columns?.value ?? keys[2];    // Third column: value
+
+  // Get value format from resolved columns (new schema) or global format
+  const valueFormat = _columns?.valueFormat ?? format;
 
   // Parse edges and build node set
   const edges = [];
@@ -445,7 +449,7 @@ export function renderSankey(config) {
   flows.forEach((flow, i) => {
     const sourceColor = nodeColors.get(flow.source);
     const targetColor = nodeColors.get(flow.target);
-    const tooltipText = `${flow.source} → ${flow.target}: ${formatNumber(flow.value, format) || flow.value}`;
+    const tooltipText = `${flow.source} → ${flow.target}: ${formatNumber(flow.value, valueFormat) || flow.value}`;
 
     // Flow spans from after source node column to target node column
     const colStart = flow.fromLevel * 2 + 2;
@@ -493,7 +497,7 @@ export function renderSankey(config) {
       const colorClass = `chart-color-${colorIndex}`;
       const seriesClass = `chart-series-${slugify(node)}`;
       const throughput = nodeThroughput.get(node);
-      const tooltipText = `${node}: ${formatNumber(throughput, format) || throughput}`;
+      const tooltipText = `${node}: ${formatNumber(throughput, valueFormat) || throughput}`;
 
       html += `<div class="chart-sankey-node ${colorClass} ${seriesClass}" `;
       html += `style="--top: ${pos.top.toFixed(2)}%; --height: ${pos.height.toFixed(2)}%" `;
@@ -514,8 +518,8 @@ export function renderSankey(config) {
       const seriesClass = `chart-series-${slugify(node)}`;
       const throughput = nodeThroughput.get(node);
       html += `<li class="chart-legend-item ${colorClass} ${seriesClass}">${escapeHtml(node)}`;
-      if (format) {
-        html += ` <span class="legend-value">${formatNumber(throughput, format) || throughput}</span>`;
+      if (valueFormat) {
+        html += ` <span class="legend-value">${formatNumber(throughput, valueFormat) || throughput}</span>`;
       }
       html += `</li>`;
     });

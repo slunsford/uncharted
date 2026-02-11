@@ -2,6 +2,8 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { renderers } from './src/renderers/index.js';
 import { loadCSV } from './src/csv.js';
+import { normalizeConfig } from './src/config.js';
+import { resolveColumns } from './src/columns.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -122,13 +124,20 @@ export default function(eleventyConfig, options = {}) {
       downloadDataUrl = normalizedDataPath + chartConfig.file;
     }
 
+    // Normalize configuration (handles deprecated keys, axis config)
+    const normalizedConfig = normalizeConfig(chartConfig, chartId);
+
+    // Resolve column mappings
+    const columns = resolveColumns(normalizedConfig, data, chartType);
+
     return renderer({
-      ...chartConfig,
+      ...normalizedConfig,
       id: chartId,
       data,
       animate,
       downloadData,
-      downloadDataUrl
+      downloadDataUrl,
+      _columns: columns
     });
   });
 }

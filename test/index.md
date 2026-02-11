@@ -6,8 +6,10 @@ charts:
     type: stacked-bar
     title: Platform Growth
     subtitle: Models by domain
-    max: 25
     file: charts/platform-growth.csv
+    x:
+      max: 25
+    legend: true
   quick-stats:
     type: donut
     title: Issue Types
@@ -75,6 +77,22 @@ This page demonstrates all chart types supported by the Uncharted plugin.
 ### Multi-Level Sankey
 
 {% chart "sankey-multi" %}
+
+## Legacy Schema Tests
+
+These charts use deprecated options to verify backwards compatibility and deprecation warnings.
+
+### Legacy Dot Chart
+
+Uses `columns:`, `legend: []`, and top-level `max`:
+
+{% chart "legacy-deprecation-test" %}
+
+### Legacy Scatter Chart
+
+Uses `maxX`, `maxY`, `titleX`, `titleY`, `legendTitle`:
+
+{% chart "legacy-scatter-test" %}
 
 ## Error Handling
 

@@ -1,30 +1,28 @@
 import { slugify, escapeHtml, renderDownloadLink } from '../utils.js';
 import { formatNumber } from '../formatters.js';
+import { getAxisMax, getAxisMin, getAxisTitle, getAxisFormat } from '../config.js';
 
 /**
  * Render a scatter plot (continuous X and Y axes)
- * @param {Object} config - Chart configuration
+ * @param {Object} config - Chart configuration (normalized)
  * @param {string} config.title - Chart title
  * @param {string} [config.subtitle] - Chart subtitle
  * @param {Object[]} config.data - Chart data (label + named columns: x, y, size, series)
- * @param {number} [config.maxX] - Maximum X value (defaults to max in data)
- * @param {number} [config.maxY] - Maximum Y value (defaults to max in data)
- * @param {number} [config.minX] - Minimum X value (defaults to min in data or 0)
- * @param {number} [config.minY] - Minimum Y value (defaults to min in data or 0)
+ * @param {Object} [config.x] - X-axis configuration { max, min, title, format }
+ * @param {Object} [config.y] - Y-axis configuration { max, min, title, format }
  * @param {string[]} [config.legend] - Legend labels for series
  * @param {string} [config.legendTitle] - Title for series legend
  * @param {string} [config.sizeTitle] - Title for size legend (enables size legend display)
  * @param {boolean} [config.animate] - Enable animations
- * @param {string} [config.titleX] - X-axis title (defaults to column name)
- * @param {string} [config.titleY] - Y-axis title (defaults to column name)
+ * @param {Object} [config._columns] - Resolved column mappings
  * @returns {string} - HTML string
  */
 export function renderScatter(config) {
-  const { title, subtitle, data, maxX, maxY, minX, minY, legend, legendTitle, sizeTitle, animate, format, titleX, titleY, id, downloadData, downloadDataUrl, proportional } = config;
+  const { title, subtitle, data, legend, animate, format, id, downloadData, downloadDataUrl, proportional, _columns } = config;
 
-  // Handle nested X/Y format for scatter charts
-  const fmtX = format?.x || format || {};
-  const fmtY = format?.y || format || {};
+  // Get axis-specific format configs (normalized config provides x.format/y.format)
+  const fmtX = getAxisFormat(config, 'x');
+  const fmtY = getAxisFormat(config, 'y');
 
   if (!data || data.length === 0) {
     return `<!-- Scatter chart: no data provided -->`;
@@ -32,26 +30,37 @@ export function renderScatter(config) {
 
   const animateClass = animate ? ' chart-animate' : '';
 
-  // Named column detection (case-insensitive), with positional fallback for x/y
+  // Use resolved columns if available, otherwise fall back to implicit detection
   const keys = Object.keys(data[0]);
   const findKey = name => keys.find(k => k.toLowerCase() === name) || null;
 
-  // First column is always label
-  const labelKey = keys[0];
+  let labelKey, xKey, yKey, sizeKey, seriesKey;
 
-  // X and Y: named if both exist, otherwise positional (columns 2 and 3)
-  const namedX = findKey('x');
-  const namedY = findKey('y');
-  const xKey = (namedX && namedY) ? namedX : keys[1];
-  const yKey = (namedX && namedY) ? namedY : keys[2];
+  if (_columns) {
+    // Use pre-resolved columns from config normalization
+    labelKey = _columns.label;
+    xKey = _columns.x;
+    yKey = _columns.y;
+    sizeKey = _columns.size;
+    seriesKey = _columns.series;
+  } else {
+    // Fallback: implicit detection (for backwards compatibility)
+    labelKey = keys[0];
+    const namedX = findKey('x');
+    const namedY = findKey('y');
+    xKey = (namedX && namedY) ? namedX : keys[1];
+    yKey = (namedX && namedY) ? namedY : keys[2];
+    sizeKey = findKey('size');
+    seriesKey = findKey('series');
+  }
 
-  // Size and series: named only (no positional fallback)
-  const sizeKey = findKey('size');
-  const seriesKey = findKey('series');
+  // Get legend/size titles from resolved columns (new schema) or deprecated top-level
+  const legendTitle = _columns?.seriesTitle ?? config.legendTitle;
+  const sizeTitle = _columns?.sizeTitle ?? config.sizeTitle;
 
-  // Axis titles: explicit config overrides column names
-  const xAxisTitle = titleX ?? xKey;
-  const yAxisTitle = titleY ?? yKey;
+  // Axis titles: use normalized config, fall back to column names
+  const xAxisTitle = getAxisTitle(config, 'x', xKey);
+  const yAxisTitle = getAxisTitle(config, 'y', yKey);
 
   // Map data to dots
   const dots = data.map(item => ({
@@ -78,7 +87,7 @@ export function renderScatter(config) {
     });
   }
 
-  // Calculate bounds
+  // Calculate bounds using normalized axis config
   const xValues = dots.map(d => d.x);
   const yValues = dots.map(d => d.y);
   const dataMaxX = Math.max(...xValues);
@@ -86,10 +95,10 @@ export function renderScatter(config) {
   const dataMaxY = Math.max(...yValues);
   const dataMinY = Math.min(...yValues);
 
-  const calcMaxX = maxX ?? dataMaxX;
-  const calcMaxY = maxY ?? dataMaxY;
-  const calcMinX = minX ?? (dataMinX < 0 ? dataMinX : 0);
-  const calcMinY = minY ?? (dataMinY < 0 ? dataMinY : 0);
+  const calcMaxX = getAxisMax(config, 'x') ?? dataMaxX;
+  const calcMaxY = getAxisMax(config, 'y') ?? dataMaxY;
+  const calcMinX = getAxisMin(config, 'x') ?? (dataMinX < 0 ? dataMinX : 0);
+  const calcMinY = getAxisMin(config, 'y') ?? (dataMinY < 0 ? dataMinY : 0);
   const rangeX = calcMaxX - calcMinX;
   const rangeY = calcMaxY - calcMinY;
   const dataAspectRatio = rangeY > 0 ? rangeX / rangeY : 1;

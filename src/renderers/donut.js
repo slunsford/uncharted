@@ -3,7 +3,7 @@ import { formatNumber } from '../formatters.js';
 
 /**
  * Render a donut/pie chart using conic-gradient
- * @param {Object} config - Chart configuration
+ * @param {Object} config - Chart configuration (normalized)
  * @param {string} config.title - Chart title
  * @param {string} [config.subtitle] - Chart subtitle
  * @param {Object[]} config.data - Chart data (with label and value properties)
@@ -13,10 +13,11 @@ import { formatNumber } from '../formatters.js';
  * @param {string} [config.center.label] - Label below the value
  * @param {boolean} [config.animate] - Enable animations
  * @param {boolean} [config.showPercentages] - Show percentages instead of values in legend
+ * @param {Object} [config._columns] - Resolved column mappings
  * @returns {string} - HTML string
  */
 export function renderDonut(config) {
-  const { title, subtitle, data, legend, center, animate, format, id, showPercentages, downloadData, downloadDataUrl } = config;
+  const { title, subtitle, data, legend, center, animate, format, id, showPercentages, downloadData, downloadDataUrl, _columns } = config;
 
   if (!data || data.length === 0) {
     return `<!-- Donut chart: no data provided -->`;
@@ -24,10 +25,10 @@ export function renderDonut(config) {
 
   const animateClass = animate ? ' chart-animate' : '';
 
-  // Get column keys positionally
-  const labelKey = getLabelKey(data);
-  const valueKey = getValueKey(data);
-  const seriesKeys = getSeriesNames(data);
+  // Get column keys (use resolved columns if available)
+  const labelKey = _columns?.label ?? getLabelKey(data);
+  const valueKey = _columns?.values?.[0] ?? getValueKey(data);
+  const seriesKeys = _columns?.values?.length > 0 ? _columns.values : getSeriesNames(data);
 
   // Extract values - support both label/value format and series format
   let segments = [];
@@ -102,25 +103,39 @@ export function renderDonut(config) {
 
   html += `</div>`; // Close donut-body
 
+  // Build label lookup from: 1) yLabels (new schema), 2) legend array (deprecated), 3) segment labels
+  const labelMap = _columns?.yLabels || {};
+  const getSegmentLabel = (segment, index) => {
+    if (labelMap[segment.label]) return labelMap[segment.label];
+    if (Array.isArray(legend)) return legend[index] ?? segment.label;
+    return segment.label;
+  };
+
+  // Get value format from resolved columns or global format
+  const valueFormat = _columns?.valueFormat ?? format;
+
   // Legend with values (or percentages if showPercentages is true)
-  const legendLabels = legend ?? segments.map(s => s.label);
-  html += `<ul class="chart-legend">`;
-  segments.forEach((segment, i) => {
-    const label = legendLabels[i] ?? segment.label;
-    let displayValue;
-    if (showPercentages) {
-      displayValue = ((segment.value / total) * 100).toFixed(1) + '%';
-    } else {
-      displayValue = formatNumber(segment.value, format) || segment.value;
-    }
-    const colorClass = `chart-color-${i + 1}`;
-    const seriesClass = `chart-series-${slugify(segment.label)}`;
-    html += `<li class="chart-legend-item ${colorClass} ${seriesClass}">`;
-    html += `<span class="legend-label">${escapeHtml(label)}</span>`;
-    html += `<span class="legend-value">${escapeHtml(String(displayValue))}</span>`;
-    html += `</li>`;
-  });
-  html += `</ul>`;
+  // Show if legend !== false (donut always shows legend by default)
+  const showLegend = config.legend !== false;
+  if (showLegend) {
+    html += `<ul class="chart-legend">`;
+    segments.forEach((segment, i) => {
+      const label = getSegmentLabel(segment, i);
+      let displayValue;
+      if (showPercentages) {
+        displayValue = ((segment.value / total) * 100).toFixed(1) + '%';
+      } else {
+        displayValue = formatNumber(segment.value, valueFormat) || segment.value;
+      }
+      const colorClass = `chart-color-${i + 1}`;
+      const seriesClass = `chart-series-${slugify(segment.label)}`;
+      html += `<li class="chart-legend-item ${colorClass} ${seriesClass}">`;
+      html += `<span class="legend-label">${escapeHtml(label)}</span>`;
+      html += `<span class="legend-value">${escapeHtml(String(displayValue))}</span>`;
+      html += `</li>`;
+    });
+    html += `</ul>`;
+  }
 
   html += renderDownloadLink(downloadDataUrl, downloadData);
   html += `</figure>`;

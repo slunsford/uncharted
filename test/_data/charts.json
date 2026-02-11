@@ -4,56 +4,110 @@
     "title": "Release Cadence",
     "subtitle": "By quarter",
     "file": "charts/releases.csv",
-    "legend": ["Production", "Hotfix", "Beta"],
-    "download": "Download release data (CSV)"
+    "x": {
+      "column": "label"
+    },
+    "y": {
+      "columns": {
+        "production": "Production",
+        "hotfix": "Hotfix",
+        "beta": "Beta"
+      }
+    },
+    "legend": true
   },
   "adoption": {
     "type": "dot",
     "title": "AI-Assisted Development",
     "subtitle": "PRs and commits by month",
     "file": "charts/adoption.csv",
-    "max": 60,
-    "legend": ["Pull Requests", "Commits"]
+    "x": {
+      "column": "label"
+    },
+    "y": {
+      "columns": {
+        "prs": "Pull Requests",
+        "commits": "Commits"
+      },
+      "max": 60
+    },
+    "legend": true
   },
   "scatter": {
     "type": "scatter",
     "title": "Performance Metrics",
     "subtitle": "Alpha vs Beta",
     "file": "charts/scatter-data.csv",
-    "maxX": 100,
-    "maxY": 100,
-    "legend": ["Alpha Group", "Beta Group"]
+    "x": {
+      "column": "x",
+      "max": 100,
+      "title": "X Performance"
+    },
+    "y": {
+      "column": "y",
+      "max": 100,
+      "title": "Y Performance"
+    },
+    "label": {
+      "column": "label"
+    },
+    "series": {
+      "column": "series",
+      "title": "Group"
+    },
+    "legend": true
   },
   "temperature": {
     "type": "dot",
     "title": "Temperature Range",
     "subtitle": "Monthly highs and lows (°C)",
     "file": "charts/temperature.csv",
-    "legend": ["Low", "High"]
+    "y": {
+      "columns": {
+        "High": "High",
+        "Low": "Low"
+      }
+    },
+    "legend": true
   },
   "quadrant": {
     "type": "scatter",
     "title": "Quadrant Analysis",
     "subtitle": "Data across all four quadrants",
     "file": "charts/quadrant.csv",
-    "legend": ["Group 1", "Group 2"]
+    "series": {
+      "column": "series",
+      "title": "Group"
+    },
+    "legend": true
   },
   "profit": {
     "type": "stacked-column",
     "title": "Quarterly Revenue",
     "subtitle": "Cost + Profit/Loss",
     "file": "charts/profit.csv",
-    "legend": ["Cost", "Profit/Loss"],
+    "y": {
+      "columns": {
+        "Cost": "Cost",
+        "Profit": "Profit/Loss"
+      }
+    },
     "animate": true,
-    "download": false
+    "legend": true
   },
   "line": {
     "type": "line",
     "title": "AI-Assisted Development",
     "subtitle": "PRs and commits by month (line)",
     "file": "charts/adoption.csv",
-    "max": 60,
-    "legend": ["Pull Requests", "Commits"],
+    "y": {
+      "columns": {
+        "prs": "Pull Requests",
+        "commits": "Commits"
+      },
+      "max": 60
+    },
+    "legend": true,
     "animate": true,
     "dots": true
   },
@@ -62,27 +116,61 @@
     "title": "Budget Allocation",
     "subtitle": "Simple 2-level flow",
     "file": "charts/sankey-basic.csv",
-    "legend": true,
-    "proportional": true,
-    "format": {
-      "compact": true,
-      "currency": {
-        "symbol": "$"
+    "source": {
+      "column": "source"
+    },
+    "target": {
+      "column": "target"
+    },
+    "value": {
+      "column": "value",
+      "format": {
+        "compact": true,
+        "currency": {
+          "symbol": "$"
+        }
       }
-    }
+    },
+    "legend": true,
+    "proportional": true
   },
   "sankey-multi": {
     "type": "sankey",
     "title": "Budget to Revenue",
     "subtitle": "Multi-level flow diagram",
     "file": "charts/sankey-multi.csv",
-    "animate": true,
-    "proportional": true,
-    "format": {
-      "compact": true,
-      "currency": {
-        "symbol": "$"
+    "value": {
+      "format": {
+        "compact": true,
+        "currency": {
+          "symbol": "$"
+        }
       }
-    }
+    },
+    "animate": true,
+    "proportional": true
+  },
+  "legacy-deprecation-test": {
+    "type": "dot",
+    "title": "Legacy Schema Test",
+    "subtitle": "Tests deprecation warnings",
+    "file": "charts/adoption.csv",
+    "max": 60,
+    "columns": {
+      "y": ["prs", "commits"]
+    },
+    "legend": ["Pull Requests", "Commits"]
+  },
+  "legacy-scatter-test": {
+    "type": "scatter",
+    "title": "Legacy Scatter Test",
+    "subtitle": "Tests deprecated scatter options",
+    "file": "charts/scatter-data.csv",
+    "maxX": 100,
+    "maxY": 100,
+    "titleX": "X Value",
+    "titleY": "Y Value",
+    "legendTitle": "Series",
+    "legend": ["Alpha Group", "Beta Group"]
   }
 }
