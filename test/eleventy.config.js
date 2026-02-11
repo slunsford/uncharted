@@ -1,9 +1,8 @@
 import uncharted from '../eleventy.config.js';
 
 export default function(eleventyConfig) {
-  // Register the uncharted plugin
+  // Register the uncharted plugin (dataDir auto-detected from Eleventy config)
   eleventyConfig.addPlugin(uncharted, {
-    dataDir: '_data',
     animate: true,
     dataPassthrough: true,
     downloadData: true

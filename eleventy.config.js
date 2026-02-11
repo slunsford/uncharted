@@ -11,7 +11,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
  * Uncharted - Eleventy CSS Charts Plugin
  * @param {Object} eleventyConfig - Eleventy configuration object
  * @param {Object} [options] - Plugin options
- * @param {string} [options.dataDir] - Data directory path (defaults to _data)
+ * @param {string} [options.dataDir] - Data directory path (overrides Eleventy's dir.data if set)
  * @param {boolean} [options.animate] - Enable animations globally (individual charts can override)
  * @param {string} [options.cssPath] - Output path for stylesheet (default: '/css/uncharted.css')
  * @param {boolean} [options.injectCss] - Automatically copy and inject CSS (default: true)
@@ -20,7 +20,28 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
  * @param {boolean|string} [options.downloadData] - Enable download links globally (individual charts can override)
  */
 export default function(eleventyConfig, options = {}) {
-  const dataDir = options.dataDir || '_data';
+  // Directory config from Eleventy (populated by eleventy.directories event)
+  let eleventyDirs = null;
+
+  // Listen for Eleventy's directory configuration
+  eleventyConfig.on('eleventy.directories', (dirs) => {
+    eleventyDirs = dirs;
+  });
+
+  // Helper to resolve data directory
+  function getDataDir() {
+    // Plugin option takes precedence if explicitly set
+    if (options.dataDir) {
+      return path.resolve(process.cwd(), options.dataDir);
+    }
+    // Use Eleventy's directory configuration (already includes full path)
+    if (eleventyDirs?.data) {
+      return path.resolve(process.cwd(), eleventyDirs.data);
+    }
+    // Fallback to default
+    return path.resolve(process.cwd(), '_data');
+  }
+
   const globalAnimate = options.animate ?? false;
   const cssPath = options.cssPath || '/css/uncharted.css';
   const injectCss = options.injectCss ?? true;
@@ -67,17 +88,19 @@ export default function(eleventyConfig, options = {}) {
     });
   }
 
-  // CSV data passthrough for download links
+  // CSV data passthrough for download links (set up after directories are known)
   if (dataPassthrough) {
-    const resolvedDataDir = path.resolve(process.cwd(), dataDir);
-    eleventyConfig.addPassthroughCopy({
-      [resolvedDataDir]: dataPath.replace(/^\//, '').replace(/\/$/, '')
+    eleventyConfig.on('eleventy.directories', () => {
+      const resolvedDataDir = getDataDir();
+      eleventyConfig.addPassthroughCopy({
+        [resolvedDataDir]: dataPath.replace(/^\//, '').replace(/\/$/, '')
+      });
     });
   }
 
   eleventyConfig.addShortcode('chart', function(chartId) {
-    // Resolve data directory relative to the current working directory
-    const resolvedDataDir = path.resolve(process.cwd(), dataDir);
+    // Get resolved data directory (from Eleventy config or plugin options)
+    const resolvedDataDir = getDataDir();
 
     // Look up chart config from page data or global data
     // In Eleventy 3.x, data is available directly on `this` context
