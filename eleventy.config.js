@@ -11,7 +11,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
  * Uncharted - Eleventy CSS Charts Plugin
  * @param {Object} eleventyConfig - Eleventy configuration object
  * @param {Object} [options] - Plugin options
- * @param {string} [options.dataDir] - Data directory path (overrides Eleventy's dir.data if set)
+ * @param {string} [options.dataDir] - @deprecated Data directory path (now auto-detected from Eleventy's dir.data)
  * @param {boolean} [options.animate] - Enable animations globally (individual charts can override)
  * @param {string} [options.cssPath] - Output path for stylesheet (default: '/css/uncharted.css')
  * @param {boolean} [options.injectCss] - Automatically copy and inject CSS (default: true)
@@ -28,9 +28,14 @@ export default function(eleventyConfig, options = {}) {
     eleventyDirs = dirs;
   });
 
+  // Warn if deprecated dataDir option is used
+  if (options.dataDir) {
+    console.warn('[uncharted] "dataDir" option is deprecated; the plugin now auto-detects from Eleventy\'s dir.data config');
+  }
+
   // Helper to resolve data directory
   function getDataDir() {
-    // Plugin option takes precedence if explicitly set
+    // Plugin option takes precedence if explicitly set (deprecated)
     if (options.dataDir) {
       return path.resolve(process.cwd(), options.dataDir);
     }
