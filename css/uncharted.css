@@ -126,11 +126,12 @@
   margin-bottom: 1rem;
 }
 
-.chart-legend-item {
+.chart-legend > .chart-legend-item {
   display: flex;
   align-items: baseline;
   gap: 0.5rem;
   background: transparent;
+  margin: 0;
 }
 
 .chart-legend-item::before {
