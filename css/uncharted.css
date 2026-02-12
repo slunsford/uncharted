@@ -128,15 +128,15 @@
 
 .chart-legend-item {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   gap: 0.5rem;
   background: transparent;
 }
 
 .chart-legend-item::before {
   content: '';
-  width: 0.75rem;
-  height: 0.75rem;
+  width: 1cap;
+  height: 1cap;
   border-radius: 2px;
   background-color: var(--color);
   flex-shrink: 0;
