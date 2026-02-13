@@ -512,18 +512,18 @@ export function renderSankey(config) {
 
   // Legend (optional)
   if (legend) {
-    html += `<ul class="chart-legend">`;
+    html += `<div class="chart-legend">`;
     nodes.forEach((node, i) => {
       const colorClass = `chart-color-${nodeColors.get(node)}`;
       const seriesClass = `chart-series-${slugify(node)}`;
       const throughput = nodeThroughput.get(node);
-      html += `<li class="chart-legend-item ${colorClass} ${seriesClass}">${escapeHtml(node)}`;
+      html += `<span class="chart-legend-item ${colorClass} ${seriesClass}">${escapeHtml(node)}`;
       if (valueFormat) {
         html += ` <span class="legend-value">${formatNumber(throughput, valueFormat) || throughput}</span>`;
       }
-      html += `</li>`;
+      html += `</span>`;
     });
-    html += `</ul>`;
+    html += `</div>`;
   }
 
   html += renderDownloadLink(downloadDataUrl, downloadData);

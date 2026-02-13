@@ -65,14 +65,14 @@ export function renderStackedBar(config) {
     if (legendTitle) {
       html += `<span class="chart-legend-title">${escapeHtml(legendTitle)}</span>`;
     }
-    html += `<ul class="chart-legend">`;
+    html += `<div class="chart-legend">`;
     seriesKeys.forEach((key, i) => {
       const label = getSeriesLabel(key, i);
       const colorClass = `chart-color-${i + 1}`;
       const seriesClass = `chart-series-${slugify(key)}`;
-      html += `<li class="chart-legend-item ${colorClass} ${seriesClass}">${escapeHtml(label)}</li>`;
+      html += `<span class="chart-legend-item ${colorClass} ${seriesClass}">${escapeHtml(label)}</span>`;
     });
-    html += `</ul>`;
+    html += `</div>`;
   }
 
   // Calculate delay step to cap total stagger at 1s

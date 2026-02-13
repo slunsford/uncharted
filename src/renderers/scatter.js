@@ -201,14 +201,14 @@ export function renderScatter(config) {
     if (legendTitle) {
       html += `<span class="chart-legend-title">${escapeHtml(legendTitle)}</span>`;
     }
-    html += `<ul class="chart-legend">`;
+    html += `<div class="chart-legend">`;
     seriesList.forEach((series, i) => {
       const label = legendLabels[i] ?? series;
       const colorClass = `chart-color-${i + 1}`;
       const seriesClass = `chart-series-${slugify(series)}`;
-      html += `<li class="chart-legend-item ${colorClass} ${seriesClass}">${escapeHtml(label)}</li>`;
+      html += `<span class="chart-legend-item ${colorClass} ${seriesClass}">${escapeHtml(label)}</span>`;
     });
-    html += `</ul>`;
+    html += `</div>`;
   }
 
   // Size legend (when sizeTitle is specified and size column exists)

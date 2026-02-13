@@ -199,14 +199,14 @@ export function renderStackedColumn(config) {
   // Legend (show if legend !== false and we have series keys)
   const showLegend = config.legend !== false && seriesKeys.length > 0;
   if (showLegend) {
-    html += `<ul class="chart-legend">`;
+    html += `<div class="chart-legend">`;
     seriesKeys.forEach((key, i) => {
       const label = getSeriesLabel(key, i);
       const colorClass = `chart-color-${i + 1}`;
       const seriesClass = `chart-series-${slugify(key)}`;
-      html += `<li class="chart-legend-item ${colorClass} ${seriesClass}">${escapeHtml(label)}</li>`;
+      html += `<span class="chart-legend-item ${colorClass} ${seriesClass}">${escapeHtml(label)}</span>`;
     });
-    html += `</ul>`;
+    html += `</div>`;
   }
 
   html += renderDownloadLink(downloadDataUrl, downloadData);

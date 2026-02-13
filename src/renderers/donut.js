@@ -118,7 +118,7 @@ export function renderDonut(config) {
   // Show if legend !== false (donut always shows legend by default)
   const showLegend = config.legend !== false;
   if (showLegend) {
-    html += `<ul class="chart-legend">`;
+    html += `<div class="chart-legend">`;
     segments.forEach((segment, i) => {
       const label = getSegmentLabel(segment, i);
       let displayValue;
@@ -129,12 +129,12 @@ export function renderDonut(config) {
       }
       const colorClass = `chart-color-${i + 1}`;
       const seriesClass = `chart-series-${slugify(segment.label)}`;
-      html += `<li class="chart-legend-item ${colorClass} ${seriesClass}">`;
+      html += `<span class="chart-legend-item ${colorClass} ${seriesClass}">`;
       html += `<span class="legend-label">${escapeHtml(label)}</span>`;
       html += `<span class="legend-value">${escapeHtml(String(displayValue))}</span>`;
-      html += `</li>`;
+      html += `</span>`;
     });
-    html += `</ul>`;
+    html += `</div>`;
   }
 
   html += renderDownloadLink(downloadDataUrl, downloadData);
