@@ -16,7 +16,7 @@ import { getAxisMax, getAxisMin, getAxisFormat, getRotateLabels } from '../confi
  * @returns {string} - HTML string
  */
 export function renderDot(config) {
-  const { title, subtitle, data, max, min, legend, legendTitle, animate, format, id, downloadData, downloadDataUrl, connectDots, dots: showDots = true, chartType = 'dot', _columns } = config;
+  const { title, subtitle, data, max, min, legend, legendTitle, animate, format, id, downloadData, downloadDataUrl, connectDots, dots: showDots = true, icons, chartType = 'dot', _columns } = config;
 
   if (!data || data.length === 0) {
     return `<!-- Dot chart: no data provided -->`;
@@ -32,6 +32,13 @@ export function renderDot(config) {
     if (yLabels[key]) return yLabels[key];
     if (Array.isArray(legend)) return legend[index] ?? key;
     return key;
+  };
+
+  // Helper to get icon for a series
+  const getSeriesIcon = (key) => {
+    if (!icons) return null;
+    if (typeof icons === 'string') return icons;
+    return icons[key] ?? null;
   };
 
   const animateClass = animate ? ' chart-animate' : '';
@@ -62,7 +69,8 @@ export function renderDot(config) {
   const negativeClass = hasNegativeY ? ' has-negative-y' : '';
   const idClass = id ? ` chart-${id}` : '';
   const rotateClass = rotateLabels ? ' rotate-labels' : '';
-  const dotsClass = !showDots ? ' no-dots' : '';
+  // Only add no-dots class if dots are disabled AND no icons are set
+  const dotsClass = (!showDots && !icons) ? ' no-dots' : '';
   let html = `<figure class="chart chart-${chartType}${animateClass}${negativeClass}${idClass}${rotateClass}${dotsClass}">`;
 
   if (title) {
@@ -120,7 +128,8 @@ export function renderDot(config) {
   }
 
   // Each row becomes a column with dots for each series
-  if (showDots) {
+  // Show dots if explicitly enabled OR if icons are set (icons override dots: false)
+  if (showDots || icons) {
     data.forEach((row, colIndex) => {
       const label = row[labelKey] ?? '';
 
@@ -133,11 +142,17 @@ export function renderDot(config) {
         const colorClass = `chart-color-${i + 1}`;
         const seriesClass = `chart-series-${slugify(key)}`;
         const tooltipLabel = getSeriesLabel(key, i);
+        const icon = getSeriesIcon(key);
+        const iconClass = icon ? ' has-icon' : '';
 
-        html += `<div class="dot ${colorClass} ${seriesClass}" `;
+        html += `<div class="dot ${colorClass} ${seriesClass}${iconClass}" `;
         html += `style="--value: ${yPct.toFixed(2)}%" `;
         html += `title="${escapeHtml(tooltipLabel)}: ${formatNumber(value, yFormat) || value}"`;
-        html += `></div>`;
+        html += `>`;
+        if (icon) {
+          html += `<i class="${escapeHtml(icon)}"></i>`;
+        }
+        html += `</div>`;
       });
 
       html += `</div>`;
@@ -169,7 +184,13 @@ export function renderDot(config) {
       const label = getSeriesLabel(key, i);
       const colorClass = `chart-color-${i + 1}`;
       const seriesClass = `chart-series-${slugify(key)}`;
-      html += `<span class="chart-legend-item ${colorClass} ${seriesClass}">${escapeHtml(label)}</span>`;
+      const icon = getSeriesIcon(key);
+      const iconClass = icon ? ' has-icon' : '';
+      html += `<span class="chart-legend-item ${colorClass} ${seriesClass}${iconClass}">`;
+      if (icon) {
+        html += `<i class="${escapeHtml(icon)}"></i>`;
+      }
+      html += `${escapeHtml(label)}</span>`;
     });
     html += `</div>`;
   }

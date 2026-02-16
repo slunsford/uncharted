@@ -161,5 +161,70 @@
     "titleY": "Y Value",
     "legendTitle": "Series",
     "legend": ["Alpha Group", "Beta Group"]
+  },
+  "dot-icons": {
+    "type": "dot",
+    "title": "AI-Assisted Development",
+    "subtitle": "With per-series icons",
+    "file": "adoption.csv",
+    "x": {
+      "column": "label"
+    },
+    "y": {
+      "columns": {
+        "prs": "Pull Requests",
+        "commits": "Commits"
+      },
+      "max": 60
+    },
+    "icons": {
+      "prs": "fa-solid fa-code-pull-request",
+      "commits": "fa-solid fa-code-commit"
+    },
+    "legend": true
+  },
+  "scatter-icons": {
+    "type": "scatter",
+    "title": "Performance Metrics",
+    "subtitle": "With per-series icons",
+    "file": "scatter-data.csv",
+    "x": {
+      "column": "x",
+      "max": 100,
+      "title": "X Performance"
+    },
+    "y": {
+      "column": "y",
+      "max": 100,
+      "title": "Y Performance"
+    },
+    "label": {
+      "column": "label"
+    },
+    "series": {
+      "column": "series",
+      "title": "Group"
+    },
+    "icons": {
+      "alpha": "fa-solid fa-circle",
+      "beta": "fa-solid fa-square"
+    },
+    "legend": true
+  },
+  "line-icons": {
+    "type": "line",
+    "title": "AI-Assisted Development",
+    "subtitle": "Line chart with icons",
+    "file": "adoption.csv",
+    "y": {
+      "columns": {
+        "prs": "Pull Requests",
+        "commits": "Commits"
+      },
+      "max": 60
+    },
+    "icons": "fa-solid fa-star",
+    "legend": true,
+    "animate": true
   }
 }

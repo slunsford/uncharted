@@ -78,6 +78,22 @@ This page demonstrates all chart types supported by the Uncharted plugin.
 
 {% chart "sankey-multi" %}
 
+## Icon Support
+
+Charts can use Font Awesome icons instead of default dots.
+
+### Dot Chart with Per-Series Icons
+
+{% chart "dot-icons" %}
+
+### Scatter Chart with Per-Series Icons
+
+{% chart "scatter-icons" %}
+
+### Line Chart with Icons
+
+{% chart "line-icons" %}
+
 ## Legacy Schema Tests
 
 These charts use deprecated options to verify backwards compatibility and deprecation warnings.

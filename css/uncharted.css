@@ -161,6 +161,20 @@
 }
 
 /* ==========================================================================
+   Icons (Font Awesome support for dots and legends)
+   ========================================================================== */
+
+/* Legend items with icons - hide the default ::before marker */
+.chart-legend-item.has-icon::before {
+  display: none;
+}
+
+.chart-legend-item.has-icon i {
+  color: var(--color);
+  margin-inline-end: 0.35em;
+}
+
+/* ==========================================================================
    Axes
    ========================================================================== */
 
@@ -560,7 +574,6 @@
   left: 0.5rem;
   display: flex;
   align-items: stretch;
-  gap: 6px;
 }
 
 :is(.chart-dot, .chart-line) .dot-col {
@@ -584,6 +597,34 @@
 :is(.chart-dot, .chart-line) .dot[title]:hover {
   transform: translate(-50%, 50%) scale(1.3);
   z-index: 1;
+}
+
+/* Dots with icons */
+:is(.chart-dot, .chart-line) .dot.has-icon {
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+:is(.chart-dot, .chart-line) .dot.has-icon i {
+  color: var(--color);
+  font-size: var(--chart-dot-size);
+  line-height: 1;
+}
+
+/* Line chart icons: clip the line ends around the icons */
+.chart-line:has(.dot.has-icon) .chart-line-segment {
+  --clip-size: calc(var(--chart-dot-size) * 0.75);
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    transparent var(--clip-size),
+    black var(--clip-size),
+    black calc(100% - var(--clip-size)),
+    transparent calc(100% - var(--clip-size)),
+    transparent 100%
+  );
 }
 
 :is(.chart-dot, .chart-line) .dot-labels {
@@ -702,6 +743,20 @@
   z-index: 1;
 }
 
+/* Scatter dots with icons */
+.chart-scatter .dot.has-icon {
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chart-scatter .dot.has-icon i {
+  color: var(--color);
+  font-size: var(--chart-dot-size);
+  line-height: 1;
+}
+
 /* Variable-sized dots (size column) */
 .chart-scatter .dot[style*="--size-scale"] {
   --computed-size: calc(
@@ -710,6 +765,11 @@
   );
   width: var(--computed-size);
   height: var(--computed-size);
+}
+
+/* Variable-sized dots with icons */
+.chart-scatter .dot.has-icon[style*="--size-scale"] i {
+  font-size: var(--computed-size);
 }
 
 /* Size legend */

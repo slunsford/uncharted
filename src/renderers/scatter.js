@@ -18,7 +18,7 @@ import { getAxisMax, getAxisMin, getAxisTitle, getAxisFormat } from '../config.j
  * @returns {string} - HTML string
  */
 export function renderScatter(config) {
-  const { title, subtitle, data, legend, animate, format, id, downloadData, downloadDataUrl, proportional, _columns } = config;
+  const { title, subtitle, data, legend, animate, format, id, downloadData, downloadDataUrl, proportional, icons, _columns } = config;
 
   // Get axis-specific format configs (normalized config provides x.format/y.format)
   const fmtX = getAxisFormat(config, 'x');
@@ -115,6 +115,13 @@ export function renderScatter(config) {
   const seriesList = Array.from(seriesSet);
   const seriesIndex = new Map(seriesList.map((s, i) => [s, i]));
 
+  // Helper to get icon for a series
+  const getSeriesIcon = (seriesName) => {
+    if (!icons) return null;
+    if (typeof icons === 'string') return icons;
+    return icons[seriesName] ?? null;
+  };
+
   const negativeClasses = (hasNegativeX ? ' has-negative-x' : '') + (hasNegativeY ? ' has-negative-y' : '');
   const proportionalClass = proportional ? ' chart-proportional' : '';
   const idClass = id ? ` chart-${id}` : '';
@@ -159,6 +166,8 @@ export function renderScatter(config) {
     const seriesClass = `chart-series-${slugify(dot.series)}`;
     const fmtXVal = formatNumber(dot.x, fmtX) || dot.x;
     const fmtYVal = formatNumber(dot.y, fmtY) || dot.y;
+    const icon = getSeriesIcon(dot.series);
+    const iconClass = icon ? ' has-icon' : '';
 
     // Build tooltip with optional size value
     let tooltipText = dot.label ? `${dot.label}: (${fmtXVal}, ${fmtYVal})` : `(${fmtXVal}, ${fmtYVal})`;
@@ -173,10 +182,14 @@ export function renderScatter(config) {
       styleStr += `; --size-scale: ${dot.sizeScale.toFixed(4)}`;
     }
 
-    html += `<div class="dot ${colorClass} ${seriesClass}" `;
+    html += `<div class="dot ${colorClass} ${seriesClass}${iconClass}" `;
     html += `style="${styleStr}" `;
     html += `title="${escapeHtml(tooltipText)}"`;
-    html += `></div>`;
+    html += `>`;
+    if (icon) {
+      html += `<i class="${escapeHtml(icon)}"></i>`;
+    }
+    html += `</div>`;
   });
 
   html += `</div>`;
@@ -206,7 +219,13 @@ export function renderScatter(config) {
       const label = legendLabels[i] ?? series;
       const colorClass = `chart-color-${i + 1}`;
       const seriesClass = `chart-series-${slugify(series)}`;
-      html += `<span class="chart-legend-item ${colorClass} ${seriesClass}">${escapeHtml(label)}</span>`;
+      const icon = getSeriesIcon(series);
+      const iconClass = icon ? ' has-icon' : '';
+      html += `<span class="chart-legend-item ${colorClass} ${seriesClass}${iconClass}">`;
+      if (icon) {
+        html += `<i class="${escapeHtml(icon)}"></i>`;
+      }
+      html += `${escapeHtml(label)}</span>`;
     });
     html += `</div>`;
   }
