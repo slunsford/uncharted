@@ -68,9 +68,14 @@ export function parseCSV(content) {
 
     headers.forEach((header, index) => {
       const value = values[index] ?? '';
-      // Try to parse as number, keep as string if not numeric
-      const num = parseFloat(value);
-      row[header] = isNaN(num) ? value : num;
+      // Empty cells become null (missing data)
+      if (value === '') {
+        row[header] = null;
+      } else {
+        // Try to parse as number, keep as string if not numeric
+        const num = parseFloat(value);
+        row[header] = isNaN(num) ? value : num;
+      }
     });
 
     rows.push(row);

@@ -47,13 +47,10 @@ export function renderDot(config) {
   // Get Y-axis format
   const yFormat = getAxisFormat(config, 'y');
 
-  // Calculate min and max values for Y scaling
+  // Calculate min and max values for Y scaling (exclude null values)
   const allValues = data.flatMap(row =>
-    seriesKeys.map(key => {
-      const val = row[key];
-      return typeof val === 'number' ? val : parseFloat(val) || 0;
-    })
-  );
+    seriesKeys.map(key => row[key]).filter(val => val !== null && val !== undefined && val !== '')
+  ).map(val => typeof val === 'number' ? val : parseFloat(val)).filter(v => !isNaN(v));
   const dataMax = Math.max(...allValues);
   const dataMin = Math.min(...allValues);
 
@@ -105,6 +102,7 @@ export function renderDot(config) {
   html += `<div class="dot-field">`;
 
   // CSS line segments connecting dots (rendered before dot-cols so they stack behind)
+  // Skip segments where either endpoint is null (gap in data)
   if (connectDots && data.length > 1) {
     let segIndex = 0;
     seriesKeys.forEach((key, i) => {
@@ -113,8 +111,13 @@ export function renderDot(config) {
       for (let colIndex = 0; colIndex < data.length - 1; colIndex++) {
         const val1 = data[colIndex][key];
         const val2 = data[colIndex + 1][key];
-        const v1 = typeof val1 === 'number' ? val1 : parseFloat(val1) || 0;
-        const v2 = typeof val2 === 'number' ? val2 : parseFloat(val2) || 0;
+        // Skip segment if either endpoint is null/missing
+        if (val1 === null || val1 === undefined || val1 === '' ||
+            val2 === null || val2 === undefined || val2 === '') {
+          continue;
+        }
+        const v1 = typeof val1 === 'number' ? val1 : parseFloat(val1);
+        const v2 = typeof val2 === 'number' ? val2 : parseFloat(val2);
         const y1 = range > 0 ? ((v1 - minValue) / range) * 100 : 0;
         const y2 = range > 0 ? ((v2 - minValue) / range) * 100 : 0;
         const x1 = ((colIndex + 0.5) / data.length) * 100;
@@ -137,6 +140,9 @@ export function renderDot(config) {
 
       seriesKeys.forEach((key, i) => {
         const val = row[key];
+        // Skip null/missing values - don't render a dot
+        if (val === null || val === undefined || val === '') return;
+
         const value = typeof val === 'number' ? val : parseFloat(val) || 0;
         const yPct = range > 0 ? ((value - minValue) / range) * 100 : 0;
         const colorClass = `chart-color-${i + 1}`;
