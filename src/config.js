@@ -68,11 +68,6 @@ export function normalizeConfig(config, chartId = 'unknown') {
   // Build y axis config
   normalized.y = buildAxisConfig('y', config, chartId);
 
-  // Warn for deprecated columns key
-  if (config.columns) {
-    warnDeprecation(chartId, 'columns', 'x.column / y.columns');
-  }
-
   // Warn for deprecated legend array (when used for labels, not boolean)
   if (Array.isArray(config.legend)) {
     warnDeprecation(chartId, 'legend (array)', 'y.columns: { key: "Label" }');

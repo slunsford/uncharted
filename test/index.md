@@ -6,7 +6,7 @@ charts:
     type: stacked-bar
     title: Platform Growth
     subtitle: Models by domain
-    file: charts/platform-growth.csv
+    file: platform-growth.csv
     x:
       max: 25
     legend: true
@@ -81,12 +81,6 @@ This page demonstrates all chart types supported by the Uncharted plugin.
 ## Legacy Schema Tests
 
 These charts use deprecated options to verify backwards compatibility and deprecation warnings.
-
-### Legacy Dot Chart
-
-Uses `columns:`, `legend: []`, and top-level `max`:
-
-{% chart "legacy-deprecation-test" %}
 
 ### Legacy Scatter Chart
 

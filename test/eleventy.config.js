@@ -1,8 +1,9 @@
 import uncharted from '../eleventy.config.js';
 
 export default function(eleventyConfig) {
-  // Register the uncharted plugin (dataDir auto-detected from Eleventy config)
+  // Register the uncharted plugin with explicit dataDir for CSV files
   eleventyConfig.addPlugin(uncharted, {
+    dataDir: '_data/charts',
     animate: true,
     dataPassthrough: true,
     downloadData: true

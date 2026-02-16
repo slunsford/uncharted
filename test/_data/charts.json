@@ -3,7 +3,7 @@
     "type": "stacked-column",
     "title": "Release Cadence",
     "subtitle": "By quarter",
-    "file": "charts/releases.csv",
+    "file": "releases.csv",
     "x": {
       "column": "label"
     },
@@ -20,7 +20,7 @@
     "type": "dot",
     "title": "AI-Assisted Development",
     "subtitle": "PRs and commits by month",
-    "file": "charts/adoption.csv",
+    "file": "adoption.csv",
     "x": {
       "column": "label"
     },
@@ -37,7 +37,7 @@
     "type": "scatter",
     "title": "Performance Metrics",
     "subtitle": "Alpha vs Beta",
-    "file": "charts/scatter-data.csv",
+    "file": "scatter-data.csv",
     "x": {
       "column": "x",
       "max": 100,
@@ -61,7 +61,7 @@
     "type": "dot",
     "title": "Temperature Range",
     "subtitle": "Monthly highs and lows (°C)",
-    "file": "charts/temperature.csv",
+    "file": "temperature.csv",
     "y": {
       "columns": {
         "High": "High",
@@ -74,7 +74,7 @@
     "type": "scatter",
     "title": "Quadrant Analysis",
     "subtitle": "Data across all four quadrants",
-    "file": "charts/quadrant.csv",
+    "file": "quadrant.csv",
     "series": {
       "column": "series",
       "title": "Group"
@@ -85,7 +85,7 @@
     "type": "stacked-column",
     "title": "Quarterly Revenue",
     "subtitle": "Cost + Profit/Loss",
-    "file": "charts/profit.csv",
+    "file": "profit.csv",
     "y": {
       "columns": {
         "Cost": "Cost",
@@ -99,7 +99,7 @@
     "type": "line",
     "title": "AI-Assisted Development",
     "subtitle": "PRs and commits by month (line)",
-    "file": "charts/adoption.csv",
+    "file": "adoption.csv",
     "y": {
       "columns": {
         "prs": "Pull Requests",
@@ -115,7 +115,7 @@
     "type": "sankey",
     "title": "Budget Allocation",
     "subtitle": "Simple 2-level flow",
-    "file": "charts/sankey-basic.csv",
+    "file": "sankey-basic.csv",
     "source": {
       "column": "source"
     },
@@ -138,7 +138,7 @@
     "type": "sankey",
     "title": "Budget to Revenue",
     "subtitle": "Multi-level flow diagram",
-    "file": "charts/sankey-multi.csv",
+    "file": "sankey-multi.csv",
     "value": {
       "format": {
         "compact": true,
@@ -150,22 +150,11 @@
     "animate": true,
     "proportional": true
   },
-  "legacy-deprecation-test": {
-    "type": "dot",
-    "title": "Legacy Schema Test",
-    "subtitle": "Tests deprecation warnings",
-    "file": "charts/adoption.csv",
-    "max": 60,
-    "columns": {
-      "y": ["prs", "commits"]
-    },
-    "legend": ["Pull Requests", "Commits"]
-  },
   "legacy-scatter-test": {
     "type": "scatter",
     "title": "Legacy Scatter Test",
     "subtitle": "Tests deprecated scatter options",
-    "file": "charts/scatter-data.csv",
+    "file": "scatter-data.csv",
     "maxX": 100,
     "maxY": 100,
     "titleX": "X Value",
