@@ -1,6 +1,6 @@
 import { slugify, escapeHtml, getLabelKey, getSeriesNames, renderDownloadLink } from '../utils.js';
 import { formatNumber } from '../formatters.js';
-import { getAxisMax, getAxisMin, getAxisFormat, getRotateLabels } from '../config.js';
+import { getAxisMax, getAxisMin, getAxisFormat, getAxisTitle, getRotateLabels } from '../config.js';
 
 /**
  * Render a categorical dot chart (columns with dots at different Y positions)
@@ -44,8 +44,10 @@ export function renderDot(config) {
   const animateClass = animate ? ' chart-animate' : '';
   const rotateLabels = getRotateLabels(config, config.id);
 
-  // Get Y-axis format
+  // Get Y-axis format and axis titles
   const yFormat = getAxisFormat(config, 'y');
+  const xAxisTitle = getAxisTitle(config, 'x', '');
+  const yAxisTitle = getAxisTitle(config, 'y', '');
 
   // Calculate min and max values for Y scaling (exclude null values)
   const allValues = data.flatMap(row =>
@@ -87,6 +89,9 @@ export function renderDot(config) {
   const midLabelY = hasNegativeY ? 0 : Math.round((maxValue + minValue) / 2);
   html += `<span class="axis-label">${formatNumber(midLabelY, yFormat) || midLabelY}</span>`;
   html += `<span class="axis-label">${formatNumber(minValue, yFormat) || minValue}</span>`;
+  if (yAxisTitle) {
+    html += `<span class="axis-title">${escapeHtml(yAxisTitle)}</span>`;
+  }
   html += `</div>`;
 
   // Scroll wrapper for chart + labels
@@ -172,6 +177,9 @@ export function renderDot(config) {
     const label = row[labelKey] ?? '';
     html += `<span class="dot-label">${escapeHtml(label)}</span>`;
   });
+  if (xAxisTitle) {
+    html += `<span class="axis-title">${escapeHtml(xAxisTitle)}</span>`;
+  }
   html += `</div>`;
 
   html += `</div>`; // close chart-scroll

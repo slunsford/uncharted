@@ -85,22 +85,65 @@ function getNiceInterval(range, isDate) {
 
 /**
  * Round value down to interval boundary
+ * For dates, aligns to calendar boundaries (month starts)
  * @param {number} value - Value to round
  * @param {number} interval - Interval size
+ * @param {boolean} isDate - Whether value is a date timestamp
  * @returns {number} - Rounded value
  */
-function floorToInterval(value, interval) {
-  return Math.floor(value / interval) * interval;
+function floorToInterval(value, interval, isDate) {
+  if (!isDate) {
+    return Math.floor(value / interval) * interval;
+  }
+
+  // For dates, align to calendar month boundaries
+  const date = new Date(value);
+  const MS_DAY = 86400000;
+  const MS_WEEK = MS_DAY * 7;
+  const MS_MONTH = MS_DAY * 30;
+
+  if (interval <= MS_WEEK) {
+    // Weekly or daily: just floor to interval from epoch
+    return Math.floor(value / interval) * interval;
+  }
+
+  // Monthly or longer: align to start of month
+  const year = date.getFullYear();
+  const month = date.getMonth();
+
+  // Calculate months per interval
+  const monthsPerInterval = Math.round(interval / MS_MONTH);
+
+  // Floor month to interval boundary
+  const flooredMonth = Math.floor(month / monthsPerInterval) * monthsPerInterval;
+
+  return Date.UTC(year, flooredMonth, 1);
 }
 
 /**
- * Round value up to interval boundary
- * @param {number} value - Value to round
+ * Get next interval value for dates (calendar-aware)
+ * @param {number} value - Current value
  * @param {number} interval - Interval size
- * @returns {number} - Rounded value
+ * @param {boolean} isDate - Whether value is a date timestamp
+ * @returns {number} - Next interval value
  */
-function ceilToInterval(value, interval) {
-  return Math.ceil(value / interval) * interval;
+function nextInterval(value, interval, isDate) {
+  if (!isDate) {
+    return value + interval;
+  }
+
+  const MS_DAY = 86400000;
+  const MS_WEEK = MS_DAY * 7;
+  const MS_MONTH = MS_DAY * 30;
+
+  if (interval <= MS_WEEK) {
+    return value + interval;
+  }
+
+  // Monthly or longer: add months
+  const date = new Date(value);
+  const monthsPerInterval = Math.round(interval / MS_MONTH);
+  return Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + monthsPerInterval, 1);
 }
 
 /**
@@ -127,8 +170,10 @@ function formatXLabel(value, isDate, range) {
   }
 
   if (range > MS_MONTH * 2) {
-    // Months range: show MMM YYYY
-    return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+    // Months range: show MMM over YYYY (two lines)
+    const month = date.toLocaleDateString('en-US', { month: 'short' });
+    const year = date.getFullYear();
+    return `${month}<br>${year}`;
   }
 
   // Days/weeks range: show MMM D
@@ -150,11 +195,11 @@ function getAxisTicks(min, max, isDate) {
   const ticks = [];
 
   // Start at first interval boundary at or before min
-  let tick = floorToInterval(min, interval);
+  let tick = floorToInterval(min, interval, isDate);
 
   // If first tick is too far before min, start at next interval
   if (tick < min - interval * 0.1) {
-    tick += interval;
+    tick = nextInterval(tick, interval, isDate);
   }
 
   while (tick <= max + interval * 0.1) {
@@ -162,7 +207,7 @@ function getAxisTicks(min, max, isDate) {
       value: tick,
       label: formatXLabel(tick, isDate, range)
     });
-    tick += interval;
+    tick = nextInterval(tick, interval, isDate);
   }
 
   // Ensure we have at least start and end
@@ -417,7 +462,8 @@ export function renderTimeseries(config) {
   xTicks.forEach(tick => {
     // Use decimal factor (0-1) so CSS can apply proper inset calculation
     const xFactor = rangeX > 0 ? (tick.value - calcMinX) / rangeX : 0;
-    html += `<span class="axis-label" style="--x: ${xFactor.toFixed(4)}">${escapeHtml(tick.label)}</span>`;
+    // Label may contain <br> for two-line formatting, so don't escape
+    html += `<span class="axis-label" style="--x: ${xFactor.toFixed(4)}">${tick.label}</span>`;
   });
   if (xAxisTitle) {
     html += `<span class="axis-title">${escapeHtml(xAxisTitle)}</span>`;

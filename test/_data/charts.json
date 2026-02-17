@@ -250,22 +250,17 @@
     "legend": true,
     "animate": true
   },
-  "timeseries-with-dots": {
+  "timeseries-daily": {
     "type": "timeseries",
-    "title": "Cattle vs Sheep",
-    "subtitle": "With dots enabled (scrollable)",
-    "file": "nz_animals.csv",
-    "x": {
-      "column": "year"
-    },
+    "title": "Daily Temperatures",
+    "subtitle": "2024",
+    "file": "daily-temps.csv",
     "y": {
       "columns": {
-        "cattle": "Cattle",
-        "sheep": "Sheep"
+        "high": "High",
+        "low": "Low"
       },
-      "format": {
-        "compact": true
-      }
+      "title": "Temperature (°C)"
     },
     "dots": true,
     "legend": true,

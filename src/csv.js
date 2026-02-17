@@ -72,9 +72,10 @@ export function parseCSV(content) {
       if (value === '') {
         row[header] = null;
       } else {
-        // Try to parse as number, keep as string if not numeric
-        const num = parseFloat(value);
-        row[header] = isNaN(num) ? value : num;
+        // Only parse as number if the entire value is numeric
+        // This prevents dates like "2024-06-01" from becoming 2024
+        const isNumeric = /^-?\d+(\.\d+)?$/.test(value);
+        row[header] = isNumeric ? parseFloat(value) : value;
       }
     });
 

@@ -104,9 +104,9 @@ Time-series charts render with a continuous x-axis where data points are positio
 
 Note: Poultry data starts in 2002, demonstrating series with different start points. Years are spaced proportionally (gap between 1996 and 2002). Dots are hidden by default.
 
-### Time-Series with Dots
+### Time-Series with ISO Dates
 
-{% chart "timeseries-with-dots" %}
+{% chart "timeseries-daily" %}
 
 ## Legacy Schema Tests
 
