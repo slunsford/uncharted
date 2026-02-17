@@ -52,7 +52,7 @@ This page demonstrates all chart types supported by the Uncharted plugin.
 
 ### Line Chart (Dots Only)
 
-Using `showLines: false` to display dots without connecting lines:
+Using `lines: false` to display dots without connecting lines:
 
 {% chart "line-dots-only" %}
 

@@ -22,7 +22,7 @@ export function renderDot(config) {
   if (chartType === 'dot') {
     console.warn(
       '[uncharted] Chart type "dot" is deprecated. ' +
-      'Migrate to "line" with showLines: false, or use "bubble" for sized dots.'
+      'Migrate to "line" with lines: false, or use "bubble" for sized dots.'
     );
   }
 

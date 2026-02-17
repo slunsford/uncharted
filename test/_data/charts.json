@@ -297,7 +297,7 @@
     "title": "Line Chart (dots only)",
     "subtitle": "showLines: false",
     "file": "adoption.csv",
-    "showLines": false,
+    "lines": false,
     "y": {
       "columns": {
         "prs": "PRs",
