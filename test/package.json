@@ -1,0 +1,9 @@
+{
+  "name": "uncharted-test",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@11ty/eleventy": "^3.0.0",
+    "puppeteer": "^24.0.0"
+  }
+}

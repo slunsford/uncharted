@@ -32,7 +32,13 @@
     "url": "https://github.com/slunsford/uncharted/issues"
   },
   "peerDependencies": {
-    "@11ty/eleventy": ">=2.0.0 || >=4.0.0-0"
+    "@11ty/eleventy": ">=2.0.0 || >=4.0.0-0",
+    "puppeteer": ">=21.0.0"
+  },
+  "peerDependenciesMeta": {
+    "puppeteer": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@11ty/eleventy": "^3.0.0 || ^4.0.0-0"

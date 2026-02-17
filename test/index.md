@@ -10,6 +10,10 @@ charts:
     x:
       max: 25
     legend: true
+    image:
+      width: 1200
+      height: 600
+      filename: custom-platform-growth
   quick-stats:
     type: donut
     title: Issue Types
@@ -135,6 +139,16 @@ These charts use deprecated options to verify backwards compatibility and deprec
 Uses `maxX`, `maxY`, `titleX`, `titleY`, `legendTitle`:
 
 {% chart "legacy-scatter-test" %}
+
+## Image Generation
+
+### Chart Image URL Shortcode
+
+Image URL for "releases" chart: `{% chartImageUrl "releases" %}`
+
+### Download Link Example
+
+<a href="{% chartImageUrl 'quick-stats' %}" download>Download Quick Stats Chart</a>
 
 ## Error Handling
 

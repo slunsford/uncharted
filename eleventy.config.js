@@ -4,6 +4,15 @@ import { renderers } from './src/renderers/index.js';
 import { loadCSV } from './src/csv.js';
 import { normalizeConfig } from './src/config.js';
 import { resolveColumns } from './src/columns.js';
+import {
+  normalizeImageOptions,
+  queueChartForImage,
+  processQueue,
+  getImageUrl,
+  getStoredImageUrl,
+  shouldSkipInDevMode,
+  clearImageUrls
+} from './src/image/index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -18,6 +27,14 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
  * @param {boolean} [options.dataPassthrough] - Copy CSV files to public dataPath (default: false)
  * @param {string} [options.dataPath] - Public URL path for CSV files (default: '/data/')
  * @param {boolean|string} [options.downloadData] - Enable download links globally (individual charts can override)
+ * @param {Object} [options.image] - Image generation options
+ * @param {boolean} [options.image.enabled=false] - Enable PNG image generation
+ * @param {string} [options.image.outputDir='/images/charts/'] - Output directory for images
+ * @param {number} [options.image.width=800] - Default image width in pixels
+ * @param {number} [options.image.height=400] - Default image height in pixels
+ * @param {number} [options.image.scale=2] - Device scale factor (2 for retina)
+ * @param {string} [options.image.background='#ffffff'] - Default background color
+ * @param {boolean} [options.image.skipDev=true] - Skip image generation during --serve/--watch
  */
 export default function(eleventyConfig, options = {}) {
   // Directory config from Eleventy (populated by eleventy.directories event)
@@ -48,6 +65,13 @@ export default function(eleventyConfig, options = {}) {
   const dataPassthrough = options.dataPassthrough ?? false;
   const dataPath = options.dataPath || '/data/';
   const globalDownloadData = options.downloadData ?? false;
+
+  // Image generation options
+  const imageOptions = normalizeImageOptions(options.image);
+  const skipImageGeneration = shouldSkipInDevMode(imageOptions);
+
+  // Clear image URLs at start of each build
+  clearImageUrls();
 
   // Automatic CSS handling
   if (injectCss) {
@@ -153,7 +177,8 @@ export default function(eleventyConfig, options = {}) {
     // Resolve column mappings
     const columns = resolveColumns(normalizedConfig, data, chartType);
 
-    return renderer({
+    // Render the chart HTML
+    let chartHtml = renderer({
       ...normalizedConfig,
       id: chartId,
       data,
@@ -162,5 +187,64 @@ export default function(eleventyConfig, options = {}) {
       downloadDataUrl,
       _columns: columns
     });
+
+    // Handle image generation
+    const chartImageEnabled = chartConfig.image?.enabled ?? imageOptions.enabled;
+    if (chartImageEnabled && !skipImageGeneration && eleventyDirs?.output) {
+      // Queue chart for image generation
+      queueChartForImage(chartId, chartHtml, chartConfig, imageOptions, eleventyDirs.output);
+
+      // Add data-chart-image attribute to the figure element
+      const imageUrl = getImageUrl(chartId, chartConfig, imageOptions);
+      chartHtml = chartHtml.replace(
+        /^<figure([^>]*class="chart[^"]*")/,
+        `<figure$1 data-chart-image="${imageUrl}"`
+      );
+    }
+
+    return chartHtml;
+  });
+
+  // Shortcode to get chart image URL
+  eleventyConfig.addShortcode('chartImageUrl', function(chartId) {
+    // First check if we have a stored URL from queueing
+    const storedUrl = getStoredImageUrl(chartId);
+    if (storedUrl) return storedUrl;
+
+    // Otherwise, look up chart config and compute URL
+    const pageCharts = this.page?.charts;
+    const globalCharts = this.charts || this.ctx?.charts;
+    const chartConfig = pageCharts?.[chartId] || globalCharts?.[chartId];
+
+    if (!chartConfig) return '';
+
+    return getImageUrl(chartId, chartConfig, imageOptions);
+  });
+
+  // Filter to replace chart HTML with image tags (for RSS feeds)
+  eleventyConfig.addFilter('chartToImage', function(content) {
+    if (!content) return content;
+
+    // Find chart figures with data-chart-image attributes and replace with img tags
+    return content.replace(
+      /<figure[^>]*class="chart[^"]*"[^>]*data-chart-image="([^"]+)"[^>]*>[\s\S]*?<figcaption[^>]*>([^<]*)<[\s\S]*?<\/figure>/g,
+      '<img src="$1" alt="Chart: $2">'
+    );
+  });
+
+  // Process image queue after build completes
+  eleventyConfig.on('eleventy.after', async () => {
+    if (!imageOptions.enabled || skipImageGeneration) return;
+
+    const results = await processQueue(imageOptions);
+
+    if (results.skipped) return;
+
+    if (results.success.length > 0) {
+      console.log(`[uncharted] Generated ${results.success.length} chart image(s)`);
+    }
+    if (results.failed.length > 0) {
+      console.warn(`[uncharted] Failed to generate ${results.failed.length} chart image(s)`);
+    }
   });
 }

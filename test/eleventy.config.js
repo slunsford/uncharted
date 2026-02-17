@@ -6,7 +6,19 @@ export default function(eleventyConfig) {
     dataDir: '_data/charts',
     animate: true,
     dataPassthrough: true,
-    downloadData: true
+    downloadData: true,
+    image: {
+      enabled: true,
+      outputDir: '/images/charts/',
+      width: 800,
+      height: 400,
+      scale: 2,
+      background: '#ffffff',
+      stylesheets: [
+        'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/fontawesome.min.css',
+        'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/solid.min.css'
+      ]
+    }
   });
 
   return {
