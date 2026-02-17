@@ -71,13 +71,16 @@ function getNiceInterval(range, isDate) {
     return MS_DAY;                                   // Days
   }
 
-  // Numeric ranges (years)
+  // Numeric ranges (years) - minimum interval of 1
   const magnitude = Math.pow(10, Math.floor(Math.log10(range)));
   const normalized = range / magnitude;
 
-  if (normalized <= 2) return magnitude / 5;
-  if (normalized <= 5) return magnitude / 2;
-  return magnitude;
+  let interval;
+  if (normalized <= 2) interval = magnitude / 5;
+  else if (normalized <= 5) interval = magnitude / 2;
+  else interval = magnitude;
+
+  return Math.max(1, interval);
 }
 
 /**
@@ -273,8 +276,18 @@ export function renderTimeseries(config) {
   const dataMaxX = Math.max(...allXValues);
   const isDate = isDateTimestamp(allXValues);
 
-  const calcMinX = getAxisMin(config, 'x') ?? dataMinX;
-  const calcMaxX = getAxisMax(config, 'x') ?? dataMaxX;
+  // Get preliminary range for tick calculation
+  const prelimMinX = getAxisMin(config, 'x') ?? dataMinX;
+  const prelimMaxX = getAxisMax(config, 'x') ?? dataMaxX;
+
+  // Get x-axis ticks based on data range
+  const xTicks = getAxisTicks(prelimMinX, prelimMaxX, isDate);
+
+  // Extend range to include tick boundaries so labels align properly
+  const tickMin = xTicks.length > 0 ? Math.min(...xTicks.map(t => t.value)) : prelimMinX;
+  const tickMax = xTicks.length > 0 ? Math.max(...xTicks.map(t => t.value)) : prelimMaxX;
+  const calcMinX = Math.min(prelimMinX, tickMin);
+  const calcMaxX = Math.max(prelimMaxX, tickMax);
   const rangeX = calcMaxX - calcMinX;
 
   // Calculate y range
@@ -293,9 +306,6 @@ export function renderTimeseries(config) {
 
   // Calculate zero position for y-axis line
   const zeroPctY = hasNegativeY ? ((0 - minValue) / rangeY) * 100 : 0;
-
-  // Get x-axis ticks
-  const xTicks = getAxisTicks(calcMinX, calcMaxX, isDate);
 
   // Axis titles
   const xAxisTitle = getAxisTitle(config, 'x', '');
@@ -408,8 +418,9 @@ export function renderTimeseries(config) {
   // X-axis with interval-based ticks
   html += `<div class="chart-x-axis timeseries-x-axis">`;
   xTicks.forEach(tick => {
-    const xPct = rangeX > 0 ? ((tick.value - calcMinX) / rangeX) * 100 : 0;
-    html += `<span class="axis-label" style="--x: ${xPct.toFixed(2)}%">${escapeHtml(tick.label)}</span>`;
+    // Use decimal factor (0-1) so CSS can apply proper inset calculation
+    const xFactor = rangeX > 0 ? (tick.value - calcMinX) / rangeX : 0;
+    html += `<span class="axis-label" style="--x: ${xFactor.toFixed(4)}">${escapeHtml(tick.label)}</span>`;
   });
   if (xAxisTitle) {
     html += `<span class="axis-title">${escapeHtml(xAxisTitle)}</span>`;

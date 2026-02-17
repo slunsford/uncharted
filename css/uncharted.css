@@ -890,24 +890,12 @@
   font-size: 0.7rem;
   opacity: 0.6;
   font-variant-numeric: tabular-nums;
-  left: var(--x);
+  /* Position labels to align with dot-field (inset 1rem from dot-area) */
+  left: calc(1rem + var(--x) * (100% - 2rem));
   transform: translateX(-50%);
   white-space: nowrap;
 }
 
-/* First and last labels: don't overflow container */
-.chart-timeseries .timeseries-x-axis .axis-label:first-child {
-  transform: translateX(0);
-}
-
-.chart-timeseries .timeseries-x-axis .axis-label:nth-last-of-type(2) {
-  transform: translateX(-100%);
-}
-
-/* Single label case */
-.chart-timeseries .timeseries-x-axis .axis-label:only-of-type {
-  transform: translateX(-50%);
-}
 
 .chart-timeseries .timeseries-x-axis .axis-title {
   display: block;
