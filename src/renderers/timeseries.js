@@ -341,9 +341,6 @@ export function renderTimeseries(config) {
   }
   html += `</div>`;
 
-  // Background element (sibling to scroll, doesn't animate or scroll)
-  html += `<div class="chart-bg"></div>`;
-
   // Scroll wrapper (scrolls when content overflows)
   html += `<div class="chart-scroll">`;
 

@@ -89,9 +89,6 @@ export function renderDot(config) {
   html += `<span class="axis-label">${formatNumber(minValue, yFormat) || minValue}</span>`;
   html += `</div>`;
 
-  // Background element (outside scroll, doesn't animate or scroll)
-  html += `<div class="chart-bg"></div>`;
-
   // Scroll wrapper for chart + labels
   html += `<div class="chart-scroll">`;
 

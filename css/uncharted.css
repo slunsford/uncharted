@@ -557,15 +557,9 @@
   overflow-y: visible;
 }
 
-/* Background element - sibling to scroll container, shares grid cell */
-:is(.chart-dot, .chart-line, .chart-timeseries) .chart-bg {
-  grid-row: 1;
-  grid-column: 2;
+:is(.chart-dot, .chart-line) .dot-chart {
   background: var(--chart-bg);
   border-radius: 3px;
-}
-
-:is(.chart-dot, .chart-line) .dot-chart {
   grid-row: 1;
   position: relative;
   min-height: var(--chart-height);
@@ -834,6 +828,8 @@
   position: relative;
   min-height: var(--chart-height);
   box-sizing: border-box;
+  background: var(--chart-bg);
+  border-radius: 3px;
 }
 
 .chart-timeseries .chart-x-axis {
@@ -1173,10 +1169,22 @@
   }
 }
 
-/* Line/timeseries: animate scroll container (background is outside, won't animate) */
-.chart-animate:is(.chart-line, .chart-timeseries) .chart-scroll {
+/* Line chart: animate scroll container */
+.chart-animate.chart-line .chart-scroll {
   clip-path: inset(0 100% 0 0);
   animation: container-reveal 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+/* Timeseries: animate dot-field only (so x-axis labels and background don't animate) */
+/* Negative insets allow dots to overflow the field bounds */
+.chart-animate.chart-timeseries .dot-field {
+  clip-path: inset(-1rem 100% -1rem 0);
+  animation: timeseries-reveal 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes timeseries-reveal {
+  from { clip-path: inset(-1rem 100% -1rem 0); }
+  to   { clip-path: inset(-1rem); }
 }
 
 @keyframes container-reveal {
@@ -1247,7 +1255,8 @@
   .chart-animate.chart-scatter .dot,
   .chart-animate .donut-ring::before,
   .chart-animate.chart-sankey .chart-sankey-flow,
-  .chart-animate:is(.chart-line, .chart-timeseries) .chart-scroll {
+  .chart-animate.chart-line .chart-scroll,
+  .chart-animate.chart-timeseries .dot-field {
     animation: none;
   }
 
@@ -1257,10 +1266,14 @@
     transform: translate(-50%, 50%);
   }
 
-  .chart-animate:is(.chart-line, .chart-timeseries) .chart-scroll,
+  .chart-animate.chart-line .chart-scroll,
   .chart-animate.has-negative-y .column-track,
   .chart-animate.chart-sankey .chart-sankey-flow {
     clip-path: none;
+  }
+
+  .chart-animate.chart-timeseries .dot-field {
+    clip-path: inset(-1rem);
   }
 }
 

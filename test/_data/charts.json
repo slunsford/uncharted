@@ -230,7 +230,7 @@
   "timeseries-animals": {
     "type": "timeseries",
     "title": "New Zealand Livestock",
-    "subtitle": "Population trends 1971-2022",
+    "subtitle": "Population trends 1971-2024",
     "file": "nz_animals.csv",
     "x": {
       "column": "year",
