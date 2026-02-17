@@ -66,8 +66,8 @@ export function renderDot(config) {
   const negativeClass = hasNegativeY ? ' has-negative-y' : '';
   const idClass = id ? ` chart-${id}` : '';
   const rotateClass = rotateLabels ? ' rotate-labels' : '';
-  // Only add no-dots class if dots are disabled AND no icons are set
-  const dotsClass = (!showDots && !icons) ? ' no-dots' : '';
+  // Add no-dots class if dots are disabled (icons only affect legend, not dots)
+  const dotsClass = !showDots ? ' no-dots' : '';
   let html = `<figure class="chart chart-${chartType}${animateClass}${negativeClass}${idClass}${rotateClass}${dotsClass}">`;
 
   if (title) {
@@ -88,6 +88,9 @@ export function renderDot(config) {
   html += `<span class="axis-label">${formatNumber(midLabelY, yFormat) || midLabelY}</span>`;
   html += `<span class="axis-label">${formatNumber(minValue, yFormat) || minValue}</span>`;
   html += `</div>`;
+
+  // Background element (outside scroll, doesn't animate or scroll)
+  html += `<div class="chart-bg"></div>`;
 
   // Scroll wrapper for chart + labels
   html += `<div class="chart-scroll">`;
@@ -130,40 +133,38 @@ export function renderDot(config) {
     });
   }
 
-  // Each row becomes a column with dots for each series
-  // Show dots if explicitly enabled OR if icons are set (icons override dots: false)
-  if (showDots || icons) {
-    data.forEach((row, colIndex) => {
-      const label = row[labelKey] ?? '';
+  // Always render dots for hover/tooltips (CSS handles visibility)
+  // Only show icons inside dots when dots are visible
+  data.forEach((row, colIndex) => {
+    const label = row[labelKey] ?? '';
 
-      html += `<div class="dot-col" style="--col-index: ${colIndex}">`;
+    html += `<div class="dot-col" style="--col-index: ${colIndex}">`;
 
-      seriesKeys.forEach((key, i) => {
-        const val = row[key];
-        // Skip null/missing values - don't render a dot
-        if (val === null || val === undefined || val === '') return;
+    seriesKeys.forEach((key, i) => {
+      const val = row[key];
+      // Skip null/missing values - don't render a dot
+      if (val === null || val === undefined || val === '') return;
 
-        const value = typeof val === 'number' ? val : parseFloat(val) || 0;
-        const yPct = range > 0 ? ((value - minValue) / range) * 100 : 0;
-        const colorClass = `chart-color-${i + 1}`;
-        const seriesClass = `chart-series-${slugify(key)}`;
-        const tooltipLabel = getSeriesLabel(key, i);
-        const icon = getSeriesIcon(key);
-        const iconClass = icon ? ' has-icon' : '';
+      const value = typeof val === 'number' ? val : parseFloat(val) || 0;
+      const yPct = range > 0 ? ((value - minValue) / range) * 100 : 0;
+      const colorClass = `chart-color-${i + 1}`;
+      const seriesClass = `chart-series-${slugify(key)}`;
+      const tooltipLabel = getSeriesLabel(key, i);
+      const icon = showDots ? getSeriesIcon(key) : null;
+      const iconClass = icon ? ' has-icon' : '';
 
-        html += `<div class="dot ${colorClass} ${seriesClass}${iconClass}" `;
-        html += `style="--value: ${yPct.toFixed(2)}%" `;
-        html += `title="${escapeHtml(tooltipLabel)}: ${formatNumber(value, yFormat) || value}"`;
-        html += `>`;
-        if (icon) {
-          html += `<i class="${escapeHtml(icon)}"></i>`;
-        }
-        html += `</div>`;
-      });
-
+      html += `<div class="dot ${colorClass} ${seriesClass}${iconClass}" `;
+      html += `style="--value: ${yPct.toFixed(2)}%" `;
+      html += `title="${escapeHtml(tooltipLabel)}: ${formatNumber(value, yFormat) || value}"`;
+      html += `>`;
+      if (icon) {
+        html += `<i class="${escapeHtml(icon)}"></i>`;
+      }
       html += `</div>`;
     });
-  }
+
+    html += `</div>`;
+  });
 
   html += `</div>`; // close dot-field
   html += `</div>`; // close dot-chart

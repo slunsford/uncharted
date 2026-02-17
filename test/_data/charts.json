@@ -226,5 +226,49 @@
     "icons": "fa-solid fa-star",
     "legend": true,
     "animate": true
+  },
+  "timeseries-animals": {
+    "type": "timeseries",
+    "title": "New Zealand Livestock",
+    "subtitle": "Population trends 1971-2022",
+    "file": "nz_animals.csv",
+    "x": {
+      "column": "year",
+      "title": "Year"
+    },
+    "y": {
+      "columns": {
+        "cattle": "Cattle",
+        "sheep": "Sheep",
+        "pigs": "Pigs",
+        "poultry": "Poultry"
+      },
+      "format": {
+        "compact": true
+      }
+    },
+    "legend": true,
+    "animate": true
+  },
+  "timeseries-with-dots": {
+    "type": "timeseries",
+    "title": "Cattle vs Sheep",
+    "subtitle": "With dots enabled (scrollable)",
+    "file": "nz_animals.csv",
+    "x": {
+      "column": "year"
+    },
+    "y": {
+      "columns": {
+        "cattle": "Cattle",
+        "sheep": "Sheep"
+      },
+      "format": {
+        "compact": true
+      }
+    },
+    "dots": true,
+    "legend": true,
+    "animate": true
   }
 }

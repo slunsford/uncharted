@@ -94,6 +94,20 @@ Charts can use Font Awesome icons instead of default dots.
 
 {% chart "line-icons" %}
 
+## Time-Series Charts
+
+Time-series charts render with a continuous x-axis where data points are positioned proportionally based on their actual time/year values.
+
+### Basic Time-Series (Multiple Series with Gaps)
+
+{% chart "timeseries-animals" %}
+
+Note: Poultry data starts in 2002, demonstrating series with different start points. Years are spaced proportionally (gap between 1996 and 2002). Dots are hidden by default.
+
+### Time-Series with Dots
+
+{% chart "timeseries-with-dots" %}
+
 ## Legacy Schema Tests
 
 These charts use deprecated options to verify backwards compatibility and deprecation warnings.
