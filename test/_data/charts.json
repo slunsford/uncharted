@@ -265,5 +265,47 @@
     "dots": true,
     "legend": true,
     "animate": true
+  },
+  "bubble-simple": {
+    "type": "bubble",
+    "title": "Simple Bubble",
+    "subtitle": "Single series with variable sizes",
+    "file": "bubble-simple.csv",
+    "size": {
+      "title": "Market Size"
+    },
+    "legend": false,
+    "animate": true
+  },
+  "bubble": {
+    "type": "bubble",
+    "title": "Quarterly Performance",
+    "subtitle": "Revenue vs Users",
+    "file": "bubble-data.csv",
+    "series": {
+      "column": "series",
+      "title": "Metric"
+    },
+    "size": {
+      "title": "Market Size"
+    },
+    "legend": true,
+    "animate": true
+  },
+  "line-dots-only": {
+    "type": "line",
+    "title": "Line Chart (dots only)",
+    "subtitle": "showLines: false",
+    "file": "adoption.csv",
+    "showLines": false,
+    "y": {
+      "columns": {
+        "prs": "PRs",
+        "commits": "Commits"
+      },
+      "max": 60
+    },
+    "legend": true,
+    "animate": true
   }
 }

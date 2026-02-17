@@ -1,5 +1,6 @@
 import { renderDot } from './dot.js';
 
 export function renderLine(config) {
-  return renderDot({ ...config, connectDots: true, chartType: 'line' });
+  const connectDots = config.showLines !== false; // default true
+  return renderDot({ ...config, connectDots, chartType: 'line' });
 }

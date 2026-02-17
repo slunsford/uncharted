@@ -6,6 +6,7 @@ import { renderScatter } from './scatter.js';
 import { renderSankey } from './sankey.js';
 import { renderLine } from './line.js';
 import { renderTimeseries } from './timeseries.js';
+import { renderBubble } from './bubble.js';
 
 export const renderers = {
   'stacked-bar': renderStackedBar,
@@ -15,7 +16,8 @@ export const renderers = {
   'scatter': renderScatter,
   'sankey': renderSankey,
   'line': renderLine,
-  'timeseries': renderTimeseries
+  'timeseries': renderTimeseries,
+  'bubble': renderBubble
 };
 
-export { renderStackedBar, renderStackedColumn, renderDonut, renderDot, renderScatter, renderSankey, renderLine, renderTimeseries };
+export { renderStackedBar, renderStackedColumn, renderDonut, renderDot, renderScatter, renderSankey, renderLine, renderTimeseries, renderBubble };

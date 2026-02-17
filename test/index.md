@@ -50,6 +50,24 @@ This page demonstrates all chart types supported by the Uncharted plugin.
 
 {% chart "line" %}
 
+### Line Chart (Dots Only)
+
+Using `showLines: false` to display dots without connecting lines:
+
+{% chart "line-dots-only" %}
+
+## Bubble Chart
+
+Bubble charts have categorical X axis, continuous Y, and variable dot sizes.
+
+### Simple Bubble (Single Series)
+
+{% chart "bubble-simple" %}
+
+### Multi-Series Bubble
+
+{% chart "bubble" %}
+
 ## Scatter Plot
 
 {% chart "scatter" %}

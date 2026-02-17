@@ -98,7 +98,75 @@ export function resolveColumns(config, data, chartType) {
   };
 
   // Chart-type specific resolution
-  if (chartType === 'scatter') {
+  if (chartType === 'bubble') {
+    // Bubble charts use x (categorical), y, series, size columns
+    // Like scatter but with categorical X axis
+    // New schema: x.column, y.column, series.column, size.column
+    // Deprecated: columns.x, columns.y, columns.series, columns.size
+
+    // X column (categorical)
+    if (xConfig?.columns?.length) {
+      resolved.x = validateColumn('x.column', xConfig.columns[0]);
+    } else if (deprecatedColumns.x) {
+      resolved.x = validateColumn('columns.x', deprecatedColumns.x);
+    }
+
+    // Y column
+    if (yConfig?.columns?.length) {
+      resolved.y = validateColumn('y.column', yConfig.columns[0]);
+    } else if (deprecatedColumns.y) {
+      resolved.y = validateColumn('columns.y', deprecatedColumns.y);
+    }
+
+    // Series column (for coloring)
+    if (seriesConfig?.columns?.length) {
+      resolved.series = validateColumn('series.column', seriesConfig.columns[0]);
+      resolved.seriesTitle = seriesConfig.title;
+    } else if (deprecatedColumns.series) {
+      resolved.series = validateColumn('columns.series', deprecatedColumns.series);
+      resolved.seriesTitle = config.legendTitle; // deprecated
+    }
+
+    // Size column
+    if (sizeConfig?.columns?.length) {
+      resolved.size = validateColumn('size.column', sizeConfig.columns[0]);
+      resolved.sizeTitle = sizeConfig.title;
+    } else if (deprecatedColumns.size) {
+      resolved.size = validateColumn('columns.size', deprecatedColumns.size);
+      resolved.sizeTitle = config.sizeTitle; // deprecated
+    }
+
+    // Implicit detection for bubble if not explicitly specified
+    if (!resolved.x || !resolved.y) {
+      const namedX = findKey('x');
+      const namedY = findKey('y');
+
+      if (namedX && namedY) {
+        resolved.x = resolved.x ?? namedX;
+        resolved.y = resolved.y ?? namedY;
+      } else {
+        resolved.x = resolved.x ?? keys[0];
+        resolved.y = resolved.y ?? keys[1];
+      }
+    }
+
+    // Implicit series/size detection
+    if (!resolved.series) {
+      resolved.series = findKey('series');
+      // Capture series title even with implicit detection
+      if (resolved.series && seriesConfig?.title) {
+        resolved.seriesTitle = seriesConfig.title;
+      }
+    }
+    if (!resolved.size) {
+      resolved.size = findKey('size') ?? keys[2]; // default to third column
+    }
+    // Capture size title even with implicit detection
+    if (resolved.size && !resolved.sizeTitle && sizeConfig?.title) {
+      resolved.sizeTitle = sizeConfig.title;
+    }
+
+  } else if (chartType === 'scatter') {
     // Scatter charts use x, y, label, series, size columns
     // New schema: x.column, y.column, label.column, series.column, size.column
     // Deprecated: columns.x, columns.y, columns.label, columns.series, columns.size

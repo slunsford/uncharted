@@ -18,6 +18,14 @@ import { getAxisMax, getAxisMin, getAxisFormat, getAxisTitle, getRotateLabels } 
 export function renderDot(config) {
   const { title, subtitle, data, max, min, legend, legendTitle, animate, format, id, downloadData, downloadDataUrl, connectDots, dots: showDots = true, icons, chartType = 'dot', _columns } = config;
 
+  // Deprecation warning for dot chart type
+  if (chartType === 'dot') {
+    console.warn(
+      '[uncharted] Chart type "dot" is deprecated. ' +
+      'Migrate to "line" with showLines: false, or use "bubble" for sized dots.'
+    );
+  }
+
   if (!data || data.length === 0) {
     return `<!-- Dot chart: no data provided -->`;
   }
