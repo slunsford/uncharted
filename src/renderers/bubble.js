@@ -177,14 +177,13 @@ export function renderBubble(config) {
       const icon = getSeriesIcon(dot.series);
       const iconClass = icon ? ' has-icon' : '';
 
-      // Build tooltip
-      let tooltipText = `${category}: ${formatNumber(dot.y, fmtY) || dot.y}`;
-      if (seriesKey && dot.series !== 'default') {
-        tooltipText = `${dot.series} - ${tooltipText}`;
-      }
+      // Build tooltip: series: value, plus size if available
+      const fmtYVal = formatNumber(dot.y, fmtY) || dot.y;
+      let tooltipText = seriesList.length > 1 ? `${dot.series}: ${fmtYVal}` : `${fmtYVal}`;
       if (sizeKey && dot.rawSize !== null) {
         const fmtSizeVal = formatNumber(dot.rawSize, fmtSize) || dot.rawSize;
-        tooltipText += ` [${fmtSizeVal}]`;
+        const sizeLabel = sizeTitle || sizeKey;
+        tooltipText += ` — ${sizeLabel}: ${fmtSizeVal}`;
       }
 
       // Build style string with size scale

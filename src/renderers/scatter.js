@@ -169,12 +169,22 @@ export function renderScatter(config) {
     const icon = getSeriesIcon(dot.series);
     const iconClass = icon ? ' has-icon' : '';
 
-    // Build tooltip with optional size value
-    let tooltipText = dot.label ? `${dot.label}: (${fmtXVal}, ${fmtYVal})` : `(${fmtXVal}, ${fmtYVal})`;
+    // Build tooltip with series, axis titles, and optional size
+    let tooltipParts = [];
+    if (dot.label && seriesList.length > 1) {
+      tooltipParts.push(`${dot.label} (${dot.series})`);
+    } else if (dot.label) {
+      tooltipParts.push(dot.label);
+    } else if (seriesList.length > 1) {
+      tooltipParts.push(dot.series);
+    }
+    tooltipParts.push(`${xAxisTitle}: ${fmtXVal}, ${yAxisTitle}: ${fmtYVal}`);
     if (sizeKey && dot.rawSize !== null) {
       const fmtSizeVal = formatNumber(dot.rawSize, fmtSize) || dot.rawSize;
-      tooltipText += ` [${fmtSizeVal}]`;
+      const sizeLabel = sizeTitle || sizeKey;
+      tooltipParts.push(`${sizeLabel}: ${fmtSizeVal}`);
     }
+    const tooltipText = tooltipParts.join(' — ');
 
     // Build style string with optional size scale
     let styleStr = `--dot-index: ${i}; --x: ${xPct.toFixed(2)}%; --value: ${yPct.toFixed(2)}%`;

@@ -313,6 +313,11 @@
   background-color: var(--color);
 }
 
+.chart-stacked-bar .bar-fill[title]:hover {
+  filter: brightness(1.15);
+  cursor: default;
+}
+
 .chart-stacked-bar .bar-value {
   display: flex;
   align-items: center;
@@ -372,6 +377,11 @@
   height: var(--value);
   transition: height 0.3s ease;
   background-color: var(--color);
+}
+
+.chart-stacked-column .column-segment[title]:hover {
+  filter: brightness(1.15);
+  cursor: default;
 }
 
 .chart-stacked-column .column-labels {
