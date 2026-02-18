@@ -151,6 +151,9 @@ ${stylesheetLinks}
 
     /* Additional stylesheets (inlined) */
     ${inlinedStyles}
+
+    /* Hide download link in images */
+    .chart-download { display: none; }
   </style>
 </head>
 <body>
