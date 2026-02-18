@@ -129,24 +129,24 @@ ${stylesheetLinks}
       display: flex;
       flex-direction: column;
     }
-    .chart-container > .chart:not(.chart-donut) {
+    .chart-container > .chart:not(.chart-donut):not(.chart-stacked-bar):not(.chart-sankey) {
       flex: 1;
       min-height: 0;
       --chart-height: 100%;
     }
-    .chart-container > .chart:not(.chart-donut) .chart-body {
+    .chart-container > .chart:not(.chart-donut):not(.chart-stacked-bar):not(.chart-sankey) .chart-body {
       flex: 1;
       min-height: 0;
+    }
+    /* Stacked bar: use natural height based on row count */
+    .chart-stacked-bar .chart-bars {
+      grid-auto-rows: auto;
     }
     /* Donut: just center it, don't stretch */
     .chart-container:has(.chart-donut) {
       justify-content: center;
     }
-    /* Sankey: constrain to available height */
-    .chart-sankey .chart-sankey-container {
-      min-height: 0;
-      height: 100%;
-    }
+    /* Sankey: use natural height from --height-scale */
     ${css}
 
     /* Additional stylesheets (inlined) */
