@@ -295,7 +295,7 @@
   "line-dots-only": {
     "type": "line",
     "title": "Line Chart (dots only)",
-    "subtitle": "showLines: false",
+    "subtitle": "lines: false",
     "file": "adoption.csv",
     "lines": false,
     "y": {

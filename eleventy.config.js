@@ -188,6 +188,13 @@ export default function(eleventyConfig, options = {}) {
       _columns: columns
     });
 
+    // Add aria-label for accessibility
+    const altText = chartConfig.alt || chartConfig.title || chartId;
+    chartHtml = chartHtml.replace(
+      /^<figure([^>]*class="chart[^"]*")/,
+      `<figure aria-label="${altText}"$1`
+    );
+
     // Handle image generation
     const chartImageEnabled = chartConfig.image?.enabled ?? imageOptions.enabled;
     if (chartImageEnabled && !skipImageGeneration && eleventyDirs?.output) {
@@ -196,9 +203,8 @@ export default function(eleventyConfig, options = {}) {
 
       // Add data-chart-image and data-chart-alt attributes to the figure element
       const imageUrl = getImageUrl(chartId, chartConfig, imageOptions);
-      const altText = chartConfig.image?.alt || chartConfig.title || chartId;
       chartHtml = chartHtml.replace(
-        /^<figure([^>]*class="chart[^"]*")/,
+        /^<figure([^>]*aria-label="[^"]*"[^>]*class="chart[^"]*")/,
         `<figure$1 data-chart-image="${imageUrl}" data-chart-alt="${altText}"`
       );
     }
