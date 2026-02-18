@@ -222,13 +222,13 @@ export default function(eleventyConfig, options = {}) {
   });
 
   // Filter to replace chart HTML with image tags (for RSS feeds)
-  eleventyConfig.addFilter('chartToImage', function(content) {
+  eleventyConfig.addFilter('chartToImage', function(content, baseUrl = '') {
     if (!content) return content;
 
     // Find chart figures with data-chart-image attributes and replace with img tags
     return content.replace(
       /<figure[^>]*class="chart[^"]*"[^>]*data-chart-image="([^"]+)"[^>]*>[\s\S]*?<figcaption[^>]*>([^<]*)<[\s\S]*?<\/figure>/g,
-      '<img src="$1" alt="Chart: $2">'
+      (match, src, alt) => `<img src="${baseUrl}${src}" alt="Chart: ${alt}">`
     );
   });
 
