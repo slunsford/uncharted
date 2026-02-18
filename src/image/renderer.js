@@ -58,7 +58,8 @@ function isUrl(str) {
 }
 
 /**
- * Load stylesheets - URLs become link tags, local files are inlined.
+ * Load stylesheets - URLs become link tags, local files stay as relative paths.
+ * Since we render from a temp file in the project root, relative paths work.
  * @param {string[]} stylesheets - Array of URLs or file paths
  * @returns {{links: string, inlined: string}}
  */
@@ -70,13 +71,12 @@ function loadStylesheets(stylesheets) {
     if (isUrl(stylesheet)) {
       links.push(`  <link rel="stylesheet" href="${stylesheet}">`);
     } else {
-      // Local file - read and inline
-      try {
-        const filePath = path.resolve(process.cwd(), stylesheet);
-        const content = fs.readFileSync(filePath, 'utf-8');
-        inlined.push(`/* ${stylesheet} */\n${content}`);
-      } catch (err) {
-        console.warn(`[uncharted] Could not load stylesheet "${stylesheet}": ${err.message}`);
+      // Local file - keep relative path (works because temp HTML is in project root)
+      const filePath = path.resolve(process.cwd(), stylesheet);
+      if (fs.existsSync(filePath)) {
+        links.push(`  <link rel="stylesheet" href="${stylesheet}">`);
+      } else {
+        console.warn(`[uncharted] Could not find stylesheet "${stylesheet}"`);
       }
     }
   }
@@ -190,28 +190,37 @@ async function renderChart(page, chart, css, defaults) {
     deviceScaleFactor: scale
   });
 
-  // Build and set HTML content
+  // Build HTML content
   const html = buildHtmlDocument(chart.html, css, { background, stylesheets, height });
 
-  // Use 'load' for basic page load, then wait briefly for fonts if stylesheets are included
-  await page.setContent(html, { waitUntil: 'load' });
-  if (stylesheets.length > 0) {
-    // Wait for fonts to load
-    await page.evaluateHandle('document.fonts.ready');
-  }
+  // Write to temp file so relative paths in CSS resolve correctly
+  const tempHtmlPath = path.join(process.cwd(), `.uncharted-temp-${chart.id}.html`);
+  fs.writeFileSync(tempHtmlPath, html);
 
-  // Ensure output directory exists
-  const outputDir = path.dirname(chart.outputPath);
-  if (!fs.existsSync(outputDir)) {
-    fs.mkdirSync(outputDir, { recursive: true });
-  }
+  try {
+    // Navigate to the temp file
+    await page.goto(`file://${tempHtmlPath}`, { waitUntil: 'load' });
+    if (stylesheets.length > 0) {
+      // Wait for fonts to load
+      await page.evaluateHandle('document.fonts.ready');
+    }
 
-  // Take screenshot
-  await page.screenshot({
-    path: chart.outputPath,
-    type: 'png',
-    omitBackground: background === 'transparent'
-  });
+    // Ensure output directory exists
+    const outputDir = path.dirname(chart.outputPath);
+    if (!fs.existsSync(outputDir)) {
+      fs.mkdirSync(outputDir, { recursive: true });
+    }
+
+    // Take screenshot
+    await page.screenshot({
+      path: chart.outputPath,
+      type: 'png',
+      omitBackground: background === 'transparent'
+    });
+  } finally {
+    // Clean up temp file
+    fs.unlinkSync(tempHtmlPath);
+  }
 }
 
 /**
@@ -241,7 +250,7 @@ export async function renderCharts(charts, css, options = {}) {
   try {
     browser = await pptr.default.launch({
       headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
+      args: ['--no-sandbox', '--disable-setuid-sandbox', '--allow-file-access-from-files']
     });
 
     const page = await browser.newPage();
