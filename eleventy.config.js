@@ -194,11 +194,12 @@ export default function(eleventyConfig, options = {}) {
       // Queue chart for image generation
       queueChartForImage(chartId, chartHtml, chartConfig, imageOptions, eleventyDirs.output);
 
-      // Add data-chart-image attribute to the figure element
+      // Add data-chart-image and data-chart-alt attributes to the figure element
       const imageUrl = getImageUrl(chartId, chartConfig, imageOptions);
+      const altText = chartConfig.image?.alt || chartConfig.title || chartId;
       chartHtml = chartHtml.replace(
         /^<figure([^>]*class="chart[^"]*")/,
-        `<figure$1 data-chart-image="${imageUrl}"`
+        `<figure$1 data-chart-image="${imageUrl}" data-chart-alt="${altText}"`
       );
     }
 
@@ -225,10 +226,10 @@ export default function(eleventyConfig, options = {}) {
   eleventyConfig.addFilter('chartToImage', function(content, baseUrl = '') {
     if (!content) return content;
 
-    // Find chart figures with data-chart-image attributes and replace with img tags
+    // Find chart figures with data-chart-image and data-chart-alt attributes and replace with img tags
     return content.replace(
-      /<figure[^>]*class="chart[^"]*"[^>]*data-chart-image="([^"]+)"[^>]*>[\s\S]*?<figcaption[^>]*>([^<]*)<[\s\S]*?<\/figure>/g,
-      (match, src, alt) => `<img src="${baseUrl}${src}" alt="Chart: ${alt}">`
+      /<figure[^>]*class="chart[^"]*"[^>]*data-chart-image="([^"]+)"[^>]*data-chart-alt="([^"]+)"[^>]*>[\s\S]*?<\/figure>/g,
+      (match, src, alt) => `<img src="${baseUrl}${src}" alt="${alt}">`
     );
   });
 
