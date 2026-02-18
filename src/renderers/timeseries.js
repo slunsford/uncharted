@@ -176,8 +176,10 @@ function formatXLabel(value, isDate, range) {
     return `${month}<br>${year}`;
   }
 
-  // Days/weeks range: show MMM D
-  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  // Days/weeks range: show D MMM
+  const day = date.getDate();
+  const month = date.toLocaleDateString('en-US', { month: 'short' });
+  return `${day} ${month}`;
 }
 
 /**
