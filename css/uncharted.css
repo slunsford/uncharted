@@ -614,7 +614,7 @@
 }
 
 :is(.chart-dot, .chart-line) .dot[title]:hover {
-  transform: translate(-50%, 50%) scale(1.3);
+  transform: translate(-50%, 50%) scale(1.3) !important;
   z-index: 1;
 }
 
@@ -752,7 +752,7 @@
 }
 
 .chart-bubble .dot[title]:hover {
-  transform: translate(-50%, 50%) scale(1.3);
+  transform: translate(-50%, 50%) scale(1.3) !important;
   z-index: 1;
 }
 
@@ -942,7 +942,7 @@
 }
 
 .chart-scatter .dot[title]:hover {
-  transform: translate(-50%, 50%) scale(1.3);
+  transform: translate(-50%, 50%) scale(1.3) !important;
   z-index: 1;
 }
 
@@ -1048,7 +1048,7 @@
 }
 
 .chart-timeseries .dot[title]:hover {
-  transform: translate(-50%, 50%) scale(1.3);
+  transform: translate(-50%, 50%) scale(1.3) !important;
   z-index: 1;
 }
 
@@ -1061,7 +1061,7 @@
 
 :is(.chart-line, .chart-timeseries).no-dots .dot:hover {
   background-color: var(--color);
-  transform: translate(-50%, 50%) scale(1.3);
+  transform: translate(-50%, 50%) scale(1.3) !important;
   z-index: 1;
 }
 
