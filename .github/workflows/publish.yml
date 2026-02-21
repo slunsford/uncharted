@@ -20,4 +20,13 @@ jobs:
           node-version: '24'
           registry-url: 'https://registry.npmjs.org'
       - run: npm run build --if-present
-      - run: npm publish
+      - name: Publish
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          if [[ "$VERSION" == *-* ]]; then
+            # Prerelease: extract tag name (beta, alpha, rc, etc.)
+            TAG=$(echo "$VERSION" | sed 's/.*-\([a-z]*\).*/\1/')
+            npm publish --tag "$TAG"
+          else
+            npm publish
+          fi
