@@ -1,7 +1,6 @@
 /**
  * Column resolution for Uncharted
  * Handles explicit column mapping and implicit detection
- * Supports both new unified schema (x.column, y.columns) and deprecated columns key
  */
 
 import { parseAxisConfig } from './config.js';
@@ -9,12 +8,9 @@ import { parseAxisConfig } from './config.js';
 /**
  * Resolve column mappings for chart data
  *
- * New unified schema (takes precedence):
+ * New unified schema:
  * - x: { column: "month" } or x: "month"
  * - y: { columns: ["a", "b"] } or y: { columns: { a: "Label A" } }
- *
- * Deprecated schema (fallback):
- * - columns: { x: "month", y: ["a", "b"] }
  *
  * @param {Object} config - Chart configuration with optional columns mapping
  * @param {Object[]} data - Chart data array
@@ -42,7 +38,6 @@ export function resolveColumns(config, data, chartType) {
   }
 
   const keys = Object.keys(data[0]);
-  const deprecatedColumns = config.columns || {};
 
   // Helper to find column by name (case-insensitive)
   const findKey = name => keys.find(k => k.toLowerCase() === name.toLowerCase()) || null;
@@ -100,40 +95,28 @@ export function resolveColumns(config, data, chartType) {
   // Chart-type specific resolution
   if (chartType === 'bubble') {
     // Bubble charts use x (categorical), y, series, size columns
-    // Like scatter but with categorical X axis
-    // New schema: x.column, y.column, series.column, size.column
-    // Deprecated: columns.x, columns.y, columns.series, columns.size
+    // Schema: x.column, y.column, series.column, size.column
 
     // X column (categorical)
     if (xConfig?.columns?.length) {
       resolved.x = validateColumn('x.column', xConfig.columns[0]);
-    } else if (deprecatedColumns.x) {
-      resolved.x = validateColumn('columns.x', deprecatedColumns.x);
     }
 
     // Y column
     if (yConfig?.columns?.length) {
       resolved.y = validateColumn('y.column', yConfig.columns[0]);
-    } else if (deprecatedColumns.y) {
-      resolved.y = validateColumn('columns.y', deprecatedColumns.y);
     }
 
     // Series column (for coloring)
     if (seriesConfig?.columns?.length) {
       resolved.series = validateColumn('series.column', seriesConfig.columns[0]);
       resolved.seriesTitle = seriesConfig.title;
-    } else if (deprecatedColumns.series) {
-      resolved.series = validateColumn('columns.series', deprecatedColumns.series);
-      resolved.seriesTitle = config.legendTitle; // deprecated
     }
 
     // Size column
     if (sizeConfig?.columns?.length) {
       resolved.size = validateColumn('size.column', sizeConfig.columns[0]);
       resolved.sizeTitle = sizeConfig.title;
-    } else if (deprecatedColumns.size) {
-      resolved.size = validateColumn('columns.size', deprecatedColumns.size);
-      resolved.sizeTitle = config.sizeTitle; // deprecated
     }
 
     // Implicit detection for bubble if not explicitly specified
@@ -168,28 +151,21 @@ export function resolveColumns(config, data, chartType) {
 
   } else if (chartType === 'scatter') {
     // Scatter charts use x, y, label, series, size columns
-    // New schema: x.column, y.column, label.column, series.column, size.column
-    // Deprecated: columns.x, columns.y, columns.label, columns.series, columns.size
+    // Schema: x.column, y.column, label.column, series.column, size.column
 
     // X column
     if (xConfig?.columns?.length) {
       resolved.x = validateColumn('x.column', xConfig.columns[0]);
-    } else if (deprecatedColumns.x) {
-      resolved.x = validateColumn('columns.x', deprecatedColumns.x);
     }
 
     // Y column
     if (yConfig?.columns?.length) {
       resolved.y = validateColumn('y.column', yConfig.columns[0]);
-    } else if (deprecatedColumns.y) {
-      resolved.y = validateColumn('columns.y', deprecatedColumns.y);
     }
 
     // Label column (point identifier)
     if (labelConfig?.columns?.length) {
       resolved.label = validateColumn('label.column', labelConfig.columns[0]);
-    } else if (deprecatedColumns.label) {
-      resolved.label = validateColumn('columns.label', deprecatedColumns.label);
     } else {
       resolved.label = keys[0];
     }
@@ -198,18 +174,12 @@ export function resolveColumns(config, data, chartType) {
     if (seriesConfig?.columns?.length) {
       resolved.series = validateColumn('series.column', seriesConfig.columns[0]);
       resolved.seriesTitle = seriesConfig.title;
-    } else if (deprecatedColumns.series) {
-      resolved.series = validateColumn('columns.series', deprecatedColumns.series);
-      resolved.seriesTitle = config.legendTitle; // deprecated
     }
 
     // Size column
     if (sizeConfig?.columns?.length) {
       resolved.size = validateColumn('size.column', sizeConfig.columns[0]);
       resolved.sizeTitle = sizeConfig.title;
-    } else if (deprecatedColumns.size) {
-      resolved.size = validateColumn('columns.size', deprecatedColumns.size);
-      resolved.sizeTitle = config.sizeTitle; // deprecated
     }
 
     // Implicit detection for scatter if not explicitly specified
@@ -236,21 +206,16 @@ export function resolveColumns(config, data, chartType) {
 
   } else if (chartType === 'sankey') {
     // Sankey charts use source, target, value columns
-    // New schema: source.column, target.column, value.column
-    // Deprecated: columns.source, columns.target, columns.value
+    // Schema: source.column, target.column, value.column
 
     if (sourceConfig?.columns?.length) {
       resolved.source = validateColumn('source.column', sourceConfig.columns[0]);
-    } else if (deprecatedColumns.source) {
-      resolved.source = validateColumn('columns.source', deprecatedColumns.source);
     } else {
       resolved.source = keys[0];
     }
 
     if (targetConfig?.columns?.length) {
       resolved.target = validateColumn('target.column', targetConfig.columns[0]);
-    } else if (deprecatedColumns.target) {
-      resolved.target = validateColumn('columns.target', deprecatedColumns.target);
     } else {
       resolved.target = keys[1];
     }
@@ -258,22 +223,17 @@ export function resolveColumns(config, data, chartType) {
     if (valueConfig?.columns?.length) {
       resolved.value = validateColumn('value.column', valueConfig.columns[0]);
       resolved.valueFormat = valueConfig.format;
-    } else if (deprecatedColumns.value) {
-      resolved.value = validateColumn('columns.value', deprecatedColumns.value);
     } else {
       resolved.value = keys[2];
     }
 
   } else if (chartType === 'donut') {
     // Donut charts use label, value columns
-    // New schema: label.column, value.column
-    // Deprecated: columns.label, columns.value (or implicit first/second columns)
+    // Schema: label.column, value.column
 
     if (labelConfig?.columns?.length) {
       resolved.label = validateColumn('label.column', labelConfig.columns[0]);
       resolved.yLabels = labelConfig.labels || {};
-    } else if (deprecatedColumns.label) {
-      resolved.label = validateColumn('columns.label', deprecatedColumns.label);
     } else {
       resolved.label = keys[0];
     }
@@ -284,9 +244,6 @@ export function resolveColumns(config, data, chartType) {
         resolved.values = [resolved.values];
       }
       resolved.valueFormat = valueConfig.format;
-    } else if (deprecatedColumns.value) {
-      const val = validateColumn('columns.value', deprecatedColumns.value);
-      resolved.values = val ? [val] : [];
     } else {
       // Default: all columns except label
       resolved.values = keys.filter(k => k !== resolved.label);
@@ -294,14 +251,11 @@ export function resolveColumns(config, data, chartType) {
 
   } else if (chartType === 'stacked-bar') {
     // Stacked bar: y = categories (left side), x = value series (bars extend right)
-    // New schema: y.column (categories), x.columns (values with labels)
-    // Deprecated: columns.y (or label), columns.x (or y as values)
+    // Schema: y.column (categories), x.columns (values with labels)
 
     // Category column (on Y axis for stacked-bar)
     if (yConfig?.columns?.length) {
       resolved.label = validateColumn('y.column', yConfig.columns[0]);
-    } else if (deprecatedColumns.label) {
-      resolved.label = validateColumn('columns.label', deprecatedColumns.label);
     } else {
       resolved.label = keys[0];
     }
@@ -310,25 +264,18 @@ export function resolveColumns(config, data, chartType) {
     if (xConfig?.columns?.length) {
       resolved.values = validateColumn('x.columns', xConfig.columns) || [];
       resolved.xLabels = xConfig.labels || {};
-    } else if (deprecatedColumns.y) {
-      // Deprecated: columns.y was used for value columns in stacked-bar
-      const explicitY = validateColumn('columns.y', deprecatedColumns.y);
-      resolved.values = Array.isArray(explicitY) ? explicitY : (explicitY ? [explicitY] : []);
     } else {
       // Implicit: all columns except label are values
       resolved.values = keys.filter(k => k !== resolved.label);
     }
 
   } else {
-    // Standard charts (dot, line, stacked-column): x = categories, y = multi-series values
-    // New schema: x.column (categories), y.columns (values with labels)
-    // Deprecated: columns.label (or implicit first), columns.y
+    // Standard charts (line, stacked-column): x = categories, y = multi-series values
+    // Schema: x.column (categories), y.columns (values with labels)
 
     // Label/category column (X axis)
     if (xConfig?.columns?.length) {
       resolved.label = validateColumn('x.column', xConfig.columns[0]);
-    } else if (deprecatedColumns.label) {
-      resolved.label = validateColumn('columns.label', deprecatedColumns.label);
     } else {
       resolved.label = keys[0];
     }
@@ -337,9 +284,6 @@ export function resolveColumns(config, data, chartType) {
     if (yConfig?.columns?.length) {
       resolved.values = validateColumn('y.columns', yConfig.columns) || [];
       resolved.yLabels = yConfig.labels || {};
-    } else if (deprecatedColumns.y) {
-      const explicitY = validateColumn('columns.y', deprecatedColumns.y);
-      resolved.values = Array.isArray(explicitY) ? explicitY : (explicitY ? [explicitY] : []);
     } else {
       // Implicit: all columns except label are values
       resolved.values = keys.filter(k => k !== resolved.label);

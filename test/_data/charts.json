@@ -16,23 +16,6 @@
     },
     "legend": true
   },
-  "adoption": {
-    "type": "dot",
-    "title": "AI-Assisted Development",
-    "subtitle": "PRs and commits by month",
-    "file": "adoption.csv",
-    "x": {
-      "column": "label"
-    },
-    "y": {
-      "columns": {
-        "prs": "Pull Requests",
-        "commits": "Commits"
-      },
-      "max": 60
-    },
-    "legend": true
-  },
   "scatter": {
     "type": "scatter",
     "title": "Performance Metrics",
@@ -54,19 +37,6 @@
     "series": {
       "column": "series",
       "title": "Group"
-    },
-    "legend": true
-  },
-  "temperature": {
-    "type": "dot",
-    "title": "Temperature Range",
-    "subtitle": "Monthly highs and lows (°C)",
-    "file": "temperature.csv",
-    "y": {
-      "columns": {
-        "High": "High",
-        "Low": "Low"
-      }
     },
     "legend": true
   },
@@ -149,39 +119,6 @@
     },
     "animate": true,
     "proportional": true
-  },
-  "legacy-scatter-test": {
-    "type": "scatter",
-    "title": "Legacy Scatter Test",
-    "subtitle": "Tests deprecated scatter options",
-    "file": "scatter-data.csv",
-    "maxX": 100,
-    "maxY": 100,
-    "titleX": "X Value",
-    "titleY": "Y Value",
-    "legendTitle": "Series",
-    "legend": ["Alpha Group", "Beta Group"]
-  },
-  "dot-icons": {
-    "type": "dot",
-    "title": "AI-Assisted Development",
-    "subtitle": "With per-series icons",
-    "file": "adoption.csv",
-    "x": {
-      "column": "label"
-    },
-    "y": {
-      "columns": {
-        "prs": "Pull Requests",
-        "commits": "Commits"
-      },
-      "max": 60
-    },
-    "icons": {
-      "prs": "fa-solid fa-code-pull-request",
-      "commits": "fa-solid fa-code-commit"
-    },
-    "legend": true
   },
   "scatter-icons": {
     "type": "scatter",

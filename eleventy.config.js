@@ -4,6 +4,7 @@ import { renderers } from './src/renderers/index.js';
 import { loadCSV } from './src/csv.js';
 import { normalizeConfig } from './src/config.js';
 import { resolveColumns } from './src/columns.js';
+import { validateChartType, checkDeprecatedOptions } from './src/deprecation.js';
 import {
   normalizeImageOptions,
   queueChartForImage,
@@ -145,10 +146,20 @@ export default function(eleventyConfig, options = {}) {
       return `<!-- Chart "${chartId}" has no type specified -->`;
     }
 
+    // Check for deprecated chart type (ERROR - prevents rendering)
+    const typeError = validateChartType(chartType, chartId);
+    if (typeError) {
+      console.error(`[uncharted] ${typeError}`);
+      return `<!-- ${typeError} -->`;
+    }
+
     const renderer = renderers[chartType];
     if (!renderer) {
       return `<!-- Unknown chart type "${chartType}" for chart "${chartId}" -->`;
     }
+
+    // Check for deprecated config options (WARNING - chart renders but option ignored)
+    checkDeprecatedOptions(chartConfig, chartId);
 
     // Load data from CSV file or use inline data
     let data = chartConfig.data;

@@ -25,11 +25,10 @@ export function renderStackedBar(config) {
   const labelKey = _columns?.label ?? getLabelKey(data);
   const seriesKeys = _columns?.values?.length > 0 ? _columns.values : getSeriesNames(data);
 
-  // Build legend labels from: 1) xLabels (new - stacked-bar uses x for values), 2) legend array (deprecated), 3) column names
+  // Build legend labels from xLabels (new schema) or column names
   const xLabels = _columns?.xLabels || {};
-  const getSeriesLabel = (key, index) => {
+  const getSeriesLabel = (key) => {
     if (xLabels[key]) return xLabels[key];
-    if (Array.isArray(legend)) return legend[index] ?? key;
     return key;
   };
 
@@ -67,7 +66,7 @@ export function renderStackedBar(config) {
     }
     html += `<div class="chart-legend">`;
     seriesKeys.forEach((key, i) => {
-      const label = getSeriesLabel(key, i);
+      const label = getSeriesLabel(key);
       const colorClass = `chart-color-${i + 1}`;
       const seriesClass = `chart-series-${slugify(key)}`;
       html += `<span class="chart-legend-item ${colorClass} ${seriesClass}">${escapeHtml(label)}</span>`;
@@ -101,7 +100,7 @@ export function renderStackedBar(config) {
       if (pct > 0) {
         const colorClass = `chart-color-${i + 1}`;
         const seriesClass = `chart-series-${slugify(key)}`;
-        const seriesLabel = getSeriesLabel(key, i);
+        const seriesLabel = getSeriesLabel(key);
         html += `<div class="bar-fill ${colorClass} ${seriesClass}" style="--value: ${pct.toFixed(2)}%" title="${escapeHtml(seriesLabel)}: ${formatNumber(value, xFormat) || value}"></div>`;
       }
     });

@@ -262,14 +262,14 @@ export function renderTimeseries(config) {
   }
 
   // Build legend labels
+  // Build legend labels from yLabels (new schema) or column names
   const yLabels = _columns?.yLabels || {};
   const yColumnsLabels = config.y?.columns && typeof config.y.columns === 'object' && !Array.isArray(config.y.columns)
     ? config.y.columns
     : {};
-  const getSeriesLabel = (key, index) => {
+  const getSeriesLabel = (key) => {
     if (yLabels[key]) return yLabels[key];
     if (yColumnsLabels[key]) return yColumnsLabels[key];
-    if (Array.isArray(legend)) return legend[index] ?? key;
     return key;
   };
 
@@ -433,7 +433,7 @@ export function renderTimeseries(config) {
       const points = seriesData.get(key);
       const colorClass = `chart-color-${seriesIdx + 1}`;
       const seriesClass = `chart-series-${slugify(key)}`;
-      const seriesLabel = getSeriesLabel(key, seriesIdx);
+      const seriesLabel = getSeriesLabel(key);
       const icon = showDots ? getSeriesIcon(key) : null;
       const iconClass = icon ? ' has-icon' : '';
 
@@ -484,7 +484,7 @@ export function renderTimeseries(config) {
     }
     html += `<div class="chart-legend">`;
     seriesKeys.forEach((key, i) => {
-      const label = getSeriesLabel(key, i);
+      const label = getSeriesLabel(key);
       const colorClass = `chart-color-${i + 1}`;
       const seriesClass = `chart-series-${slugify(key)}`;
       const icon = getSeriesIcon(key);

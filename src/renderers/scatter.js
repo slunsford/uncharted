@@ -54,9 +54,9 @@ export function renderScatter(config) {
     seriesKey = findKey('series');
   }
 
-  // Get legend/size titles from resolved columns (new schema) or deprecated top-level
-  const legendTitle = _columns?.seriesTitle ?? config.legendTitle;
-  const sizeTitle = _columns?.sizeTitle ?? config.sizeTitle;
+  // Get legend/size titles from resolved columns (new schema only)
+  const legendTitle = _columns?.seriesTitle;
+  const sizeTitle = _columns?.sizeTitle;
 
   // Axis titles: use normalized config, fall back to column names
   const xAxisTitle = getAxisTitle(config, 'x', xKey);
@@ -219,8 +219,9 @@ export function renderScatter(config) {
   html += `</div>`;
 
   // Legend (if multiple series or legendTitle specified)
-  if (seriesList.length > 1 || legend || legendTitle) {
-    const legendLabels = legend ?? seriesList;
+  // Note: legend array is deprecated; use series names directly
+  if (seriesList.length > 1 || legendTitle) {
+    const legendLabels = seriesList;
     if (legendTitle) {
       html += `<span class="chart-legend-title">${escapeHtml(legendTitle)}</span>`;
     }

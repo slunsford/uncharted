@@ -103,11 +103,10 @@ export function renderDonut(config) {
 
   html += `</div>`; // Close donut-body
 
-  // Build label lookup from: 1) yLabels (new schema), 2) legend array (deprecated), 3) segment labels
+  // Build label lookup from yLabels (new schema) or segment labels
   const labelMap = _columns?.yLabels || {};
-  const getSegmentLabel = (segment, index) => {
+  const getSegmentLabel = (segment) => {
     if (labelMap[segment.label]) return labelMap[segment.label];
-    if (Array.isArray(legend)) return legend[index] ?? segment.label;
     return segment.label;
   };
 
@@ -120,7 +119,7 @@ export function renderDonut(config) {
   if (showLegend) {
     html += `<div class="chart-legend">`;
     segments.forEach((segment, i) => {
-      const label = getSegmentLabel(segment, i);
+      const label = getSegmentLabel(segment);
       let displayValue;
       if (showPercentages) {
         displayValue = ((segment.value / total) * 100).toFixed(1) + '%';

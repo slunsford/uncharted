@@ -3,58 +3,22 @@
  * Transforms various config formats into a standardized structure
  */
 
-// Deprecated keys mapping for deprecation warnings
-const DEPRECATED_KEYS = {
-  maxX: 'x.max',
-  minX: 'x.min',
-  maxY: 'y.max',
-  minY: 'y.min',
-  titleX: 'x.title',
-  titleY: 'y.title',
-  legendTitle: 'series.title',
-  sizeTitle: 'size.title',
-  rotateLabels: 'x.rotateLabels'
-};
-
-// Track which deprecation warnings have been shown to avoid spam
-const warnedConfigs = new Set();
-
-/**
- * Log a deprecation warning (once per config/key combination)
- * @param {string} chartId - Chart identifier
- * @param {string} oldKey - Deprecated key name
- * @param {string} newKey - New key path
- */
-function warnDeprecation(chartId, oldKey, newKey) {
-  const key = `${chartId}:${oldKey}`;
-  if (warnedConfigs.has(key)) return;
-  warnedConfigs.add(key);
-  console.warn(`[uncharted] Chart "${chartId}": "${oldKey}" is deprecated, use "${newKey}" instead`);
-}
-
 /**
  * Normalize chart configuration to standardized structure
  *
- * Precedence for axis properties (highest to lowest):
- * 1. x.max / y.max (new nested format)
- * 2. maxX / maxY (deprecated suffixed format)
- * 3. max (global fallback)
+ * Axis properties:
+ * - x.max / y.max, x.min / y.min
+ * - x.title / y.title
+ * - x.format / y.format
  *
- * Format precedence:
- * 1. x.format / y.format (new nested format)
- * 2. format.x / format.y (deprecated nested format)
- * 3. format (global fallback)
+ * Column mapping:
+ * - x.column / x.columns / y.column / y.columns
  *
- * Column mapping precedence:
- * 1. x.column / x.columns / y.column / y.columns (new unified format)
- * 2. columns.x / columns.y (deprecated format)
- *
- * Legend precedence:
- * 1. y.columns: { key: "Label" } or x.columns (for stacked-bar)
- * 2. legend: ["Label1", "Label2"] (deprecated)
+ * Legend:
+ * - y.columns: { key: "Label" } or x.columns (for stacked-bar)
  *
  * @param {Object} config - Raw chart configuration
- * @param {string} [chartId] - Chart ID for deprecation warnings
+ * @param {string} [chartId] - Chart ID (unused, kept for API compatibility)
  * @returns {Object} - Normalized configuration
  */
 export function normalizeConfig(config, chartId = 'unknown') {
@@ -63,26 +27,10 @@ export function normalizeConfig(config, chartId = 'unknown') {
   const normalized = { ...config };
 
   // Build x axis config
-  normalized.x = buildAxisConfig('x', config, chartId);
+  normalized.x = buildAxisConfig('x', config);
 
   // Build y axis config
-  normalized.y = buildAxisConfig('y', config, chartId);
-
-  // Warn for deprecated legend array (when used for labels, not boolean)
-  if (Array.isArray(config.legend)) {
-    warnDeprecation(chartId, 'legend (array)', 'y.columns: { key: "Label" }');
-  }
-
-  // Warn for deprecated scatter-specific keys
-  if (config.legendTitle !== undefined) {
-    warnDeprecation(chartId, 'legendTitle', 'series.title');
-  }
-  if (config.sizeTitle !== undefined) {
-    warnDeprecation(chartId, 'sizeTitle', 'size.title');
-  }
-
-  // Clean up deprecated top-level keys (keep them for backwards compat but don't pass to renderers)
-  // The renderers will use normalized.x and normalized.y instead
+  normalized.y = buildAxisConfig('y', config);
 
   return normalized;
 }
@@ -91,58 +39,22 @@ export function normalizeConfig(config, chartId = 'unknown') {
  * Build normalized axis configuration
  * @param {'x' | 'y'} axis - Axis name
  * @param {Object} config - Raw config
- * @param {string} chartId - Chart ID for warnings
  * @returns {Object} - Normalized axis config
  */
-function buildAxisConfig(axis, config, chartId) {
-  const axisUpper = axis.toUpperCase();
+function buildAxisConfig(axis, config) {
   const existingAxisConfig = config[axis] || {};
 
   // Start with existing axis config if present
   const axisConfig = { ...existingAxisConfig };
 
-  // max: x.max > maxX > max
-  if (axisConfig.max === undefined) {
-    const deprecatedKey = `max${axisUpper}`;
-    if (config[deprecatedKey] !== undefined) {
-      warnDeprecation(chartId, deprecatedKey, `${axis}.max`);
-      axisConfig.max = config[deprecatedKey];
-    } else if (config.max !== undefined) {
-      axisConfig.max = config.max;
-    }
+  // max: x.max > max (global fallback)
+  if (axisConfig.max === undefined && config.max !== undefined) {
+    axisConfig.max = config.max;
   }
 
-  // min: x.min > minX > min
-  if (axisConfig.min === undefined) {
-    const deprecatedKey = `min${axisUpper}`;
-    if (config[deprecatedKey] !== undefined) {
-      warnDeprecation(chartId, deprecatedKey, `${axis}.min`);
-      axisConfig.min = config[deprecatedKey];
-    } else if (config.min !== undefined) {
-      axisConfig.min = config.min;
-    }
-  }
-
-  // title: x.title > titleX
-  if (axisConfig.title === undefined) {
-    const deprecatedKey = `title${axisUpper}`;
-    if (config[deprecatedKey] !== undefined) {
-      warnDeprecation(chartId, deprecatedKey, `${axis}.title`);
-      axisConfig.title = config[deprecatedKey];
-    }
-  }
-
-  // format: x.format > format.x > format
-  if (axisConfig.format === undefined) {
-    const globalFormat = config.format || {};
-    if (globalFormat[axis] !== undefined) {
-      // format.x or format.y (deprecated nested format)
-      warnDeprecation(chartId, `format.${axis}`, `${axis}.format`);
-      axisConfig.format = globalFormat[axis];
-    } else if (typeof globalFormat === 'object' && !globalFormat.x && !globalFormat.y) {
-      // Global format object (no x/y nesting) - use as fallback
-      axisConfig.format = globalFormat;
-    }
+  // min: x.min > min (global fallback)
+  if (axisConfig.min === undefined && config.min !== undefined) {
+    axisConfig.min = config.min;
   }
 
   return axisConfig;
@@ -236,20 +148,10 @@ export function parseAxisConfig(axisConfig) {
 }
 
 /**
- * Get rotateLabels setting from axis config or deprecated top-level
+ * Get rotateLabels setting from axis config
  * @param {Object} config - Normalized config
- * @param {string} chartId - Chart ID for deprecation warnings
  * @returns {boolean} - Whether to rotate labels
  */
-export function getRotateLabels(config, chartId) {
-  // New schema: x.rotateLabels
-  if (config.x?.rotateLabels !== undefined) {
-    return config.x.rotateLabels;
-  }
-  // Deprecated: top-level rotateLabels
-  if (config.rotateLabels !== undefined) {
-    warnDeprecation(chartId, 'rotateLabels', 'x.rotateLabels');
-    return config.rotateLabels;
-  }
-  return false;
+export function getRotateLabels(config) {
+  return config.x?.rotateLabels ?? false;
 }

@@ -25,16 +25,15 @@ export function renderStackedColumn(config) {
   const labelKey = _columns?.label ?? getLabelKey(data);
   const seriesKeys = _columns?.values?.length > 0 ? _columns.values : getSeriesNames(data);
 
-  // Build legend labels from: 1) yLabels (new), 2) legend array (deprecated), 3) column names
+  // Build legend labels from yLabels (new schema) or column names
   const yLabels = _columns?.yLabels || {};
-  const getSeriesLabel = (key, index) => {
+  const getSeriesLabel = (key) => {
     if (yLabels[key]) return yLabels[key];
-    if (Array.isArray(legend)) return legend[index] ?? key;
     return key;
   };
 
   const animateClass = animate ? ' chart-animate' : '';
-  const rotateLabels = getRotateLabels(config, config.id);
+  const rotateLabels = getRotateLabels(config);
 
   // Get Y-axis format
   const yFormat = getAxisFormat(config, 'y');
@@ -122,7 +121,7 @@ export function renderStackedColumn(config) {
         const value = typeof val === 'number' ? val : parseFloat(val) || 0;
         const colorClass = `chart-color-${i + 1}`;
         const seriesClass = `chart-series-${slugify(key)}`;
-        const seriesLabel = getSeriesLabel(key, i);
+        const seriesLabel = getSeriesLabel(key);
         const segmentHeight = range > 0 ? (Math.abs(value) / range) * 100 : 0;
 
         if (value >= 0) {
@@ -201,7 +200,7 @@ export function renderStackedColumn(config) {
   if (showLegend) {
     html += `<div class="chart-legend">`;
     seriesKeys.forEach((key, i) => {
-      const label = getSeriesLabel(key, i);
+      const label = getSeriesLabel(key);
       const colorClass = `chart-color-${i + 1}`;
       const seriesClass = `chart-series-${slugify(key)}`;
       html += `<span class="chart-legend-item ${colorClass} ${seriesClass}">${escapeHtml(label)}</span>`;

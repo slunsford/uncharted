@@ -27,7 +27,7 @@ export function renderBubble(config) {
   }
 
   const animateClass = animate ? ' chart-animate' : '';
-  const rotateLabels = getRotateLabels(config, config.id);
+  const rotateLabels = getRotateLabels(config);
 
   // Use resolved columns if available, otherwise fall back to implicit detection
   const keys = Object.keys(data[0]);
@@ -49,9 +49,9 @@ export function renderBubble(config) {
     seriesKey = findKey('series');
   }
 
-  // Get legend/size titles from resolved columns (new schema) or deprecated top-level
-  const legendTitle = _columns?.seriesTitle ?? config.legendTitle;
-  const sizeTitle = _columns?.sizeTitle ?? config.sizeTitle;
+  // Get legend/size titles from resolved columns (new schema only)
+  const legendTitle = _columns?.seriesTitle;
+  const sizeTitle = _columns?.sizeTitle;
 
   // Axis titles
   const xAxisTitle = getAxisTitle(config, 'x', '');
@@ -222,8 +222,9 @@ export function renderBubble(config) {
   html += `</div>`; // close chart-body
 
   // Legend (if multiple series or legendTitle specified)
-  if (seriesList.length > 1 || legend || legendTitle) {
-    const legendLabels = legend ?? seriesList;
+  // Note: legend array is deprecated; use series names directly
+  if (seriesList.length > 1 || legendTitle) {
+    const legendLabels = seriesList;
     if (legendTitle) {
       html += `<span class="chart-legend-title">${escapeHtml(legendTitle)}</span>`;
     }

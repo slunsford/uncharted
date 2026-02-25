@@ -46,10 +46,6 @@ This page demonstrates all chart types supported by the Uncharted plugin.
 
 {% chart "quick-stats" %}
 
-## Dot Chart (Categorical)
-
-{% chart "adoption" %}
-
 ## Line Chart
 
 {% chart "line" %}
@@ -78,10 +74,6 @@ Bubble charts have categorical X axis, continuous Y, and variable dot sizes.
 
 ## Negative Values
 
-### Dot Chart with Negative Y
-
-{% chart "temperature" %}
-
 ### Scatter with Negative X and Y
 
 {% chart "quadrant" %}
@@ -104,10 +96,6 @@ Bubble charts have categorical X axis, continuous Y, and variable dot sizes.
 
 Charts can use Font Awesome icons instead of default dots.
 
-### Dot Chart with Per-Series Icons
-
-{% chart "dot-icons" %}
-
 ### Scatter Chart with Per-Series Icons
 
 {% chart "scatter-icons" %}
@@ -129,16 +117,6 @@ Note: Poultry data starts in 2002, demonstrating series with different start poi
 ### Time-Series with ISO Dates
 
 {% chart "timeseries-daily" %}
-
-## Legacy Schema Tests
-
-These charts use deprecated options to verify backwards compatibility and deprecation warnings.
-
-### Legacy Scatter Chart
-
-Uses `maxX`, `maxY`, `titleX`, `titleY`, `legendTitle`:
-
-{% chart "legacy-scatter-test" %}
 
 ## Image Generation
 
