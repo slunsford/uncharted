@@ -15,6 +15,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
  * @typedef {Object} ImageOptions
  * @property {boolean} [enabled=false] - Enable image generation
  * @property {string} [outputDir='/images/charts/'] - Output directory for images (URL path)
+ * @property {string} [cacheDir=null] - Source directory for cached images (enables caching when set)
  * @property {number} [width=800] - Default image width
  * @property {number} [height=400] - Default image height
  * @property {number} [scale=2] - Device scale factor (2 for retina)
@@ -33,6 +34,7 @@ const imageUrls = new Map();
 const defaultOptions = {
   enabled: false,
   outputDir: '/images/charts/',
+  cacheDir: null,
   width: 800,
   height: 400,
   scale: 2,
@@ -81,6 +83,23 @@ export function getImageUrl(chartId, chartConfig, globalOptions) {
     : globalOptions.outputDir + '/';
 
   return `${dir}${filename}.png`;
+}
+
+/**
+ * Get the cache file path for a chart image.
+ * @param {string} chartId - Chart identifier
+ * @param {Object} chartConfig - Chart configuration
+ * @param {ImageOptions} globalOptions - Global image options
+ * @returns {string|null} Absolute cache path, or null if caching disabled
+ */
+export function getCachePath(chartId, chartConfig, globalOptions) {
+  if (!globalOptions.cacheDir) return null;
+
+  const imageConfig = chartConfig.image || {};
+  const filename = imageConfig.filename || chartId;
+  const cacheDir = globalOptions.cacheDir.replace(/\/$/, '');
+
+  return path.resolve(process.cwd(), cacheDir, `${filename}.png`);
 }
 
 /**
@@ -143,6 +162,7 @@ export function queueChartForImage(chartId, chartHtml, chartConfig, globalOption
 
   const outputPath = getImageOutputPath(chartId, chartConfig, globalOptions, outputDir);
   const url = getImageUrl(chartId, chartConfig, globalOptions);
+  const cachePath = getCachePath(chartId, chartConfig, globalOptions);
 
   // Store URL for shortcode lookup
   storeImageUrl(chartId, url);
@@ -152,7 +172,8 @@ export function queueChartForImage(chartId, chartHtml, chartConfig, globalOption
     id: chartId,
     html: chartHtml,
     config,
-    outputPath
+    outputPath,
+    cachePath
   });
 }
 
@@ -171,7 +192,10 @@ export async function processQueue(options) {
   if (!available) {
     const count = getQueueSize();
     clearQueue();
-    console.warn(`[uncharted] Puppeteer not installed. Skipped ${count} chart image(s).`);
+    // Suppress warning if cacheDir is set (cached images will be used via passthrough)
+    if (!options.cacheDir) {
+      console.warn(`[uncharted] Puppeteer not installed. Skipped ${count} chart image(s).`);
+    }
     return { success: [], failed: [], skipped: true };
   }
 

@@ -170,7 +170,8 @@ ${stylesheetLinks}
  * @param {Object} chart - Chart data
  * @param {string} chart.html - Chart HTML
  * @param {Object} chart.config - Image configuration
- * @param {string} chart.outputPath - Output file path
+ * @param {string} chart.outputPath - Output file path (_site)
+ * @param {string} [chart.cachePath] - Cache file path (source directory, if caching enabled)
  * @param {string} css - Chart CSS content
  * @param {Object} defaults - Default image options
  * @returns {Promise<void>}
@@ -182,6 +183,9 @@ async function renderChart(page, chart, css, defaults) {
   const scale = config.scale || 2;
   const background = config.background || '#ffffff';
   const stylesheets = config.stylesheets || defaults.stylesheets || [];
+
+  // Use cache path if provided, otherwise write directly to output
+  const writePath = chart.cachePath || chart.outputPath;
 
   // Set viewport
   await page.setViewport({
@@ -206,14 +210,14 @@ async function renderChart(page, chart, css, defaults) {
     }
 
     // Ensure output directory exists
-    const outputDir = path.dirname(chart.outputPath);
+    const outputDir = path.dirname(writePath);
     if (!fs.existsSync(outputDir)) {
       fs.mkdirSync(outputDir, { recursive: true });
     }
 
     // Take screenshot
     await page.screenshot({
-      path: chart.outputPath,
+      path: writePath,
       type: 'png',
       omitBackground: background === 'transparent'
     });

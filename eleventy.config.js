@@ -30,7 +30,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
  * @param {boolean|string} [options.downloadData] - Enable download links globally (individual charts can override)
  * @param {Object} [options.image] - Image generation options
  * @param {boolean} [options.image.enabled=false] - Enable PNG image generation
- * @param {string} [options.image.outputDir='/images/charts/'] - Output directory for images
+ * @param {string} [options.image.outputDir='/images/charts/'] - Output directory for images (URL path)
+ * @param {string} [options.image.cacheDir] - Source directory for cached images (enables caching when set)
  * @param {number} [options.image.width=800] - Default image width in pixels
  * @param {number} [options.image.height=400] - Default image height in pixels
  * @param {number} [options.image.scale=2] - Device scale factor (2 for retina)
@@ -69,7 +70,8 @@ export default function(eleventyConfig, options = {}) {
 
   // Image generation options
   const imageOptions = normalizeImageOptions(options.image);
-  const skipImageGeneration = shouldSkipInDevMode(imageOptions);
+  const skipImageGeneration = shouldSkipInDevMode(imageOptions) ||
+    process.argv.includes('--skip-images');
 
   // Clear image URLs at start of each build
   clearImageUrls();
@@ -120,6 +122,15 @@ export default function(eleventyConfig, options = {}) {
     const destPath = dataPath.replace(/^\//, '').replace(/\/$/, '');
     eleventyConfig.addPassthroughCopy({
       [dataDirForPassthrough]: destPath
+    });
+  }
+
+  // Image cache passthrough - copies cached images to output
+  if (imageOptions.cacheDir) {
+    const cacheDirClean = imageOptions.cacheDir.replace(/^\/|\/$/g, '');
+    const outputDirClean = imageOptions.outputDir.replace(/^\/|\/$/g, '');
+    eleventyConfig.addPassthroughCopy({
+      [cacheDirClean]: outputDirClean
     });
   }
 

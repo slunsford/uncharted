@@ -10,6 +10,7 @@ export default function(eleventyConfig) {
     image: {
       enabled: true,
       outputDir: '/images/charts/',
+      cacheDir: 'images/charts/',
       width: 800,
       height: 400,
       scale: 2,
