@@ -70,8 +70,7 @@ export default function(eleventyConfig, options = {}) {
 
   // Image generation options
   const imageOptions = normalizeImageOptions(options.image);
-  const skipImageGeneration = shouldSkipInDevMode(imageOptions) ||
-    process.argv.includes('--skip-images');
+  const skipImageGeneration = shouldSkipInDevMode(imageOptions);
 
   // Clear image URLs at start of each build
   clearImageUrls();
