@@ -152,8 +152,8 @@ ${stylesheetLinks}
     /* Additional stylesheets (inlined) */
     ${inlinedStyles}
 
-    /* Hide download link in images */
-    .chart-download { display: none; }
+    /* Hide download links in images */
+    .chart-downloads { display: none; }
   </style>
 </head>
 <body>
