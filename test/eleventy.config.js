@@ -7,6 +7,7 @@ export default function(eleventyConfig) {
     animate: true,
     dataPassthrough: true,
     downloadData: true,
+    downloadImage: true,
     image: {
       enabled: true,
       outputDir: '/images/charts/',

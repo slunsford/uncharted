@@ -1,4 +1,4 @@
-import { slugify, escapeHtml, renderDownloadLink } from '../utils.js';
+import { slugify, escapeHtml, renderDownloadLinks } from '../utils.js';
 import { formatNumber } from '../formatters.js';
 import { getAxisMax, getAxisMin, getAxisTitle, getAxisFormat } from '../config.js';
 
@@ -18,7 +18,7 @@ import { getAxisMax, getAxisMin, getAxisTitle, getAxisFormat } from '../config.j
  * @returns {string} - HTML string
  */
 export function renderScatter(config) {
-  const { title, subtitle, data, legend, animate, format, id, downloadData, downloadDataUrl, proportional, icons, _columns } = config;
+  const { title, subtitle, data, legend, animate, format, id, downloadData, downloadDataUrl, downloadImage, downloadImageUrl, proportional, icons, _columns } = config;
 
   // Get axis-specific format configs (normalized config provides x.format/y.format)
   const fmtX = getAxisFormat(config, 'x');
@@ -259,7 +259,7 @@ export function renderScatter(config) {
     html += `</div>`;
   }
 
-  html += renderDownloadLink(downloadDataUrl, downloadData);
+  html += renderDownloadLinks(downloadDataUrl, downloadData, downloadImageUrl, downloadImage);
   html += `</figure>`;
 
   return html;

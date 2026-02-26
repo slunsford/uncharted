@@ -1,4 +1,4 @@
-import { slugify, escapeHtml, renderDownloadLink } from '../utils.js';
+import { slugify, escapeHtml, renderDownloadLinks } from '../utils.js';
 import { formatNumber } from '../formatters.js';
 import { getAxisMax, getAxisMin, getAxisTitle, getAxisFormat, getRotateLabels } from '../config.js';
 
@@ -17,7 +17,7 @@ import { getAxisMax, getAxisMin, getAxisTitle, getAxisFormat, getRotateLabels } 
  * @returns {string} - HTML string
  */
 export function renderBubble(config) {
-  const { title, subtitle, data, legend, animate, format, id, downloadData, downloadDataUrl, icons, _columns } = config;
+  const { title, subtitle, data, legend, animate, format, id, downloadData, downloadDataUrl, downloadImage, downloadImageUrl, icons, _columns } = config;
 
   // Get axis-specific format configs
   const fmtY = getAxisFormat(config, 'y');
@@ -262,7 +262,7 @@ export function renderBubble(config) {
     html += `</div>`;
   }
 
-  html += renderDownloadLink(downloadDataUrl, downloadData);
+  html += renderDownloadLinks(downloadDataUrl, downloadData, downloadImageUrl, downloadImage);
   html += `</figure>`;
 
   return html;

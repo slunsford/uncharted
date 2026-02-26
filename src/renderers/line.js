@@ -1,4 +1,4 @@
-import { slugify, escapeHtml, getLabelKey, getSeriesNames, renderDownloadLink } from '../utils.js';
+import { slugify, escapeHtml, getLabelKey, getSeriesNames, renderDownloadLinks } from '../utils.js';
 import { formatNumber } from '../formatters.js';
 import { getAxisMax, getAxisMin, getAxisFormat, getAxisTitle, getRotateLabels } from '../config.js';
 
@@ -17,7 +17,7 @@ import { getAxisMax, getAxisMin, getAxisFormat, getAxisTitle, getRotateLabels } 
  * @returns {string} - HTML string
  */
 export function renderLine(config) {
-  const { title, subtitle, data, max, min, legend, legendTitle, animate, format, id, downloadData, downloadDataUrl, icons, _columns } = config;
+  const { title, subtitle, data, max, min, legend, legendTitle, animate, format, id, downloadData, downloadDataUrl, downloadImage, downloadImageUrl, icons, _columns } = config;
 
   // Line-specific options
   const showLines = config.lines !== false; // default true
@@ -211,7 +211,7 @@ export function renderLine(config) {
     html += `</div>`;
   }
 
-  html += renderDownloadLink(downloadDataUrl, downloadData);
+  html += renderDownloadLinks(downloadDataUrl, downloadData, downloadImageUrl, downloadImage);
   html += `</figure>`;
 
   return html;

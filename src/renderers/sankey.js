@@ -1,4 +1,4 @@
-import { slugify, escapeHtml, renderDownloadLink } from '../utils.js';
+import { slugify, escapeHtml, renderDownloadLinks } from '../utils.js';
 import { formatNumber } from '../formatters.js';
 
 /**
@@ -17,7 +17,7 @@ import { formatNumber } from '../formatters.js';
  * @returns {string} - HTML string
  */
 export function renderSankey(config) {
-  const { title, subtitle, data, legend, animate, format, id, downloadData, downloadDataUrl, nodeWidth = 20, nodePadding = 10, endLabelsOutside = false, proportional = false, _columns } = config;
+  const { title, subtitle, data, legend, animate, format, id, downloadData, downloadDataUrl, downloadImage, downloadImageUrl, nodeWidth = 20, nodePadding = 10, endLabelsOutside = false, proportional = false, _columns } = config;
 
   if (!data || data.length === 0) {
     return `<!-- Sankey chart: no data provided -->`;
@@ -526,7 +526,7 @@ export function renderSankey(config) {
     html += `</div>`;
   }
 
-  html += renderDownloadLink(downloadDataUrl, downloadData);
+  html += renderDownloadLinks(downloadDataUrl, downloadData, downloadImageUrl, downloadImage);
   html += `</figure>`;
 
   return html;

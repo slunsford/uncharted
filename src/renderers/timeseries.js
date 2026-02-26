@@ -1,4 +1,4 @@
-import { slugify, escapeHtml, getLabelKey, getSeriesNames, renderDownloadLink } from '../utils.js';
+import { slugify, escapeHtml, getLabelKey, getSeriesNames, renderDownloadLinks } from '../utils.js';
 import { formatNumber } from '../formatters.js';
 import { getAxisMax, getAxisMin, getAxisTitle, getAxisFormat, getRotateLabels } from '../config.js';
 
@@ -237,7 +237,7 @@ function getAxisTicks(min, max, isDate) {
  * @returns {string} - HTML string
  */
 export function renderTimeseries(config) {
-  const { title, subtitle, data, legend, legendTitle, animate, format, id, downloadData, downloadDataUrl, dots: showDots = false, icons, _columns } = config;
+  const { title, subtitle, data, legend, legendTitle, animate, format, id, downloadData, downloadDataUrl, downloadImage, downloadImageUrl, dots: showDots = false, icons, _columns } = config;
 
   if (!data || data.length === 0) {
     return `<!-- Timeseries chart: no data provided -->`;
@@ -498,7 +498,7 @@ export function renderTimeseries(config) {
     html += `</div>`;
   }
 
-  html += renderDownloadLink(downloadDataUrl, downloadData);
+  html += renderDownloadLinks(downloadDataUrl, downloadData, downloadImageUrl, downloadImage);
   html += `</figure>`;
 
   return html;

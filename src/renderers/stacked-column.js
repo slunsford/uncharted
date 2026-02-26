@@ -1,4 +1,4 @@
-import { slugify, getLabelKey, getSeriesNames, escapeHtml, renderDownloadLink } from '../utils.js';
+import { slugify, getLabelKey, getSeriesNames, escapeHtml, renderDownloadLinks } from '../utils.js';
 import { formatNumber } from '../formatters.js';
 import { getAxisMax, getAxisMin, getAxisFormat, getRotateLabels } from '../config.js';
 
@@ -15,7 +15,7 @@ import { getAxisMax, getAxisMin, getAxisFormat, getRotateLabels } from '../confi
  * @returns {string} - HTML string
  */
 export function renderStackedColumn(config) {
-  const { title, subtitle, data, max, min, legend, animate, format, id, downloadData, downloadDataUrl, _columns } = config;
+  const { title, subtitle, data, max, min, legend, animate, format, id, downloadData, downloadDataUrl, downloadImage, downloadImageUrl, _columns } = config;
 
   if (!data || data.length === 0) {
     return `<!-- Stacked column chart: no data provided -->`;
@@ -208,7 +208,7 @@ export function renderStackedColumn(config) {
     html += `</div>`;
   }
 
-  html += renderDownloadLink(downloadDataUrl, downloadData);
+  html += renderDownloadLinks(downloadDataUrl, downloadData, downloadImageUrl, downloadImage);
   html += `</figure>`;
 
   return html;

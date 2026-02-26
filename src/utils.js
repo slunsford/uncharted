@@ -82,3 +82,31 @@ export function renderDownloadLink(url, label) {
   return `<a href="${escapeHtml(url)}" class="chart-download" download>${escapeHtml(text)}</a>`;
 }
 
+/**
+ * Render a download link for chart image
+ * @param {string} url - URL to the image file
+ * @param {boolean|string} label - true for default label, or custom string
+ * @returns {string} - HTML string for the download link, or empty string if no URL
+ */
+export function renderDownloadImageLink(url, label) {
+  if (!url) return '';
+  const text = typeof label === 'string' ? label : '↓ Download image';
+  return `<a href="${escapeHtml(url)}" class="chart-download" download>${escapeHtml(text)}</a>`;
+}
+
+/**
+ * Render download links container (wraps data and image download links)
+ * @param {string} dataUrl - URL to the CSV file
+ * @param {boolean|string} dataLabel - true for default label, or custom string
+ * @param {string} imageUrl - URL to the image file
+ * @param {boolean|string} imageLabel - true for default label, or custom string
+ * @returns {string} - HTML string for the download links container, or empty string if no URLs
+ */
+export function renderDownloadLinks(dataUrl, dataLabel, imageUrl, imageLabel) {
+  const dataLink = renderDownloadLink(dataUrl, dataLabel);
+  const imageLink = renderDownloadImageLink(imageUrl, imageLabel);
+  if (!dataLink && !imageLink) return '';
+  const separator = dataLink && imageLink ? ' <span class="chart-download-sep">•</span> ' : '';
+  return `<div class="chart-downloads">${dataLink}${separator}${imageLink}</div>`;
+}
+

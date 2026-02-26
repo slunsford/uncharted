@@ -28,6 +28,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
  * @param {boolean} [options.dataPassthrough] - Copy CSV files to public dataPath (default: false)
  * @param {string} [options.dataPath] - Public URL path for CSV files (default: '/data/')
  * @param {boolean|string} [options.downloadData] - Enable download links globally (individual charts can override)
+ * @param {boolean|string} [options.downloadImage] - Enable image download links globally (requires image generation)
  * @param {Object} [options.image] - Image generation options
  * @param {boolean} [options.image.enabled=false] - Enable PNG image generation
  * @param {string} [options.image.outputDir='/images/charts/'] - Output directory for images (URL path)
@@ -67,6 +68,7 @@ export default function(eleventyConfig, options = {}) {
   const dataPassthrough = options.dataPassthrough ?? false;
   const dataPath = options.dataPath || '/data/';
   const globalDownloadData = options.downloadData ?? false;
+  const globalDownloadImage = options.downloadImage ?? false;
 
   // Image generation options
   const imageOptions = normalizeImageOptions(options.image);
@@ -184,12 +186,20 @@ export default function(eleventyConfig, options = {}) {
     // Render the chart (chart-specific settings override global)
     const animate = chartConfig.animate ?? globalAnimate;
     const downloadData = chartConfig.downloadData ?? globalDownloadData;
+    const downloadImage = chartConfig.downloadImage ?? globalDownloadImage;
 
     // Calculate download URL if download is enabled and file is specified
     let downloadDataUrl = null;
     if (downloadData && chartConfig.file) {
       const normalizedDataPath = dataPath.endsWith('/') ? dataPath : dataPath + '/';
       downloadDataUrl = normalizedDataPath + chartConfig.file;
+    }
+
+    // Calculate image download URL if enabled and image generation is active
+    const chartImageEnabled = chartConfig.image?.enabled ?? imageOptions.enabled;
+    let downloadImageUrl = null;
+    if (downloadImage && chartImageEnabled) {
+      downloadImageUrl = getImageUrl(chartId, chartConfig, imageOptions);
     }
 
     // Normalize configuration (handles deprecated keys, axis config)
@@ -206,6 +216,8 @@ export default function(eleventyConfig, options = {}) {
       animate,
       downloadData,
       downloadDataUrl,
+      downloadImage,
+      downloadImageUrl,
       _columns: columns
     });
 
@@ -217,7 +229,6 @@ export default function(eleventyConfig, options = {}) {
     );
 
     // Handle image generation
-    const chartImageEnabled = chartConfig.image?.enabled ?? imageOptions.enabled;
     if (chartImageEnabled && !skipImageGeneration && eleventyDirs?.output) {
       // Queue chart for image generation
       queueChartForImage(chartId, chartHtml, chartConfig, imageOptions, eleventyDirs.output);

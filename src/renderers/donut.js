@@ -1,4 +1,4 @@
-import { slugify, escapeHtml, getLabelKey, getValueKey, getSeriesNames, renderDownloadLink } from '../utils.js';
+import { slugify, escapeHtml, getLabelKey, getValueKey, getSeriesNames, renderDownloadLinks } from '../utils.js';
 import { formatNumber } from '../formatters.js';
 
 /**
@@ -17,7 +17,7 @@ import { formatNumber } from '../formatters.js';
  * @returns {string} - HTML string
  */
 export function renderDonut(config) {
-  const { title, subtitle, data, legend, center, animate, format, id, showPercentages, downloadData, downloadDataUrl, _columns } = config;
+  const { title, subtitle, data, legend, center, animate, format, id, showPercentages, downloadData, downloadDataUrl, downloadImage, downloadImageUrl, _columns } = config;
 
   if (!data || data.length === 0) {
     return `<!-- Donut chart: no data provided -->`;
@@ -136,7 +136,7 @@ export function renderDonut(config) {
     html += `</div>`;
   }
 
-  html += renderDownloadLink(downloadDataUrl, downloadData);
+  html += renderDownloadLinks(downloadDataUrl, downloadData, downloadImageUrl, downloadImage);
   html += `</figure>`;
 
   return html;
