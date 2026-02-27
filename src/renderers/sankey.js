@@ -270,14 +270,17 @@ export function renderSankey(config) {
     }
   });
 
-  // Sort edges by source level, then target level for consistent rendering
+  // Sort edges by source level, then target level, then target vertical position
+  // The tertiary sort by target position prevents flow crossings from the same source
   aggregatedEdges.sort((a, b) => {
     const aSourceLevel = nodeLevel.get(a.source);
     const bSourceLevel = nodeLevel.get(b.source);
     if (aSourceLevel !== bSourceLevel) return aSourceLevel - bSourceLevel;
     const aTargetLevel = nodeLevel.get(a.target);
     const bTargetLevel = nodeLevel.get(b.target);
-    return aTargetLevel - bTargetLevel;
+    if (aTargetLevel !== bTargetLevel) return aTargetLevel - bTargetLevel;
+    // Sort by target's vertical position to prevent flow crossings
+    return nodePosition.get(a.target).top - nodePosition.get(b.target).top;
   });
 
   // Calculate flow heights proportional to each end's node height.
