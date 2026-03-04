@@ -737,6 +737,10 @@
   background-color: var(--color);
 }
 
+:is(.chart-scatter, .chart-bubble) .dot:not(.has-icon) {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+
 /* Variable-sized dots for bubble charts */
 .chart-bubble .dot[style*="--size-scale"] {
   --computed-size: calc(
@@ -770,6 +774,10 @@
   color: var(--color);
   font-size: var(--computed-size);
   line-height: 1;
+}
+
+:is(.chart-scatter, .chart-bubble) .dot.has-icon i {
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.25));
 }
 
 .chart-bubble .dot-labels {
@@ -942,7 +950,6 @@
   transform: translate(-50%, 50%);
   cursor: default;
   background-color: var(--color);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
 }
 
 .chart-scatter .dot[title]:hover {
