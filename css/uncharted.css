@@ -387,6 +387,7 @@
 .chart-stacked-column .column-labels {
   grid-row: 2;
   display: flex;
+  flex-wrap: wrap;
   gap: clamp(0.375rem, 1.5cqi, 1rem);
   padding: 0.25rem 0.5rem 0;
 }
@@ -641,6 +642,7 @@
 :is(.chart-dot, .chart-line) .dot-labels {
   grid-row: 2;
   display: flex;
+  flex-wrap: wrap;
   gap: 6px;
   padding: 0 0.5rem;
   margin-top: 0.5rem;
@@ -773,6 +775,7 @@
 .chart-bubble .dot-labels {
   grid-row: 2;
   display: flex;
+  flex-wrap: wrap;
   gap: 6px;
   padding: 0 0.5rem;
   margin-top: 0.5rem;

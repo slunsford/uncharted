@@ -157,7 +157,7 @@ export function renderScatter(config) {
   html += `<div class="dot-area"${dotAreaStyle}>`;
   html += `<div class="dot-field">`;
 
-  const fmtSize = format?.size || {};
+  const fmtSize = _columns?.sizeFormat || {};
   dots.forEach((dot, i) => {
     const xPct = rangeX > 0 ? ((dot.x - calcMinX) / rangeX) * 100 : 0;
     const yPct = rangeY > 0 ? ((dot.y - calcMinY) / rangeY) * 100 : 0;
@@ -246,7 +246,7 @@ export function renderScatter(config) {
     const sizeValues = dots.map(d => d.rawSize).filter(v => v > 0);
     const minSizeVal = sizeValues.length ? Math.min(...sizeValues) : 0;
     const maxSizeVal = sizeValues.length ? Math.max(...sizeValues) : 0;
-    const fmtSizeLegend = format?.size || format || {};
+    const fmtSizeLegend = _columns?.sizeFormat || {};
     const minFormatted = formatNumber(minSizeVal, fmtSizeLegend) || minSizeVal;
     const maxFormatted = formatNumber(maxSizeVal, fmtSizeLegend) || maxSizeVal;
 

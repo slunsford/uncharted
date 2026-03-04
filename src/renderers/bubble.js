@@ -161,7 +161,7 @@ export function renderBubble(config) {
     dotsByCategory.get(dot.x).push({ ...dot, originalIndex: i });
   });
 
-  const fmtSize = format?.size || {};
+  const fmtSize = _columns?.sizeFormat || {};
 
   // Render dots by category column
   categories.forEach((category, colIndex) => {
@@ -249,7 +249,7 @@ export function renderBubble(config) {
     const sizeValues = dots.map(d => d.rawSize).filter(v => v > 0);
     const minSizeVal = sizeValues.length ? Math.min(...sizeValues) : 0;
     const maxSizeVal = sizeValues.length ? Math.max(...sizeValues) : 0;
-    const fmtSizeLegend = format?.size || format || {};
+    const fmtSizeLegend = _columns?.sizeFormat || {};
     const minFormatted = formatNumber(minSizeVal, fmtSizeLegend) || minSizeVal;
     const maxFormatted = formatNumber(maxSizeVal, fmtSizeLegend) || maxSizeVal;
 

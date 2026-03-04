@@ -85,6 +85,7 @@ export function resolveColumns(config, data, chartType) {
     seriesTitle: undefined,
     size: undefined,
     sizeTitle: undefined,
+    sizeFormat: undefined,
     source: undefined,
     target: undefined,
     value: undefined,
@@ -117,6 +118,7 @@ export function resolveColumns(config, data, chartType) {
     if (sizeConfig?.columns?.length) {
       resolved.size = validateColumn('size.column', sizeConfig.columns[0]);
       resolved.sizeTitle = sizeConfig.title;
+      resolved.sizeFormat = sizeConfig.format;
     }
 
     // Implicit detection for bubble if not explicitly specified
@@ -180,6 +182,7 @@ export function resolveColumns(config, data, chartType) {
     if (sizeConfig?.columns?.length) {
       resolved.size = validateColumn('size.column', sizeConfig.columns[0]);
       resolved.sizeTitle = sizeConfig.title;
+      resolved.sizeFormat = sizeConfig.format;
     }
 
     // Implicit detection for scatter if not explicitly specified
