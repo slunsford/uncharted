@@ -181,12 +181,12 @@ export function renderLine(config) {
     const label = row[labelKey] ?? '';
     html += `<span class="dot-label">${escapeHtml(label)}</span>`;
   });
-  if (xAxisTitle) {
-    html += `<span class="axis-title">${escapeHtml(xAxisTitle)}</span>`;
-  }
   html += `</div>`;
 
   html += `</div>`; // close chart-scroll
+  if (xAxisTitle) {
+    html += `<span class="axis-title">${escapeHtml(xAxisTitle)}</span>`;
+  }
   html += `</div>`; // close chart-body
 
   // Legend (show if legend !== false and we have series keys or legendTitle)

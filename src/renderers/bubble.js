@@ -213,12 +213,12 @@ export function renderBubble(config) {
   categories.forEach(category => {
     html += `<span class="dot-label">${escapeHtml(category)}</span>`;
   });
-  if (xAxisTitle) {
-    html += `<span class="axis-title">${escapeHtml(xAxisTitle)}</span>`;
-  }
   html += `</div>`;
 
   html += `</div>`; // close chart-scroll
+  if (xAxisTitle) {
+    html += `<span class="axis-title">${escapeHtml(xAxisTitle)}</span>`;
+  }
   html += `</div>`; // close chart-body
 
   // Legend (if multiple series or legendTitle specified)
