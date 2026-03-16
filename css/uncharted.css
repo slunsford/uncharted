@@ -1374,10 +1374,11 @@
   }
 }
 
-/* Line chart: animate scroll container */
-.chart-animate.chart-line .chart-scroll {
-  clip-path: inset(0 100% 0 0);
-  animation: container-reveal 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+/* Line chart: animate dot-field only (so x-axis labels and background don't animate) */
+/* Negative insets allow dots to overflow the field bounds */
+.chart-animate.chart-line .dot-field {
+  clip-path: inset(-1rem 100% -1rem 0);
+  animation: timeseries-reveal 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
 /* Timeseries: animate dot-field only (so x-axis labels and background don't animate) */
@@ -1390,11 +1391,6 @@
 @keyframes timeseries-reveal {
   from { clip-path: inset(-1rem 100% -1rem 0); }
   to   { clip-path: inset(-1rem); }
-}
-
-@keyframes container-reveal {
-  from { clip-path: inset(0 100% 0 0); }
-  to   { clip-path: inset(0); }
 }
 
 /* Donut chart: clockwise reveal using animated mask */
