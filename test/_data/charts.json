@@ -5,14 +5,16 @@
     "subtitle": "By quarter",
     "file": "releases.csv",
     "x": {
-      "column": "label"
+      "column": "label",
+      "title": "Quarter"
     },
     "y": {
       "columns": {
         "production": "Production",
         "hotfix": "Hotfix",
         "beta": "Beta"
-      }
+      },
+      "title": "Releases"
     },
     "legend": true
   },

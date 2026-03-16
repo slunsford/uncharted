@@ -1,6 +1,6 @@
 import { slugify, getLabelKey, getSeriesNames, escapeHtml, renderDownloadLinks } from '../utils.js';
 import { formatNumber } from '../formatters.js';
-import { getAxisMax, getAxisMin, getAxisFormat, getRotateLabels } from '../config.js';
+import { getAxisMax, getAxisMin, getAxisFormat, getAxisTitle, getRotateLabels } from '../config.js';
 
 /**
  * Render a stacked column chart (vertical)
@@ -35,8 +35,10 @@ export function renderStackedColumn(config) {
   const animateClass = animate ? ' chart-animate' : '';
   const rotateLabels = getRotateLabels(config);
 
-  // Get Y-axis format
+  // Get Y-axis format and axis titles
   const yFormat = getAxisFormat(config, 'y');
+  const xAxisTitle = getAxisTitle(config, 'x', '');
+  const yAxisTitle = getAxisTitle(config, 'y', '');
 
   // Calculate stacked totals for positive and negative values separately
   // Positives stack up from zero, negatives stack down from zero
@@ -91,6 +93,9 @@ export function renderStackedColumn(config) {
   html += `<span class="axis-label">${formatNumber(midLabelY, yFormat) || midLabelY}</span>`;
   const minLabelY = hasNegativeY ? minValue : 0;
   html += `<span class="axis-label">${formatNumber(minLabelY, yFormat) || minLabelY}</span>`;
+  if (yAxisTitle) {
+    html += `<span class="axis-title">${escapeHtml(yAxisTitle)}</span>`;
+  }
   html += `</div>`;
 
   // Scroll wrapper for columns + labels
@@ -193,6 +198,9 @@ export function renderStackedColumn(config) {
   html += `</div>`;
 
   html += `</div>`; // close chart-scroll
+  if (xAxisTitle) {
+    html += `<span class="axis-title">${escapeHtml(xAxisTitle)}</span>`;
+  }
   html += `</div>`; // close chart-body
 
   // Legend (show if legend !== false and we have series keys)

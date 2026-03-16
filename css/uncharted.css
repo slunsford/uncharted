@@ -668,7 +668,7 @@
   text-overflow: clip;
 }
 
-:is(.chart-dot, .chart-line) .chart-body > .axis-title {
+:is(.chart-dot, .chart-line, .chart-stacked-column) .chart-body > .axis-title {
   grid-column: 2;
   text-align: center;
   font-size: 0.7rem;
