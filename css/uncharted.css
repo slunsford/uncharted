@@ -410,6 +410,7 @@
   transform: rotate(180deg);
   display: flex;
   align-items: center;
+  white-space: nowrap;
   overflow: visible;
   text-overflow: clip;
 }
@@ -662,6 +663,7 @@
   transform: rotate(180deg);
   display: flex;
   align-items: center;
+  white-space: nowrap;
   overflow: visible;
   text-overflow: clip;
 }
@@ -806,6 +808,7 @@
   transform: rotate(180deg);
   display: flex;
   align-items: center;
+  white-space: nowrap;
   overflow: visible;
   text-overflow: clip;
 }
