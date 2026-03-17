@@ -380,7 +380,7 @@ export function renderTimeseries(config) {
   const yAxisStyle = hasNegativeY ? ` style="--zero-position: ${zeroPctY.toFixed(2)}%"` : '';
   html += `<div class="chart-y-axis"${yAxisStyle}>`;
   html += `<span class="axis-label">${formatNumber(maxValue, yFormat) || maxValue}</span>`;
-  const midLabelY = hasNegativeY ? 0 : Math.round((maxValue + minValue) / 2);
+  const midLabelY = hasNegativeY ? 0 : (maxValue + minValue) / 2;
   html += `<span class="axis-label">${formatNumber(midLabelY, yFormat) || midLabelY}</span>`;
   html += `<span class="axis-label">${formatNumber(minValue, yFormat) || minValue}</span>`;
   if (yAxisTitle) {

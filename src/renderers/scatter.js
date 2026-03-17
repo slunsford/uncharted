@@ -141,7 +141,7 @@ export function renderScatter(config) {
   const yAxisStyle = hasNegativeY ? ` style="--zero-position-y: ${zeroPctY.toFixed(2)}%"` : '';
   html += `<div class="chart-y-axis"${yAxisStyle}>`;
   html += `<span class="axis-label">${formatNumber(calcMaxY, fmtY) || calcMaxY}</span>`;
-  const midLabelY = hasNegativeY ? 0 : Math.round((calcMaxY + calcMinY) / 2);
+  const midLabelY = hasNegativeY ? 0 : (calcMaxY + calcMinY) / 2;
   html += `<span class="axis-label">${formatNumber(midLabelY, fmtY) || midLabelY}</span>`;
   html += `<span class="axis-label">${formatNumber(calcMinY, fmtY) || calcMinY}</span>`;
   html += `<span class="axis-title">${escapeHtml(yAxisTitle)}</span>`;
@@ -209,7 +209,7 @@ export function renderScatter(config) {
   const xAxisStyle = hasNegativeX ? ` style="--zero-position-x: ${zeroPctX.toFixed(2)}%"` : '';
   html += `<div class="chart-x-axis"${xAxisStyle}>`;
   html += `<span class="axis-label">${formatNumber(calcMinX, fmtX) || calcMinX}</span>`;
-  const midLabelX = hasNegativeX ? 0 : Math.round((calcMaxX + calcMinX) / 2);
+  const midLabelX = hasNegativeX ? 0 : (calcMaxX + calcMinX) / 2;
   html += `<span class="axis-label">${formatNumber(midLabelX, fmtX) || midLabelX}</span>`;
   html += `<span class="axis-label">${formatNumber(calcMaxX, fmtX) || calcMaxX}</span>`;
   html += `<span class="axis-title">${escapeHtml(xAxisTitle)}</span>`;

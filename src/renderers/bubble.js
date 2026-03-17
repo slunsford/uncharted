@@ -134,7 +134,7 @@ export function renderBubble(config) {
   const yAxisStyle = hasNegativeY ? ` style="--zero-position: ${zeroPctY.toFixed(2)}%"` : '';
   html += `<div class="chart-y-axis"${yAxisStyle}>`;
   html += `<span class="axis-label">${formatNumber(calcMaxY, fmtY) || calcMaxY}</span>`;
-  const midLabelY = hasNegativeY ? 0 : Math.round((calcMaxY + calcMinY) / 2);
+  const midLabelY = hasNegativeY ? 0 : (calcMaxY + calcMinY) / 2;
   html += `<span class="axis-label">${formatNumber(midLabelY, fmtY) || midLabelY}</span>`;
   html += `<span class="axis-label">${formatNumber(calcMinY, fmtY) || calcMinY}</span>`;
   if (yAxisTitle) {
