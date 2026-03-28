@@ -161,7 +161,7 @@ export function renderBubble(config) {
     dotsByCategory.get(dot.x).push({ ...dot, originalIndex: i });
   });
 
-  const fmtSize = _columns?.sizeFormat || {};
+  const fmtSize = _columns?.sizeFormat || format || {};
 
   // Render dots by category column
   categories.forEach((category, colIndex) => {
@@ -249,9 +249,8 @@ export function renderBubble(config) {
     const sizeValues = dots.map(d => d.rawSize).filter(v => v > 0);
     const minSizeVal = sizeValues.length ? Math.min(...sizeValues) : 0;
     const maxSizeVal = sizeValues.length ? Math.max(...sizeValues) : 0;
-    const fmtSizeLegend = _columns?.sizeFormat || {};
-    const minFormatted = formatNumber(minSizeVal, fmtSizeLegend) || minSizeVal;
-    const maxFormatted = formatNumber(maxSizeVal, fmtSizeLegend) || maxSizeVal;
+    const minFormatted = formatNumber(minSizeVal, fmtSize) || minSizeVal;
+    const maxFormatted = formatNumber(maxSizeVal, fmtSize) || maxSizeVal;
 
     html += `<div class="chart-size-legend">`;
     html += `<span class="chart-legend-title">${escapeHtml(sizeTitle)}</span>`;
